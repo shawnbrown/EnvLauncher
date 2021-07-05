@@ -38,3 +38,30 @@ V8888888 ##################" .oPYo. .oPYo. o   o   o .oPYo. oPY^'.oPYo. .oPYo8
          '########"          8
             '''''
 """
+
+
+if __name__ == '__main__':
+    import argparse
+    import pathlib
+    import sys
+
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--save', metavar='FILE', help='Save ASCII art to file.')
+
+    args = parser.parse_args()
+
+
+    if args.save:
+        path = pathlib.Path(args.save)
+        if path.exists():
+            sys.exit(f'Cannot save: {path} already exists')  # <- EXIT!
+
+        # Save ASCII art to a text file.
+        with open(path, 'w') as fh:
+            fh.write(ascii_art)
+        print(f'ASCII art saved to {path}')
+
+    else:
+        # Print the ASCII art to stdout.
+        print(ascii_art)
