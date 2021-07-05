@@ -47,21 +47,38 @@ if __name__ == '__main__':
 
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('--save', metavar='FILE', help='Save ASCII art to file.')
+    group = parser.add_mutually_exclusive_group()
+    group.add_argument('--test', action='store_true', help='Run test suite.')
+    group.add_argument('--save', metavar='FILE', help='Save ASCII art to file.')
 
     args = parser.parse_args()
 
 
-    if args.save:
-        path = pathlib.Path(args.save)
-        if path.exists():
-            sys.exit(f'Cannot save: {path} already exists')  # <- EXIT!
+    if args.test == False:
+        ##########################
+        # Save or print ASCII art.
+        ##########################
+        if args.save:
+            path = pathlib.Path(args.save)
+            if path.exists():
+                sys.exit(f'Cannot save: {path} already exists')  # <- EXIT!
 
-        # Save ASCII art to a text file.
-        with open(path, 'w') as fh:
-            fh.write(ascii_art)
-        print(f'ASCII art saved to {path}')
+            # Save ASCII art to a text file.
+            with open(path, 'w') as fh:
+                fh.write(ascii_art)
+            print(f'ASCII art saved to {path}')
 
-    else:
-        # Print the ASCII art to stdout.
-        print(ascii_art)
+        else:
+            # Print the ASCII art to stdout.
+            print(ascii_art)
+
+        sys.exit()  # <- EXIT!
+
+
+    #######################
+    # Define and run tests.
+    #######################
+    import unittest
+
+
+    unittest.main(argv=sys.argv[:1])
