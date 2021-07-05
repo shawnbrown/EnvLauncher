@@ -20,6 +20,11 @@ font (jazmine.flf). The banner text was then modified to better match
 the letter shapes used in the Python logo.
 """
 
+
+def apply_color(art_layer, color_layer, color_codes):
+    pass
+
+
 ascii_art = """
            .....                                     8
          d88888888.                               8  8
@@ -79,6 +84,11 @@ if __name__ == '__main__':
     # Define and run tests.
     #######################
     import unittest
+
+
+    class TestApplyColor(unittest.TestCase):
+        def test_apply_color(self):
+            pass
 
 
     unittest.main(argv=sys.argv[:1])
