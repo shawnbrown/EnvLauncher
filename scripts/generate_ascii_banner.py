@@ -25,6 +25,9 @@ from colorama import Fore, Style
 def apply_color(art_layer, color_layer, color_codes):
     rendered_characters = []
     prev_code = None
+    color_codes = dict(color_codes)  # Make a copy.
+    if ' ' not in color_codes:
+        color_codes[' '] = Style.RESET_ALL
 
     for character, code in zip(art_layer, color_layer):
         if prev_code != code:
@@ -112,6 +115,15 @@ if __name__ == '__main__':
                 {'b': Fore.BLUE, 'y': Fore.YELLOW},
             )
             self.assertEqual(result, '\x1b[34mHello\x1b[33mWorld')
+
+        def test_space_characters(self):
+            """If unspecified, spaces should get no style."""
+            result = apply_color(
+                'Hello World',
+                'bbbbb yyyyy',
+                {'b': Fore.BLUE, 'y': Fore.YELLOW},
+            )
+            self.assertEqual(result, '\x1b[34mHello\x1b[0m \x1b[33mWorld')
 
 
     unittest.main(argv=sys.argv[:1])
