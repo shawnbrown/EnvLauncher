@@ -19,6 +19,7 @@ The "python powered" text was generated with FIGlet using the Jazmine
 font (jazmine.flf). The banner text was then modified to better match
 the letter shapes used in the Python logo.
 """
+import itertools
 from colorama import Fore, Style
 
 
@@ -29,7 +30,8 @@ def apply_color(art_layer, color_layer, color_codes):
     if ' ' not in color_codes:
         color_codes[' '] = Style.RESET_ALL
 
-    for character, code in zip(art_layer, color_layer):
+    zipped = itertools.zip_longest(art_layer, color_layer, fillvalue=' ')
+    for character, code in zipped:
         if prev_code != code:
             rendered_characters.append(color_codes[code])
             prev_code = code
@@ -124,6 +126,17 @@ if __name__ == '__main__':
                 {'b': Fore.BLUE, 'y': Fore.YELLOW},
             )
             self.assertEqual(result, '\x1b[34mHello\x1b[0m \x1b[33mWorld')
+
+        def test_different_lengths(self):
+            longer_art = 'Hello World'
+            shorter_color = 'bbbbb'
+            result = apply_color(longer_art, shorter_color, {'b': Fore.BLUE})
+            self.assertEqual(result, '\x1b[34mHello\x1b[0m World')
+
+            shorter_art = 'Hello'
+            longer_color = 'yyyyyyyyyyy'
+            result = apply_color(shorter_art, longer_color, {'y': Fore.YELLOW})
+            self.assertEqual(result, '\x1b[33mHello      ')
 
 
     unittest.main(argv=sys.argv[:1])
