@@ -26,9 +26,6 @@ from colorama import Fore, Style
 def colorize_line(art_line, color_line, color_codes):
     rendered_characters = []
     prev_code = None
-    color_codes = dict(color_codes)  # Make a copy.
-    if ' ' not in color_codes:
-        color_codes[' '] = Style.RESET_ALL
 
     zipped = itertools.zip_longest(art_line, color_line, fillvalue=' ')
     for character, code in zipped:
@@ -43,6 +40,9 @@ def colorize_line(art_line, color_line, color_codes):
 def colorize_ascii_art(art_layer, color_layer, color_codes):
     art_lines = art_layer.split('\n')
     color_lines = color_layer.split('\n')
+    color_codes = dict(color_codes)  # Make a copy.
+    if ' ' not in color_codes:
+        color_codes[' '] = Style.RESET_ALL
 
     rendered_lines = []
     for art_line, color_line in zip(art_lines, color_lines):
@@ -129,19 +129,14 @@ if __name__ == '__main__':
             )
             self.assertEqual(result, '\x1b[34mHello\x1b[33mWorld')
 
-        def test_space_characters(self):
-            """If unspecified, spaces should get no style."""
-            result = colorize_line(
-                'Hello World',
-                'bbbbb yyyyy',
-                {'b': Fore.BLUE, 'y': Fore.YELLOW},
-            )
-            self.assertEqual(result, '\x1b[34mHello\x1b[0m \x1b[33mWorld')
-
         def test_different_lengths(self):
             longer_art = 'Hello World'
             shorter_color = 'bbbbb'
-            result = colorize_line(longer_art, shorter_color, {'b': Fore.BLUE})
+            result = colorize_line(
+                longer_art,
+                shorter_color,
+                {'b': Fore.BLUE, ' ': Style.RESET_ALL},
+            )
             self.assertEqual(result, '\x1b[34mHello\x1b[0m World')
 
             shorter_art = 'Hello'
@@ -157,7 +152,7 @@ if __name__ == '__main__':
         def test_colorize(self):
             art_layer = 'Hello World\nHello World\n'
             color_layer = 'bbbbb yyyyy\nyyyyy bbbbb\n'
-            color_codes = {'b': Fore.BLUE, 'y': Fore.YELLOW}
+            color_codes = {'b': Fore.BLUE, 'y': Fore.YELLOW, ' ': Style.RESET_ALL}
 
             result = colorize_ascii_art(art_layer, color_layer, color_codes)
             expected = (
@@ -165,6 +160,15 @@ if __name__ == '__main__':
                 '\x1b[33mHello\x1b[0m \x1b[34mWorld\n'
             )
             self.assertEqual(result, expected)
+
+        def test_space_characters(self):
+            """If unspecified, spaces should get no style."""
+            result = colorize_ascii_art(
+                'Hello World\n',
+                'bbbbb yyyyy\n',
+                {'b': Fore.BLUE, 'y': Fore.YELLOW},
+            )
+            self.assertEqual(result, '\x1b[34mHello\x1b[0m \x1b[33mWorld\n')
 
 
     unittest.main(argv=sys.argv[:1])
