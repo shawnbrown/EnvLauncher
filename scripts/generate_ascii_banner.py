@@ -19,10 +19,21 @@ The "python powered" text was generated with FIGlet using the Jazmine
 font (jazmine.flf). The banner text was then modified to better match
 the letter shapes used in the Python logo.
 """
+from colorama import Fore, Style
 
 
 def apply_color(art_layer, color_layer, color_codes):
-    pass
+    rendered_characters = []
+    prev_code = None
+
+    for character, code in zip(art_layer, color_layer):
+        if prev_code != code:
+            rendered_characters.append(color_codes[code])
+            prev_code = code
+        rendered_characters.append(character)
+
+    return ''.join(rendered_characters)
+
 
 
 ascii_art = """
@@ -87,8 +98,17 @@ if __name__ == '__main__':
 
 
     class TestApplyColor(unittest.TestCase):
-        def test_apply_color(self):
-            pass
+        def test_single_color(self):
+            result = apply_color('Hello', 'bbbbb', {'b': Fore.BLUE})
+            self.assertEqual(result, '\x1b[34mHello')
+
+        def test_multi_color(self):
+            result = apply_color(
+                'HelloWorld',
+                'bbbbbyyyyy',
+                {'b': Fore.BLUE, 'y': Fore.YELLOW},
+            )
+            self.assertEqual(result, '\x1b[34mHello\x1b[33mWorld')
 
 
     unittest.main(argv=sys.argv[:1])
