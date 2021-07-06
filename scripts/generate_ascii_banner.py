@@ -41,6 +41,10 @@ def colorize_line(art_line, color_line, color_codes):
 
 
 def colorize_ascii_art(art_layer, color_layer, color_codes):
+    if art_layer.startswith('\n') and color_layer.startswith('\n'):
+        art_layer = art_layer[1:]
+        color_layer = color_layer[1:]
+
     art_lines = art_layer.split('\n')
     color_lines = color_layer.split('\n')
     color_codes = dict(color_codes)  # Make a copy.
@@ -196,6 +200,24 @@ if __name__ == '__main__':
                 {'b': Fore.BLUE, 'y': Fore.YELLOW},
             )
             self.assertEqual(result, '\x1b[0m\x1b[34mHello\x1b[0m \x1b[33mWorld\x1b[0m\n')
+
+        def test_single_leading_newline(self):
+            """A leading newline in art and color layers should be removed."""
+            result = colorize_ascii_art(
+                '\nHello World\n',
+                '\nxxxxxxxxxxx\n',
+                {'x': Fore.BLUE},
+            )
+            self.assertEqual(result, '\x1b[0m\x1b[34mHello World\x1b[0m\n')
+
+        def test_multiple_leading_newlines(self):
+            """If there are multiple leading newlines, only remove one."""
+            result = colorize_ascii_art(
+                '\n\n\nHello World\n',
+                '\n\n\nxxxxxxxxxxx\n',
+                {'x': Fore.BLUE},
+            )
+            self.assertEqual(result, '\x1b[0m\n\n\x1b[34mHello World\x1b[0m\n')
 
 
     unittest.main(argv=sys.argv[:1])
