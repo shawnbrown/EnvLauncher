@@ -34,7 +34,10 @@ def colorize_line(art_line, color_line, color_codes):
             prev_code = code
         rendered_characters.append(character)
 
-    return ''.join(rendered_characters)
+    colored_line = ''.join(rendered_characters)
+    if colored_line and color_codes[prev_code] != Style.RESET_ALL:
+        colored_line = f'{colored_line}{Style.RESET_ALL}'
+    return colored_line
 
 
 def colorize_ascii_art(art_layer, color_layer, color_codes):
@@ -49,7 +52,10 @@ def colorize_ascii_art(art_layer, color_layer, color_codes):
         line = colorize_line(art_line, color_line, color_codes)
         rendered_lines.append(line)
 
-    return '\n'.join(rendered_lines)
+    ascii_art = '\n'.join(rendered_lines)
+    if not ascii_art.startswith(Style.RESET_ALL):
+        ascii_art = f'{Style.RESET_ALL}{ascii_art}'
+    return ascii_art
 
 
 ascii_art = """
@@ -117,9 +123,14 @@ if __name__ == '__main__':
         def setUp(self):
             self.addCleanup(lambda: sys.stdout.write(Style.RESET_ALL))
 
+        def test_no_color(self):
+            result = colorize_line('Hello', 'xxxxx', {'x': Style.RESET_ALL})
+            self.assertEqual(result, '\x1b[0mHello')
+
         def test_single_color(self):
+            """Should start with color code and end with reset."""
             result = colorize_line('Hello', 'bbbbb', {'b': Fore.BLUE})
-            self.assertEqual(result, '\x1b[34mHello')
+            self.assertEqual(result, '\x1b[34mHello\x1b[0m')
 
         def test_multi_color(self):
             result = colorize_line(
@@ -127,7 +138,7 @@ if __name__ == '__main__':
                 'bbbbbyyyyy',
                 {'b': Fore.BLUE, 'y': Fore.YELLOW},
             )
-            self.assertEqual(result, '\x1b[34mHello\x1b[33mWorld')
+            self.assertEqual(result, '\x1b[34mHello\x1b[33mWorld\x1b[0m')
 
         def test_different_lengths(self):
             longer_art = 'Hello World'
@@ -142,12 +153,28 @@ if __name__ == '__main__':
             shorter_art = 'Hello'
             longer_color = 'yyyyyyyyyyy'
             result = colorize_line(shorter_art, longer_color, {'y': Fore.YELLOW})
-            self.assertEqual(result, '\x1b[33mHello      ')
+            self.assertEqual(result, '\x1b[33mHello      \x1b[0m')
 
 
     class TestColorizeAsciiArt(unittest.TestCase):
         def setUp(self):
             self.addCleanup(lambda: sys.stdout.write(Style.RESET_ALL))
+
+        def test_style_isolation(self):
+            r"""Styles should be isolated with leading and trailing
+            resets when necessary (escape code \x1b[0m).
+            """
+            result = colorize_ascii_art('Hello', 'bbbbb', {'b': Fore.BLUE})
+            self.assertEqual(result, '\x1b[0m\x1b[34mHello\x1b[0m')
+
+        def test_no_isolation_needed(self):
+            """Style-reset codes should only be added where needed."""
+            result = colorize_ascii_art('Hello', 'xxxxx', {'x': Style.RESET_ALL})
+            msg = (
+                'Since the style is explicitly reset, there is no need'
+                'for additional style-reset codes.'
+            )
+            self.assertEqual(result, '\x1b[0mHello', msg=msg)
 
         def test_colorize(self):
             art_layer = 'Hello World\nHello World\n'
@@ -156,8 +183,8 @@ if __name__ == '__main__':
 
             result = colorize_ascii_art(art_layer, color_layer, color_codes)
             expected = (
-                '\x1b[34mHello\x1b[0m \x1b[33mWorld\n'
-                '\x1b[33mHello\x1b[0m \x1b[34mWorld\n'
+                '\x1b[0m\x1b[34mHello\x1b[0m \x1b[33mWorld\x1b[0m\n'
+                '\x1b[33mHello\x1b[0m \x1b[34mWorld\x1b[0m\n'
             )
             self.assertEqual(result, expected)
 
@@ -168,7 +195,7 @@ if __name__ == '__main__':
                 'bbbbb yyyyy\n',
                 {'b': Fore.BLUE, 'y': Fore.YELLOW},
             )
-            self.assertEqual(result, '\x1b[34mHello\x1b[0m \x1b[33mWorld\n')
+            self.assertEqual(result, '\x1b[0m\x1b[34mHello\x1b[0m \x1b[33mWorld\x1b[0m\n')
 
 
     unittest.main(argv=sys.argv[:1])
