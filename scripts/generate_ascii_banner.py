@@ -52,7 +52,8 @@ def colorize_ascii_art(art_layer, color_layer, color_codes):
         color_codes[' '] = Style.RESET_ALL
 
     rendered_lines = []
-    for art_line, color_line in zip(art_lines, color_lines):
+    zipped = itertools.zip_longest(art_lines, color_lines, fillvalue='')
+    for art_line, color_line in zipped:
         line = colorize_line(art_line, color_line, color_codes)
         rendered_lines.append(line)
 
@@ -218,6 +219,18 @@ if __name__ == '__main__':
                 {'x': Fore.BLUE},
             )
             self.assertEqual(result, '\x1b[0m\n\n\x1b[34mHello World\x1b[0m\n')
+
+        def test_mismatched_line_count(self):
+            """Should render all art and colors even if lengths are not
+            the same.
+            """
+            art_layer = 'Hello\nWorld\n'
+            color_layer = 'bbbbb'
+            color_codes = {'b': Fore.BLUE}
+
+            result = colorize_ascii_art(art_layer, color_layer, color_codes)
+            expected = '\x1b[0m\x1b[34mHello\x1b[0m\n\x1b[0mWorld\n'
+            self.assertEqual(result, expected)
 
 
     unittest.main(argv=sys.argv[:1])
