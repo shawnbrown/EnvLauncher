@@ -98,6 +98,9 @@ if __name__ == '__main__':
 
 
     class TestApplyColor(unittest.TestCase):
+        def setUp(self):
+            self.addCleanup(lambda: sys.stdout.write(Style.RESET_ALL))
+
         def test_single_color(self):
             result = apply_color('Hello', 'bbbbb', {'b': Fore.BLUE})
             self.assertEqual(result, '\x1b[34mHello')
