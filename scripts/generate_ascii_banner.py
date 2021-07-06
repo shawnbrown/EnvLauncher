@@ -73,7 +73,7 @@ def colorize_ascii_art(art_layer, color_layer, color_codes):
     return ascii_art
 
 
-ascii_art = """
+art_layer = """
            .....                                     8
          d88888888.                               8  8
         8  88888888                .oPYo. o    o o8P 8oPYo. .oPYo. odPYo.
@@ -92,6 +92,32 @@ V8888888 ##################" .oPYo. .oPYo. o   o   o .oPYo. oPY^'.oPYo. .oPYo8
             '''''
 """
 
+color_layer = """
+           BBBBB                                     g
+         BBBBBBBBBB                               g  g
+        B  BBBBBBBB                gggggg g    g ggg gggggg gggggg gggggg
+        BBBBBBBBBBB                g    g g    g  g  g    g g    g gg  gg
+      BBBBBBBBBBBBB                g    g g    g  g  g    g g    g g    g
+ BBBBBBBBBBBBBBBBBB YYYYYYY        gggggg gggggg  gg g    g gggggg g    g
+BBBBBBBBBBBBBBBBBBB YYYYYYYY       g           g
+BBBBBBBBBBBBBBBBBB YYYYYYYYY       g         ggg                             b
+BBBBBBBBB YYYYYYYYYYYYYYYYYY                                                 b
+BBBBBBBB YYYYYYYYYYYYYYYYYYY bbbbbb bbbbbb b   b   b bbbbbb bbbbbbbbbbb bbbbbb
+ BBBBBBB YYYYYYYYYYYYYYYYYY  b    b b    b bb bbb bb bbbbbb b    bbbbbb b    b
+         YYYYYYYYYYYYY       b    b b    b bbbbbbbbb bb     b    bb     b    b
+         YYYYYYYYYYY         bbbbbb bbbbbb  bbb bbb  bbbbbb b    bbbbbb bbbbbb
+         YYYYYYYY  Y         b
+         YYYYYYYYYY          b
+            YYYYY
+"""
+
+color_codes = {
+    'B': Style.BRIGHT + Fore.BLUE,
+    'Y': Style.BRIGHT + Fore.YELLOW,
+    'g': Style.DIM + Fore.WHITE,
+    'b': Style.NORMAL + Fore.BLUE,
+}
+
 
 if __name__ == '__main__':
     import argparse
@@ -107,22 +133,25 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
 
-    ##########################
-    # Save or print ASCII art.
-    ##########################
+    ################################
+    # Save or print color ASCII art.
+    ################################
     if args.test == False:
+        # Generate color ASCII art.
+        ascii_art = colorize_ascii_art(art_layer, color_layer, color_codes)
+
+        # Save ASCII art to a text file.
         if args.save:
             path = pathlib.Path(args.save)
             if path.exists():
                 sys.exit(f'Cannot save: {path} already exists')  # <- EXIT!
 
-            # Save ASCII art to a text file.
             with open(path, 'w') as fh:
                 fh.write(ascii_art)
             print(f'ASCII art saved to {path}')
 
+        # Print the ASCII art to stdout.
         else:
-            # Print the ASCII art to stdout.
             print(ascii_art)
 
         sys.exit()  # <- EXIT!
