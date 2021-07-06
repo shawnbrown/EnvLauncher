@@ -51,6 +51,16 @@ def colorize_ascii_art(art_layer, color_layer, color_codes):
     if ' ' not in color_codes:
         color_codes[' '] = Style.RESET_ALL
 
+    codes_used = set(color_layer)
+    codes_used.discard('\n')
+    undefined_codes = codes_used - set(color_codes.keys())
+    if undefined_codes:
+        msg = (
+            f'color_layer contains codes not defined in color_codes: '
+            f'{", ".join(sorted(undefined_codes))}'
+        )
+        raise ValueError(msg)
+
     rendered_lines = []
     zipped = itertools.zip_longest(art_lines, color_lines, fillvalue='')
     for art_line, color_line in zipped:
@@ -164,6 +174,17 @@ if __name__ == '__main__':
     class TestColorizeAsciiArt(unittest.TestCase):
         def setUp(self):
             self.addCleanup(lambda: sys.stdout.write(Style.RESET_ALL))
+
+        def test_undefined_color_codes(self):
+            regex = \
+                'color_layer contains codes not defined in color_codes: x, y'
+
+            with self.assertRaisesRegex(ValueError, regex):
+                result = colorize_ascii_art(
+                    art_layer='Hello',
+                    color_layer='bbbyx',  # <- x and y are undefined in color_codes
+                    color_codes={'b': Fore.BLUE, 'r': Fore.RED},
+                )
 
         def test_style_isolation(self):
             r"""Styles should be isolated with leading and trailing
