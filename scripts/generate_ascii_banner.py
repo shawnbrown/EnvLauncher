@@ -40,6 +40,17 @@ def colorize_line(art_line, color_line, color_codes):
     return ''.join(rendered_characters)
 
 
+def colorize_ascii_art(art_layer, color_layer, color_codes):
+    art_lines = art_layer.split('\n')
+    color_lines = color_layer.split('\n')
+
+    rendered_lines = []
+    for art_line, color_line in zip(art_lines, color_lines):
+        line = colorize_line(art_line, color_line, color_codes)
+        rendered_lines.append(line)
+
+    return '\n'.join(rendered_lines)
+
 
 ascii_art = """
            .....                                     8
@@ -137,6 +148,23 @@ if __name__ == '__main__':
             longer_color = 'yyyyyyyyyyy'
             result = colorize_line(shorter_art, longer_color, {'y': Fore.YELLOW})
             self.assertEqual(result, '\x1b[33mHello      ')
+
+
+    class TestColorizeAsciiArt(unittest.TestCase):
+        def setUp(self):
+            self.addCleanup(lambda: sys.stdout.write(Style.RESET_ALL))
+
+        def test_colorize(self):
+            art_layer = 'Hello World\nHello World\n'
+            color_layer = 'bbbbb yyyyy\nyyyyy bbbbb\n'
+            color_codes = {'b': Fore.BLUE, 'y': Fore.YELLOW}
+
+            result = colorize_ascii_art(art_layer, color_layer, color_codes)
+            expected = (
+                '\x1b[34mHello\x1b[0m \x1b[33mWorld\n'
+                '\x1b[33mHello\x1b[0m \x1b[34mWorld\n'
+            )
+            self.assertEqual(result, expected)
 
 
     unittest.main(argv=sys.argv[:1])
