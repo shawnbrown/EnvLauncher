@@ -75,10 +75,10 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
 
+    ##########################
+    # Save or print ASCII art.
+    ##########################
     if args.test == False:
-        ##########################
-        # Save or print ASCII art.
-        ##########################
         if args.save:
             path = pathlib.Path(args.save)
             if path.exists():
