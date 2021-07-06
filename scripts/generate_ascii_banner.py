@@ -23,14 +23,14 @@ import itertools
 from colorama import Fore, Style
 
 
-def apply_color(art_layer, color_layer, color_codes):
+def colorize_line(art_line, color_line, color_codes):
     rendered_characters = []
     prev_code = None
     color_codes = dict(color_codes)  # Make a copy.
     if ' ' not in color_codes:
         color_codes[' '] = Style.RESET_ALL
 
-    zipped = itertools.zip_longest(art_layer, color_layer, fillvalue=' ')
+    zipped = itertools.zip_longest(art_line, color_line, fillvalue=' ')
     for character, code in zipped:
         if prev_code != code:
             rendered_characters.append(color_codes[code])
@@ -102,16 +102,16 @@ if __name__ == '__main__':
     import unittest
 
 
-    class TestApplyColor(unittest.TestCase):
+    class TestColorizeLine(unittest.TestCase):
         def setUp(self):
             self.addCleanup(lambda: sys.stdout.write(Style.RESET_ALL))
 
         def test_single_color(self):
-            result = apply_color('Hello', 'bbbbb', {'b': Fore.BLUE})
+            result = colorize_line('Hello', 'bbbbb', {'b': Fore.BLUE})
             self.assertEqual(result, '\x1b[34mHello')
 
         def test_multi_color(self):
-            result = apply_color(
+            result = colorize_line(
                 'HelloWorld',
                 'bbbbbyyyyy',
                 {'b': Fore.BLUE, 'y': Fore.YELLOW},
@@ -120,7 +120,7 @@ if __name__ == '__main__':
 
         def test_space_characters(self):
             """If unspecified, spaces should get no style."""
-            result = apply_color(
+            result = colorize_line(
                 'Hello World',
                 'bbbbb yyyyy',
                 {'b': Fore.BLUE, 'y': Fore.YELLOW},
@@ -130,12 +130,12 @@ if __name__ == '__main__':
         def test_different_lengths(self):
             longer_art = 'Hello World'
             shorter_color = 'bbbbb'
-            result = apply_color(longer_art, shorter_color, {'b': Fore.BLUE})
+            result = colorize_line(longer_art, shorter_color, {'b': Fore.BLUE})
             self.assertEqual(result, '\x1b[34mHello\x1b[0m World')
 
             shorter_art = 'Hello'
             longer_color = 'yyyyyyyyyyy'
-            result = apply_color(shorter_art, longer_color, {'y': Fore.YELLOW})
+            result = colorize_line(shorter_art, longer_color, {'y': Fore.YELLOW})
             self.assertEqual(result, '\x1b[33mHello      ')
 
 
