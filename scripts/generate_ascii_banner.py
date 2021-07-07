@@ -115,7 +115,7 @@ color_codes = {
     'B': Style.BRIGHT + Fore.BLUE,
     'Y': Style.BRIGHT + Fore.YELLOW,
     'g': Style.DIM + Fore.WHITE,
-    'b': Style.NORMAL + Fore.BLUE,
+    'b': Fore.BLUE,
 }
 
 
