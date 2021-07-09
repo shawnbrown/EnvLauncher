@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # Copyright (C) 2021 Shawn Brown.
 #
 # This file is part of EnvLauncher.
