@@ -140,43 +140,81 @@ if __name__ == '__main__':
     import argparse
     import pathlib
     import sys
+    import textwrap
 
+    examples = textwrap.dedent("""
+        examples:
+          Print ASCII banner to stdout:
+            python %(prog)s
 
-    parser = argparse.ArgumentParser()
-    group = parser.add_mutually_exclusive_group()
-    group.add_argument('--test', action='store_true', help='Run test suite.')
-    group.add_argument('--save', metavar='FILE', help='Save ASCII art to file.')
+          Save ASCII banner to file:
+            python %(prog)s save output.ascii
+
+          Run test suite:
+            python %(prog)s test
+
+          Run test suite with verbose flag:
+            python %(prog)s test -v
+    """)
+    parser = argparse.ArgumentParser(
+        epilog=examples, formatter_class=argparse.RawDescriptionHelpFormatter)
+    subparsers = parser.add_subparsers(
+        title='sub-commands', dest='command', help='available sub-commands')
+
+    parser_test = subparsers.add_parser('save', help='Save ASCII art to file.')
+    parser_test.add_argument('file', help='filename to save to', metavar='FILE')
+
+    # This subparser mimics unittest's arguments.
+    parser_test = subparsers.add_parser('test', help='Run test suite.')
+    parser_test.add_argument('-v', '--verbose', action='store_const', const=2,
+                             help='Verbose output', dest='verbosity')
+    parser_test.add_argument('-q', '--quiet', action='store_const', const=0,
+                             help='Quiet output', dest='verbosity')
+    parser_test.add_argument('--locals', action='store_true',
+                             help='Show local variables in tracebacks',
+                             dest='tb_locals')
+    parser_test.add_argument('-f', '--failfast', action='store_true',
+                             help='Stop on first fail or error', dest='failfast')
+    parser_test.add_argument('-c', '--catch', action='store_true',
+                             help='Catch Ctrl-C and display results so far')
+    parser_test.add_argument('-b', '--buffer', action='store_true',
+                             help='Buffer stdout and stderr during tests',
+                             dest='buffer')
 
     args = parser.parse_args()
 
 
-    ################################
-    # Save or print color ASCII art.
-    ################################
-    if args.test == False:
-        # Generate color ASCII art.
+    ########################
+    # Print color ASCII art.
+    ########################
+    if args.command is None:
         ascii_art = colorize_ascii_art(art_layer, color_layer, color_codes)
+        print(ascii_art)
+        sys.exit()  # <- EXIT!
 
-        # Save ASCII art to a text file.
-        if args.save:
-            path = pathlib.Path(args.save)
-            if path.exists():
-                sys.exit(f'Cannot save: {path} already exists')  # <- EXIT!
 
-            with open(path, 'w') as fh:
-                fh.write(ascii_art)
-            print(f'ASCII art saved to {path}')
+    #######################
+    # Save color ASCII art.
+    #######################
+    if args.command == 'save':
+        path = pathlib.Path(args.file)
+        if path.exists():
+            sys.exit(f'Cannot save: {path} already exists')  # <- EXIT!
 
-        # Print the ASCII art to stdout.
-        else:
-            print(ascii_art)
-
+        ascii_art = colorize_ascii_art(art_layer, color_layer, color_codes)
+        with open(path, 'w') as fh:
+            fh.write(ascii_art)
+        print(f'ASCII art saved to {path}')
         sys.exit()  # <- EXIT!
 
 
     #######################
     # Define and run tests.
     #######################
+    if args.command != 'test':
+        msg = 'All commands other than "test" should be handled already.'
+        raise Exception(msg)
+
     import unittest
 
 
@@ -300,4 +338,6 @@ if __name__ == '__main__':
             self.assertEqual(result, expected)
 
 
-    unittest.main(argv=sys.argv[:1])
+    argv = list(sys.argv)  # Make a copy.
+    argv.remove('test')
+    unittest.main(argv=argv)  # Pass remaining args to unittest.
