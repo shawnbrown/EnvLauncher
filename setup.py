@@ -33,6 +33,11 @@ if __name__ == '__main__':
         author_email='shawnbrown@users.noreply.github.com',
 
         # Other fields:
+        entry_points={
+            'console_scripts': [
+                'envlauncher = envlauncher:launch_environment',
+            ],
+        },
         python_requires='>=3.6',
         license='GNU General Public License v3 (GPLv3)',
         classifiers=[
