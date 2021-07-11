@@ -23,6 +23,7 @@ import setuptools
 def get_long_description(readmepath):
     with open(readmepath) as file:
         long_description = file.read()
+    return long_description
 
 
 if __name__ == '__main__':
