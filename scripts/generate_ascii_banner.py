@@ -223,11 +223,12 @@ if __name__ == '__main__':
             self.addCleanup(lambda: sys.stdout.write(Style.RESET_ALL))
 
         def test_no_color(self):
+            """Should start with a leading reset code."""
             result = colorize_line('Hello', 'xxxxx', {'x': Style.RESET_ALL})
             self.assertEqual(result, '\x1b[0mHello')
 
         def test_single_color(self):
-            """Should start with color code and end with reset."""
+            """Should start with color code and end with a reset."""
             result = colorize_line('Hello', 'bbbbb', {'b': Fore.BLUE})
             self.assertEqual(result, '\x1b[34mHello\x1b[0m')
 
@@ -239,19 +240,26 @@ if __name__ == '__main__':
             )
             self.assertEqual(result, '\x1b[34mHello\x1b[33mWorld\x1b[0m')
 
-        def test_different_lengths(self):
-            longer_art = 'Hello World'
-            shorter_color = 'bbbbb'
+        def test_art_longer_than_color(self):
+            """Extra art characters should get no styles (reset code)."""
+            art_line = 'Hello World'  # <- 11 characters (6 extra)
+            color_line = 'bbbbb'      # <- 5 codes
             result = colorize_line(
-                longer_art,
-                shorter_color,
+                art_line,
+                color_line,
                 {'b': Fore.BLUE, ' ': Style.RESET_ALL},
             )
             self.assertEqual(result, '\x1b[34mHello\x1b[0m World')
 
-            shorter_art = 'Hello'
-            longer_color = 'yyyyyyyyyyy'
-            result = colorize_line(shorter_art, longer_color, {'y': Fore.YELLOW})
+        def test_art_shorter_than_color(self):
+            """Extra style codes should be applied to space characters."""
+            art_line = 'Hello'          # <- 5 characters
+            color_line = 'yyyyyyyyyyy'  # <- 11 codes (6 extra)
+            result = colorize_line(
+                art_line,
+                color_line,
+                {'y': Fore.YELLOW},
+            )
             self.assertEqual(result, '\x1b[33mHello      \x1b[0m')
 
 
@@ -272,7 +280,11 @@ if __name__ == '__main__':
 
         def test_style_isolation(self):
             r"""Styles should be isolated with leading and trailing
-            resets when necessary (escape code \x1b[0m).
+            resets when necessary.
+
+            Without a leading reset (code \x1b[0m), earlier "BRIGHT"
+            or "DIM" styles, or earlier background color codes, would
+            bleed into later codes that only define forground color.
             """
             result = colorize_ascii_art('Hello', 'bbbbb', {'b': Fore.BLUE})
             self.assertEqual(result, '\x1b[0m\x1b[34mHello\x1b[0m')
@@ -284,7 +296,7 @@ if __name__ == '__main__':
                 'Since the style is explicitly reset, there is no need'
                 'for additional style-reset codes.'
             )
-            self.assertEqual(result, '\x1b[0mHello', msg=msg)
+            self.assertEqual(result, '\x1b[0mHello')
 
         def test_colorize(self):
             art_layer = 'Hello World\nHello World\n'
@@ -305,29 +317,32 @@ if __name__ == '__main__':
                 'bbbbb yyyyy\n',
                 {'b': Fore.BLUE, 'y': Fore.YELLOW},
             )
-            self.assertEqual(result, '\x1b[0m\x1b[34mHello\x1b[0m \x1b[33mWorld\x1b[0m\n')
+            expected = '\x1b[0m\x1b[34mHello\x1b[0m \x1b[33mWorld\x1b[0m\n'
+            self.assertEqual(result, expected)
 
         def test_single_leading_newline(self):
             """A leading newline in art and color layers should be removed."""
             result = colorize_ascii_art(
-                '\nHello World\n',
-                '\nxxxxxxxxxxx\n',
+                '\nHello World\n',  # <- starts with newline
+                '\nxxxxxxxxxxx\n',  # <- starts with newline
                 {'x': Fore.BLUE},
             )
-            self.assertEqual(result, '\x1b[0m\x1b[34mHello World\x1b[0m\n')
+            expected = '\x1b[0m\x1b[34mHello World\x1b[0m\n'  # <- no starting newline
+            self.assertEqual(result, expected)
 
         def test_multiple_leading_newlines(self):
             """If there are multiple leading newlines, only remove one."""
             result = colorize_ascii_art(
-                '\n\n\nHello World\n',
-                '\n\n\nxxxxxxxxxxx\n',
+                '\n\n\nHello World\n',  # <- starts with 3 newlines
+                '\n\n\nxxxxxxxxxxx\n',  # <- starts with 3 newlines
                 {'x': Fore.BLUE},
             )
-            self.assertEqual(result, '\x1b[0m\n\n\x1b[34mHello World\x1b[0m\n')
+            expected = '\x1b[0m\n\n\x1b[34mHello World\x1b[0m\n'  # <- 2 newlines
+            self.assertEqual(result, expected)
 
         def test_mismatched_line_count(self):
-            """Should render all art and colors even if lengths are not
-            the same.
+            """Should render all art and colors even if they have a
+            different number of lines.
             """
             art_layer = 'Hello\nWorld\n'
             color_layer = 'bbbbb'
@@ -335,7 +350,9 @@ if __name__ == '__main__':
 
             result = colorize_ascii_art(art_layer, color_layer, color_codes)
             expected = '\x1b[0m\x1b[34mHello\x1b[0m\n\x1b[0mWorld\n'
-            self.assertEqual(result, expected)
+            msg = ('The second line of art_layer receives no styles because '
+                   'color_layer only contains one row.')
+            self.assertEqual(result, expected, msg=msg)
 
 
     argv = list(sys.argv)  # Make a copy.
