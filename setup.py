@@ -15,7 +15,14 @@
 # You should have received a copy of the GNU General Public License
 # along with EnvLauncher.  If not, see <https://www.gnu.org/licenses/>.
 
+"""EnvLauncher: Launch Python development environments."""
+
 import setuptools
+
+
+def get_long_description(readmepath):
+    with open(readmepath) as file:
+        long_description = file.read()
 
 
 if __name__ == '__main__':
@@ -33,11 +40,14 @@ if __name__ == '__main__':
         author_email='shawnbrown@users.noreply.github.com',
 
         # Other fields:
+        long_description=get_long_description('README.md'),
+        long_description_content_type='text/markdown',
         entry_points={
             'console_scripts': [
                 'envlauncher = envlauncher:launch_environment',
             ],
         },
+        install_requires=[],  # <- No additional dependencies!
         python_requires='>=3.6',
         license='GNU General Public License v3 (GPLv3)',
         classifiers=[
