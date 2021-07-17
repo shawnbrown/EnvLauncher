@@ -21,7 +21,7 @@ import tempfile
 
 
 def launch_environment():
-    """Launch a gnome-terminal and activate an development environment."""
+    """Launch a gnome-terminal and activate a development environment."""
     parser = argparse.ArgumentParser()
     parser.add_argument('script', help='Path to the environment activation script.')
     parser.add_argument('--dir', help='Working directory.')
