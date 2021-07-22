@@ -36,7 +36,7 @@ def parse_args(args=None):
     )
     parser.add_argument(
         '--directory',
-        help=f'working directory path (default ~)',
+        help='working directory path',
         metavar='PATH',
     )
     parser.add_argument(
