@@ -20,6 +20,33 @@ import subprocess
 import tempfile
 
 
+def parse_args(args=None):
+    """Parse command line arguments."""
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        '--activate',
+        help='environment activation script',
+        metavar='SCRIPT',
+    )
+    parser.add_argument(
+        '--directory',
+        help=f'working directory path (default ~)',
+        metavar='PATH',
+    )
+    parser.add_argument(
+        '--preferences',
+        action='store_true',
+        help='show preferences window',
+    )
+    parser.add_argument(
+        '--reset-all',
+        action='store_true',
+        help='reset all preferences',
+    )
+    args = parser.parse_args(args=args)
+    return args
+
+
 def launch_environment():
     """Launch a gnome-terminal and activate a development environment."""
     parser = argparse.ArgumentParser()
