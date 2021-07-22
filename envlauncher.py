@@ -63,16 +63,11 @@ def parse_args(args=None):
     return args
 
 
-def launch_environment():
+def launch_environment(script_path, working_dir):
     """Launch a gnome-terminal and activate a development environment."""
-    parser = argparse.ArgumentParser()
-    parser.add_argument('script', help='Path to the environment activation script.')
-    parser.add_argument('--dir', help='Working directory.')
-    args = parser.parse_args()
-
     rcfile_lines = [
-        f'source {args.script}',
-        f'cd {args.dir}' if args.dir else '',
+        f'source {script_path}',
+        f'cd {working_dir}' if working_dir else '',
     ]
 
     with tempfile.NamedTemporaryFile(mode='w+') as fh:
@@ -84,5 +79,13 @@ def launch_environment():
         process.wait(10)
 
 
+def main():
+    args = parse_args()
+    if args.activate:
+        launch_environment(args.activate, args.directory)
+    elif args.preferences:
+        pass
+
+
 if __name__ == '__main__':
-    launch_environment()
+    main()
