@@ -22,7 +22,13 @@ import tempfile
 
 def parse_args(args=None):
     """Parse command line arguments."""
-    parser = argparse.ArgumentParser()
+    usage = (
+        '\n'
+        '  %(prog)s [-h]\n'
+        '  %(prog)s --activate SCRIPT [--directory PATH]\n'
+        '  %(prog)s --preferences [--reset-all]'
+    )
+    parser = argparse.ArgumentParser(usage=usage)
     parser.add_argument(
         '--activate',
         help='environment activation script',
@@ -43,7 +49,17 @@ def parse_args(args=None):
         action='store_true',
         help='reset all preferences',
     )
+
     args = parser.parse_args(args=args)
+
+    # Check that arguments conform to `usage` examples.
+    if args.activate and args.preferences:
+        parser.error('argument --activate cannot be used with --preferences')
+    if args.directory and not args.activate:
+        parser.error('argument --activate is required when using --directory')
+    if args.reset_all and not args.preferences:
+        parser.error('argument --preferences is required when using --reset-all')
+
     return args
 
 
