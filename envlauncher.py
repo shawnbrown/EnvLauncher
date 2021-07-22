@@ -63,7 +63,7 @@ def parse_args(args=None):
     return args
 
 
-def launch_environment(script_path, working_dir):
+def activate_environment(script_path, working_dir):
     """Launch a gnome-terminal and activate a development environment."""
     rcfile_lines = [
         f'source {script_path}',
@@ -82,9 +82,7 @@ def launch_environment(script_path, working_dir):
 def main():
     args = parse_args()
     if args.activate:
-        launch_environment(args.activate, args.directory)
-    elif args.preferences:
-        pass
+        activate_environment(args.activate, args.directory)
 
 
 if __name__ == '__main__':
