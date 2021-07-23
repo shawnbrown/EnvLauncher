@@ -27,6 +27,6 @@ The CPython repository includes icons that could serve as a good template
 
 <!-- icon height and width set to actual image sizes -->
 
-<img src="./cpython-python.svg" width="32" height="32" /> <img src="./cpython-pythonw.svg" width="32" height="32" /> <img src="./cpython-launcher.svg" width="32" height="32" /> <img src="./cpython-py.svg" width="32" height="32" /> <img src="./cpython-pyc.svg" width="32" height="32" /> <img src="./cpython-pyd.svg" width="32" height="32" /> <img src="./cpython-setup.svg" width="32" height="32" />
+<img src="./cpython-python.svg" width="128" height="128" /> <img src="./cpython-pythonw.svg" width="32" height="32" /> <img src="./cpython-launcher.svg" width="32" height="32" /> <img src="./cpython-py.svg" width="32" height="32" /> <img src="./cpython-pyc.svg" width="32" height="32" /> <img src="./cpython-pyd.svg" width="32" height="32" /> <img src="./cpython-setup.svg" width="32" height="32" />
 
 <img src="./cpython-logo.svg" width="238" height="237" />
