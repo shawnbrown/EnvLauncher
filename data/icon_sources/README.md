@@ -18,3 +18,15 @@ and [Creating Icons](https://developer.gnome.org/hig/stable/icon-design.html)):
 * Shadows can be drawn internally, with the light source coming from straight above.
 * Icons should use the **GNOME icon color palette** ([gnome-colors.svg](./gnome-colors.svg)).
 * Symbolic icons should be 16x16px SVG images and can be scaled by multiples of 16 (32x32, 64x64, 128x128).
+
+
+### CPython Icons
+
+The CPython repository includes icons that could serve as a good template
+([cpython/PC/icons/](https://github.com/python/cpython/tree/main/PC/icons)):
+
+<!-- icon height and width set to actual image sizes -->
+
+<img src="./cpython-python.svg" width="32" height="32" /> <img src="./cpython-pythonw.svg" width="32" height="32" /> <img src="./cpython-launcher.svg" width="32" height="32" /> <img src="./cpython-py.svg" width="32" height="32" /> <img src="./cpython-pyc.svg" width="32" height="32" /> <img src="./cpython-pyd.svg" width="32" height="32" /> <img src="./cpython-setup.svg" width="32" height="32" />
+
+<img src="./cpython-logo.svg" width="238" height="237" />
