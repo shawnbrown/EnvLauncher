@@ -1,0 +1,23 @@
+[Desktop Entry]
+Name=EnvLauncher
+Comment=Launch a Python development environment
+Keywords=venv;virtual;virtualenv;conda;environment;launcher;python;
+TryExec=envlauncher
+#Exec=envlauncher --activate "~/Projects/.venv39/bin/activate" --directory "~/Projects/"
+Exec=gedit --standalone --class com.github.shawnbrown.EnvLauncher %k
+Icon=com.github.shawnbrown.EnvLauncher
+Type=Application
+MimeType=
+Categories=Development;
+StartupNotify=true
+StartupWMClass=com.github.shawnbrown.EnvLauncher
+#Actions=actn1;preferences;
+Actions=preferences;
+
+#[Desktop Action actn1]
+#Name=Python 3.9
+#Exec=envlauncher --activate "~/Projects/.venv39/bin/activate" --directory "~/Projects/"
+
+[Desktop Action preferences]
+Name=Preferences
+Exec=gedit --standalone --class com.github.shawnbrown.EnvLauncher %k
