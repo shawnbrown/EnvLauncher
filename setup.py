@@ -45,7 +45,7 @@ if __name__ == '__main__':
         long_description_content_type='text/markdown',
         entry_points={
             'console_scripts': [
-                'envlauncher = envlauncher:launch_environment',
+                'envlauncher = envlauncher:main',
             ],
         },
         install_requires=[],  # <- No additional dependencies!
