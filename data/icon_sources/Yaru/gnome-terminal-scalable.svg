@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="128" height="128" version="1.1" viewBox="0 0 33.867 33.867" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+ <defs>
+  <filter id="filter4346" x="-.014454" y="-.011357" width="1.0289" height="1.0227" color-interpolation-filters="sRGB">
+   <feGaussianBlur stdDeviation="2.120027"/>
+  </filter>
+  <linearGradient id="linearGradient4358" x1="88" x2="488" y1="88" y2="488" gradientTransform="rotate(-90 287.99 298)" gradientUnits="userSpaceOnUse">
+   <stop stop-opacity=".58824" offset="0"/>
+   <stop stop-opacity="0" offset=".88"/>
+   <stop offset="1"/>
+  </linearGradient>
+  <filter id="filter4380" x="-.057817" y="-.045429" width="1.1156" height="1.0909" color-interpolation-filters="sRGB">
+   <feGaussianBlur stdDeviation="8.4801079"/>
+  </filter>
+  <linearGradient id="linearGradient918" x1="252.12" x2="21.425" y1="210.69" y2="210.69" gradientUnits="userSpaceOnUse">
+   <stop offset="0"/>
+   <stop stop-opacity="0" offset="1"/>
+  </linearGradient>
+  <filter id="filter920" x="-.051592" y="-.071644" width="1.1032" height="1.1433" color-interpolation-filters="sRGB">
+   <feGaussianBlur stdDeviation="3.1384947"/>
+  </filter>
+ </defs>
+ <g transform="matrix(.13229 0 0 .13229 -3.1748 -3.7035)" enable-background="new">
+  <g>
+   <path transform="matrix(0 .5 -.5 0 301 13.003)" d="m189.84 74c-70.593 0-78.189 7.2508-77.843 77.987v146.01 146.01c-0.34598 70.736 7.2498 77.987 77.843 77.987h196.31c70.593 0 76.007-7.2738 77.843-77.987v-146.01-146.01c0-70.737-7.2498-77.987-77.843-77.987z" color="#000000" enable-background="accumulate" filter="url(#filter4346)" opacity=".1"/>
+   <path transform="matrix(0 .5 -.5 0 301 13.003)" d="m189.84 74c-70.593 0-78.189 7.2508-77.843 77.987v146.01 146.01c-0.34598 70.736 7.2498 77.987 77.843 77.987h196.31c70.593 0 77.843-7.25 77.843-77.987v-146.01-146.01c0-70.737-7.2498-77.987-77.843-77.987z" color="#000000" enable-background="accumulate" fill="url(#linearGradient4358)" filter="url(#filter4380)" opacity=".3"/>
+   <path d="m266 105.81c0-36.099-3.6902-39.983-39.69-39.806h-74.31-74.31c-36-0.17692-39.69 3.7073-39.69 39.806v100.39c0 36.099 3.6897 39.806 39.69 39.806h74.31 74.31c36 0 39.69-3.7073 39.69-39.806z" color="#000000" enable-background="accumulate" opacity=".1"/>
+   <path d="m264 205.08c0 35.297-3.6254 39.095-38.994 38.922h-73.006-73.006c-35.368 0.17299-38.994-3.6249-38.994-38.922v-98.157c0-35.297 3.625-38.922 38.994-38.922h73.006 73.006c35.369 0 38.994 3.6249 38.994 38.922z" color="#000000" enable-background="accumulate" fill="#4d4d4d"/>
+   <path d="m78.99 67.998c-35.369 0-38.992 3.6232-38.992 38.92v98.158c0 0.0882 0.0019 0.16224 2e-3 0.25v-96.41c-4.7e-5 -35.297 3.6256-38.922 38.994-38.922h73.006 73.006c35.28 0 38.974 3.621 38.992 38.672v-1.748c0-35.297-3.6256-38.92-38.994-38.92h-73.006z" color="#000000" enable-background="accumulate" fill="#fff" opacity=".3"/>
+   <path d="m39.998 203.08v2c0 35.297 3.6241 39.095 38.992 38.922h73.008 73.006c35.368 0.17299 38.994-3.6252 38.994-38.922v-2c0 35.297-3.626 39.095-38.994 38.922h-73.006-73.008c-35.368 0.17299-38.992-3.6252-38.992-38.922z" color="#000000" enable-background="accumulate" opacity=".2"/>
+   <path d="m39.998 148v57.076c0 35.297 3.6241 39.095 38.992 38.922h73.008 73.006c35.368 0.17299 38.994-3.6252 38.994-38.922v-57.076z" color="#000000" enable-background="accumulate" fill="#fff" opacity=".05"/>
+  </g>
+  <path transform="matrix(.52016 0 0 .52161 20.855 22.1)" d="m110.86 138-4.9353 14.806 50.1 20.04-50.1 20.04 4.9353 14.806 64.458-27.219v-15.254zm64.366 90.031v15.105h76.699v-15.105z" enable-background="new" fill="url(#linearGradient918)" filter="url(#filter920)" opacity=".5"/>
+  <path d="m78.519 93.039-2.5671 7.7228 26.06 10.453-26.06 10.453 2.5671 7.7228 33.528-14.197v-7.9568zm33.481 46.961v8h40v-8z" enable-background="new" fill="#f2f2f2"/>
+  <path d="m78.519 93.039-2.5673 7.7233 0.3058 0.12225 2.2615-6.8023 33.528 14.198v-1.0432zm22.192 18.697-24.76 9.9319 0.3058 0.92096 25.754-10.331zm11.288 28.264v1.0432h40v-1.0432z" enable-background="new" fill="#fff"/>
+ </g>
+</svg>
