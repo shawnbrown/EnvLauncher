@@ -51,7 +51,8 @@ if __name__ == '__main__':
         data_files = [
             ('share/applications', ['data/com.github.shawnbrown.EnvLauncher.desktop']),
             ('share/icons/hicolor/scalable/apps', ['data/hicolor/com.github.shawnbrown.EnvLauncher.svg']),
-            #('share/icons/Yaru/scalable/apps', ['data/Yaru/com.github.shawnbrown.EnvLauncher.svg']),
+            ('share/icons/Yaru/48x48/apps', ['data/Yaru/48x48/com.github.shawnbrown.EnvLauncher.svg']),
+            ('share/icons/Yaru/scalable/apps', ['data/Yaru/scalable/com.github.shawnbrown.EnvLauncher.svg']),
         ],
         install_requires=[],  # <- No additional dependencies!
         python_requires='>=3.6',
