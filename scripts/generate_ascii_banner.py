@@ -57,10 +57,13 @@ def colorize_line(art_line, color_line, color_codes):
     return colored_line
 
 
-def colorize_ascii_art(art_layer, color_layer, color_codes):
+def colorize_ascii_art(art_layer, color_layer, color_codes, nocolor=False):
     if art_layer.startswith('\n') and color_layer.startswith('\n'):
         art_layer = art_layer[1:]
         color_layer = color_layer[1:]
+
+    if nocolor:
+        return art_layer  # <- EXIT!
 
     art_lines = art_layer.split('\n')
     color_lines = color_layer.split('\n')
@@ -158,6 +161,10 @@ if __name__ == '__main__':
     """)
     parser = argparse.ArgumentParser(
         epilog=examples, formatter_class=argparse.RawDescriptionHelpFormatter)
+
+    parser.add_argument('--nocolor', action='store_true',
+                        help='display plain ASCII art witout colors')
+
     subparsers = parser.add_subparsers(
         title='sub-commands', dest='command', help='available sub-commands')
 
@@ -188,7 +195,8 @@ if __name__ == '__main__':
     # Print color ASCII art.
     ########################
     if args.command is None:
-        ascii_art = colorize_ascii_art(art_layer, color_layer, color_codes)
+        ascii_art = colorize_ascii_art(art_layer, color_layer, color_codes,
+                                       nocolor=args.nocolor)
         print(ascii_art)
         sys.exit()  # <- EXIT!
 
@@ -201,7 +209,8 @@ if __name__ == '__main__':
         if path.exists():
             sys.exit(f'Cannot save: {path} already exists')  # <- EXIT!
 
-        ascii_art = colorize_ascii_art(art_layer, color_layer, color_codes)
+        ascii_art = colorize_ascii_art(art_layer, color_layer, color_codes,
+                                       nocolor=args.nocolor)
         with open(path, 'w') as fh:
             fh.write(ascii_art)
         print(f'ASCII art saved to {path}')
