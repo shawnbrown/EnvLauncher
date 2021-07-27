@@ -40,6 +40,16 @@ class XDGDirectory(object):
         """Directories to search for data files in order of preference."""
         return self._data_dirs
 
+    def find_first_filepath(self, subdir, filename) -> str:
+        """Return first matching resource from XDG data locations."""
+        search_dirs = [self.data_home] + self.data_dirs
+        resource = os.path.join(subdir, filename)
+        for data_dir in search_dirs:
+            path = os.path.join(data_dir, resource)
+            if os.path.exists(path):
+                return os.path.realpath(path)  # <- EXIT!
+        raise FileNotFoundError(f'Could not find resource {resource!r}')
+
 
 def parse_args(args=None):
     """Parse command line arguments."""

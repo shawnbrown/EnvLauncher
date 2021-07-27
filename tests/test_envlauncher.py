@@ -2,6 +2,7 @@
 import contextlib
 import io
 import os
+import tempfile
 import unittest
 import envlauncher
 
@@ -76,7 +77,7 @@ class TestParseArgs(unittest.TestCase):
         )
 
 
-class XDGDirectory(unittest.TestCase):
+class XDGDirectoryBases(unittest.TestCase):
     def test_data_home(self):
         xdgdir = envlauncher.XDGDirectory({
             'XDG_DATA_HOME': '/other/location/share',
@@ -102,3 +103,65 @@ class XDGDirectory(unittest.TestCase):
             'HOME': '/home/testuser',
         })
         self.assertEqual(xdgdir.data_dirs, ['/usr/local/share', '/usr/share'])
+
+
+class XDGDirectoryFindFirstFilepath(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        # Define temporary directory structure and files.
+        temporary_structure = {
+            'highest/preference/applications': [
+                'app1.desktop',  # <- Present in highest, middle, and lowest.
+            ],
+            'middle/preference/applications': [
+                'app1.desktop',
+                'app2.desktop',  # <- Present in middle and lowest.
+            ],
+            'lowest/preference/applications': [
+                'app1.desktop',
+                'app2.desktop',
+                'app3.desktop',  # <- Present in lowest only.
+            ],
+        }
+
+        # Create temporary directory structure and files.
+        cls.tempdir = tempfile.TemporaryDirectory()
+        tempname = cls.tempdir.name
+        for directory, filenames in temporary_structure.items():
+            os.makedirs(os.path.join(tempname, directory))
+            for name in filenames:
+                filepath = os.path.join(tempname, directory, name)
+                with open(filepath, 'w') as fh:
+                    fh.write('dummy file contents')
+
+        # Create an XDGDirectory instance with a custom environ.
+        cls.xdgdir = envlauncher.XDGDirectory({
+            'XDG_DATA_HOME': os.path.join(tempname, 'highest/preference'),
+            'XDG_DATA_DIRS': ':'.join([
+                os.path.join(tempname, 'middle/preference'),
+                os.path.join(tempname, 'lowest/preference'),
+            ])
+        })
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.tempdir.cleanup()
+
+    def test_highest_preference(self):
+        filepath = self.xdgdir.find_first_filepath('applications', 'app1.desktop')
+        regex = r'/highest/preference/applications/app1[.]desktop$'
+        self.assertRegex(filepath, regex)
+
+    def test_middle_preference(self):
+        filepath = self.xdgdir.find_first_filepath('applications', 'app2.desktop')
+        regex = r'/middle/preference/applications/app2[.]desktop$'
+        self.assertRegex(filepath, regex)
+
+    def test_lowest_preference(self):
+        filepath = self.xdgdir.find_first_filepath('applications', 'app3.desktop')
+        regex = r'/lowest/preference/applications/app3[.]desktop$'
+        self.assertRegex(filepath, regex)
+
+    def test_no_matching_file(self):
+        with self.assertRaises(FileNotFoundError):
+            self.xdgdir.find_first_filepath('applications', 'app4.desktop')
