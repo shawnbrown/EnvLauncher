@@ -93,7 +93,7 @@ def colorize_ascii_art(art_layer, color_layer, color_codes, nocolor=False):
     return ascii_art
 
 
-art_layer = """
+ART_LAYER = """
            .....                                     8
          d88888888.                               8  8
         8  88888888                .oPYo. o    o o8P 8oPYo. .oPYo. odPYo.
@@ -112,7 +112,7 @@ V8888888 ##################" .oPYo. .oPYo. o   o   o .oPYo. oPY^'.oPYo. .oPYo8
             '''''
 """
 
-color_layer = """
+COLOR_LAYER = """
            BBBBB                                     g
          BBBBBBBBBB                               g  g
         B  BBBBBBBB                gggggg g    g ggg gggggg gggggg gggggg
@@ -131,7 +131,7 @@ BBBBBBBB YYYYYYYYYYYYYYYYYYY bbbbbb bbbbbb b   b   b bbbbbb bbbbbbbbbbb bbbbbb
             YYYYY
 """
 
-color_codes = {
+COLOR_CODES = {
     'B': Style.BRIGHT + Fore.BLUE,
     'Y': Style.BRIGHT + Fore.YELLOW,
     'g': Style.DIM + Fore.WHITE,
@@ -195,7 +195,7 @@ if __name__ == '__main__':
     # Print color ASCII art.
     ########################
     if args.command is None:
-        ascii_art = colorize_ascii_art(art_layer, color_layer, color_codes,
+        ascii_art = colorize_ascii_art(ART_LAYER, COLOR_LAYER, COLOR_CODES,
                                        nocolor=args.nocolor)
         print(ascii_art)
         sys.exit()  # <- EXIT!
@@ -209,7 +209,7 @@ if __name__ == '__main__':
         if path.exists():
             sys.exit(f'Cannot save: {path} already exists')  # <- EXIT!
 
-        ascii_art = colorize_ascii_art(art_layer, color_layer, color_codes,
+        ascii_art = colorize_ascii_art(ART_LAYER, COLOR_LAYER, COLOR_CODES,
                                        nocolor=args.nocolor)
         with open(path, 'w') as fh:
             fh.write(ascii_art)
