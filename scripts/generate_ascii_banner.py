@@ -161,8 +161,8 @@ if __name__ == '__main__':
     subparsers = parser.add_subparsers(
         title='sub-commands', dest='command', help='available sub-commands')
 
-    parser_test = subparsers.add_parser('save', help='Save ASCII art to file.')
-    parser_test.add_argument('file', help='filename to save to', metavar='FILE')
+    parser_save = subparsers.add_parser('save', help='Save ASCII art to file.')
+    parser_save.add_argument('file', help='filename to save', metavar='FILE')
 
     # This subparser mimics unittest's arguments.
     parser_test = subparsers.add_parser('test', help='Run test suite.')
