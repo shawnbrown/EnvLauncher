@@ -144,10 +144,10 @@ if __name__ == '__main__':
 
     examples = textwrap.dedent("""
         examples:
-          Print ASCII banner to stdout:
+          Print ASCII art to stdout:
             python %(prog)s
 
-          Save ASCII banner to file:
+          Save ASCII art to file:
             python %(prog)s save output.ascii
 
           Run test suite:
