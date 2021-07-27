@@ -1,6 +1,7 @@
 """Tests for EnvLauncher."""
 import contextlib
 import io
+import os
 import unittest
 import envlauncher
 
@@ -73,3 +74,31 @@ class TestParseArgs(unittest.TestCase):
             'argument --activate cannot be used with --preferences',
             self.exit_message.getvalue(),
         )
+
+
+class TestXDGDirectoryFunctions(unittest.TestCase):
+    def setUp(self):
+        original_environ = os.environ.copy()
+        os.environ.clear()
+        self.addCleanup(os.environ.update, original_environ)
+        self.addCleanup(os.environ.clear)
+
+    def test_xdg_get_data_home(self):
+        os.environ['XDG_DATA_HOME'] = '/other/location/share'
+        os.environ['HOME'] = '/home/testuser'
+        data_home = envlauncher.xdg_get_data_home()
+        self.assertEqual(data_home, '/other/location/share')
+
+    def test_xdg_get_data_home_default(self):
+        os.environ['HOME'] = '/home/testuser'
+        data_home = envlauncher.xdg_get_data_home()
+        self.assertEqual(data_home, '/home/testuser/.local/share')
+
+    def test_xdg_get_data_dirs(self):
+        os.environ['XDG_DATA_DIRS'] = '/foo/bar:/var/lib/baz'
+        data_home = envlauncher.xdg_get_data_dirs()
+        self.assertEqual(data_home, ['/foo/bar', '/var/lib/baz'])
+
+    def test_xdg_get_data_dirs_default(self):
+        data_home = envlauncher.xdg_get_data_dirs()
+        self.assertEqual(data_home, ['/usr/local/share', '/usr/share'])
