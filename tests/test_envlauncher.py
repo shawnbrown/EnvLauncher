@@ -76,29 +76,29 @@ class TestParseArgs(unittest.TestCase):
         )
 
 
-class TestXDGDirectoryFunctions(unittest.TestCase):
-    def setUp(self):
-        original_environ = os.environ.copy()
-        os.environ.clear()
-        self.addCleanup(os.environ.update, original_environ)
-        self.addCleanup(os.environ.clear)
+class XDGDirectory(unittest.TestCase):
+    def test_data_home(self):
+        xdgdir = envlauncher.XDGDirectory({
+            'XDG_DATA_HOME': '/other/location/share',
+            'HOME': '/home/testuser',
+        })
+        self.assertEqual(xdgdir.data_home, '/other/location/share')
 
-    def test_xdg_get_data_home(self):
-        os.environ['XDG_DATA_HOME'] = '/other/location/share'
-        os.environ['HOME'] = '/home/testuser'
-        data_home = envlauncher.xdg_get_data_home()
-        self.assertEqual(data_home, '/other/location/share')
+    def test_data_home_default(self):
+        xdgdir = envlauncher.XDGDirectory({
+            'HOME': '/home/testuser',
+        })
+        self.assertEqual(xdgdir.data_home, '/home/testuser/.local/share')
 
-    def test_xdg_get_data_home_default(self):
-        os.environ['HOME'] = '/home/testuser'
-        data_home = envlauncher.xdg_get_data_home()
-        self.assertEqual(data_home, '/home/testuser/.local/share')
+    def test_data_dirs(self):
+        xdgdir = envlauncher.XDGDirectory({
+            'HOME': '/home/testuser',
+            'XDG_DATA_DIRS': '/foo/bar:/var/lib/baz',
+        })
+        self.assertEqual(xdgdir.data_dirs, ['/foo/bar', '/var/lib/baz'])
 
-    def test_xdg_get_data_dirs(self):
-        os.environ['XDG_DATA_DIRS'] = '/foo/bar:/var/lib/baz'
-        data_home = envlauncher.xdg_get_data_dirs()
-        self.assertEqual(data_home, ['/foo/bar', '/var/lib/baz'])
-
-    def test_xdg_get_data_dirs_default(self):
-        data_home = envlauncher.xdg_get_data_dirs()
-        self.assertEqual(data_home, ['/usr/local/share', '/usr/share'])
+    def test_data_dirs_default(self):
+        xdgdir = envlauncher.XDGDirectory({
+            'HOME': '/home/testuser',
+        })
+        self.assertEqual(xdgdir.data_dirs, ['/usr/local/share', '/usr/share'])

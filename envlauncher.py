@@ -19,18 +19,26 @@ import argparse
 import os
 import subprocess
 import tempfile
+from typing import List
 
 
-def xdg_get_data_home():
-    """Return the current account's home directory as a path string."""
-    return (os.environ.get('XDG_DATA_HOME')
-            or os.path.join(os.environ.get('HOME'), '.local', 'share'))
+class XDGDirectory(object):
+    def __init__(self, environ=None):
+        environ = dict(os.environ if environ is None else environ)
 
+        self._data_home = (environ.get('XDG_DATA_HOME')
+                           or os.path.join(environ.get('HOME'), '.local', 'share'))
+        self._data_dirs = (environ.get('XDG_DATA_DIRS')
+                           or '/usr/local/share:/usr/share').split(':')
+    @property
+    def data_home(self) -> str:
+        """The base directory for user-specific data files."""
+        return self._data_home
 
-def xdg_get_data_dirs():
-    """Return XDG data directories as an ordered list of path strings."""
-    return (os.environ.get('XDG_DATA_DIRS')
-            or '/usr/local/share:/usr/share').split(':')
+    @property
+    def data_dirs(self) -> List[str]:
+        """Directories to search for data files in order of preference."""
+        return self._data_dirs
 
 
 def parse_args(args=None):
