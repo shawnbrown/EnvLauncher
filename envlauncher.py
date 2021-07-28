@@ -64,6 +64,8 @@ class XDGDesktop(object):
         self.config = configparser.ConfigParser(
             dict_type=collections.OrderedDict,
             delimiters=('=',),
+            allow_no_value=True,
+            comment_prefixes=None,
         )
         self.config.optionxform = str  # Use option names as-is (no case-folding).
 
