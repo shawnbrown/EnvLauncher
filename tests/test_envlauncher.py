@@ -165,3 +165,13 @@ class XDGDirectoryFindFirstFilepath(unittest.TestCase):
     def test_no_matching_file(self):
         with self.assertRaises(FileNotFoundError):
             self.xdgdir.find_first_filepath('applications', 'app4.desktop')
+
+
+class XDGDirectoryMakeHomeFilepath(unittest.TestCase):
+    def test_home_filepath(self):
+        xdgdir = envlauncher.XDGDirectory({
+            'XDG_DATA_HOME': os.path.join('/base/directory'),
+        })
+        filepath = xdgdir.make_home_filepath('applications', 'app1.desktop')
+        expected = '/base/directory/applications/app1.desktop'
+        self.assertEqual(filepath, expected)

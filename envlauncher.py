@@ -30,6 +30,7 @@ class XDGDirectory(object):
                            or os.path.join(environ.get('HOME'), '.local', 'share'))
         self._data_dirs = (environ.get('XDG_DATA_DIRS')
                            or '/usr/local/share:/usr/share').split(':')
+
     @property
     def data_home(self) -> str:
         """The base directory for user-specific data files."""
@@ -49,6 +50,10 @@ class XDGDirectory(object):
             if os.path.exists(path):
                 return os.path.realpath(path)  # <- EXIT!
         raise FileNotFoundError(f'Could not find resource {resource!r}')
+
+    def make_home_filepath(self, subdir, filename) -> str:
+        path = os.path.join(self._data_home, subdir, filename)
+        return os.path.realpath(path)
 
 
 def parse_args(args=None):
