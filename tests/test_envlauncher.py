@@ -3,6 +3,7 @@ import contextlib
 import io
 import os
 import tempfile
+import textwrap
 import unittest
 import envlauncher
 
@@ -175,3 +176,21 @@ class XDGDirectoryMakeHomeFilepath(unittest.TestCase):
         filepath = xdgdir.make_home_filepath('applications', 'app1.desktop')
         expected = '/base/directory/applications/app1.desktop'
         self.assertEqual(filepath, expected)
+
+
+class TestXDGDesktop(unittest.TestCase):
+    def test_unchanged(self):
+        """Check that parser exports values as they are given."""
+        desktop = envlauncher.XDGDesktop()
+
+        minimal_example = textwrap.dedent("""
+            [Desktop Entry]
+            Type=Application
+            Name=Hello World
+            Exec=gnome-terminal -- bash -c "echo Hello World;bash"
+
+        """).lstrip()
+
+        desktop.read_string(minimal_example)
+        export = desktop.export_string()
+        self.assertEqual(export, minimal_example, msg='should match original')

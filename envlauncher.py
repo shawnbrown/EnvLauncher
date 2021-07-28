@@ -16,6 +16,9 @@
 # along with EnvLauncher.  If not, see <https://www.gnu.org/licenses/>.
 
 import argparse
+import collections
+import configparser
+import io
 import os
 import subprocess
 import tempfile
@@ -54,6 +57,23 @@ class XDGDirectory(object):
     def make_home_filepath(self, subdir, filename) -> str:
         path = os.path.join(self._data_home, subdir, filename)
         return os.path.realpath(path)
+
+
+class XDGDesktop(object):
+    def __init__(self):
+        self.config = configparser.ConfigParser(
+            dict_type=collections.OrderedDict,
+            delimiters=('=',),
+        )
+        self.config.optionxform = str  # Use option names as-is (no case-folding).
+
+    def read_string(self, string):
+        self.config.read_string(string)
+
+    def export_string(self):
+        fh = io.StringIO()
+        self.config.write(fh, space_around_delimiters=False)
+        return fh.getvalue()
 
 
 def parse_args(args=None):
