@@ -26,6 +26,12 @@ from typing import List
 
 
 class XDGDataPaths(object):
+    """Class to fetch data paths that conform to the "XDG Base
+    Directory Specification" version 0.8.
+
+    For details see:
+        http://standards.freedesktop.org/basedir-spec/
+    """
     def __init__(self, environ=None):
         environ = dict(os.environ if environ is None else environ)
 
