@@ -69,22 +69,25 @@ class XDGDataPaths(object):
         return os.path.realpath(path)
 
 
-class XDGDesktop(object):
+class DesktopEntryParser(configparser.ConfigParser):
+    """Class to parse .desktop files that conform to the "Desktop Entry
+    Specification" version 1.5.
+
+    For details see:
+        https://specifications.freedesktop.org/desktop-entry-spec/
+    """
     def __init__(self):
-        self.config = configparser.ConfigParser(
+        super().__init__(
             dict_type=collections.OrderedDict,
             delimiters=('=',),
             allow_no_value=True,
             comment_prefixes=None,
         )
-        self.config.optionxform = str  # Use option names as-is (no case-folding).
-
-    def read_string(self, string):
-        self.config.read_string(string)
+        self.optionxform = str  # Use option names as-is (no case-folding).
 
     def export_string(self):
         fh = io.StringIO()
-        self.config.write(fh, space_around_delimiters=False)
+        self.write(fh, space_around_delimiters=False)
         return fh.getvalue()
 
 

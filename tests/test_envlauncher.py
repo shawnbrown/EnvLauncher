@@ -178,9 +178,9 @@ class XDGDataPathsMakeHomePath(unittest.TestCase):
         self.assertEqual(filepath, expected)
 
 
-class TestXDGDesktop(unittest.TestCase):
+class TestDesktopEntryParser(unittest.TestCase):
     def setUp(self):
-        self.desktop = envlauncher.XDGDesktop()
+        self.desktop = envlauncher.DesktopEntryParser()
 
     @staticmethod
     def textformat(text):  # <- Helper method.
