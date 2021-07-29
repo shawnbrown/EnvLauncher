@@ -182,15 +182,19 @@ class TestXDGDesktop(unittest.TestCase):
     def setUp(self):
         self.desktop = envlauncher.XDGDesktop()
 
+    @staticmethod
+    def textformat(text):  # <- Helper method.
+        """Format string for ConfigParser compatibility."""
+        return f'{textwrap.dedent(text).strip()}\n\n'
+
     def test_unchanged(self):
         """Check that parser exports values as they are given."""
-        minimal_example = textwrap.dedent("""
+        minimal_example = self.textformat("""
             [Desktop Entry]
             Type=Application
             Name=Hello World
             Exec=gnome-terminal -- bash -c "echo Hello World;bash"
-
-        """).lstrip()
+        """)
 
         self.desktop.read_string(minimal_example)
         export = self.desktop.export_string()
@@ -198,14 +202,13 @@ class TestXDGDesktop(unittest.TestCase):
 
     def test_preserve_comments(self):
         """Comments should be preserved, too."""
-        minimal_example = textwrap.dedent("""
+        minimal_example = self.textformat("""
             [Desktop Entry]
             Type=Application
             Name=Hello World
             Exec=gnome-terminal -- bash -c "echo Hello World;bash"
             #Keywords=hello;world; <- A COMMENT!
-
-        """).lstrip()
+        """)
 
         self.desktop.read_string(minimal_example)
         export = self.desktop.export_string()
