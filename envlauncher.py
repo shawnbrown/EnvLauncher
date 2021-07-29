@@ -25,7 +25,7 @@ import tempfile
 from typing import List
 
 
-class XDGDirectory(object):
+class XDGDataPaths(object):
     def __init__(self, environ=None):
         environ = dict(os.environ if environ is None else environ)
 

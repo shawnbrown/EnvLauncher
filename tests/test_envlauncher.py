@@ -78,35 +78,35 @@ class TestParseArgs(unittest.TestCase):
         )
 
 
-class XDGDirectoryBases(unittest.TestCase):
+class TestXDGDataPathsAttributes(unittest.TestCase):
     def test_data_home(self):
-        xdgdir = envlauncher.XDGDirectory({
+        xdgdir = envlauncher.XDGDataPaths({
             'XDG_DATA_HOME': '/other/location/share',
             'HOME': '/home/testuser',
         })
         self.assertEqual(xdgdir.data_home, '/other/location/share')
 
     def test_data_home_default(self):
-        xdgdir = envlauncher.XDGDirectory({
+        xdgdir = envlauncher.XDGDataPaths({
             'HOME': '/home/testuser',
         })
         self.assertEqual(xdgdir.data_home, '/home/testuser/.local/share')
 
     def test_data_dirs(self):
-        xdgdir = envlauncher.XDGDirectory({
+        xdgdir = envlauncher.XDGDataPaths({
             'HOME': '/home/testuser',
             'XDG_DATA_DIRS': '/foo/bar:/var/lib/baz',
         })
         self.assertEqual(xdgdir.data_dirs, ['/foo/bar', '/var/lib/baz'])
 
     def test_data_dirs_default(self):
-        xdgdir = envlauncher.XDGDirectory({
+        xdgdir = envlauncher.XDGDataPaths({
             'HOME': '/home/testuser',
         })
         self.assertEqual(xdgdir.data_dirs, ['/usr/local/share', '/usr/share'])
 
 
-class XDGDirectoryFindFirstFilepath(unittest.TestCase):
+class XDGDataPathsFindFirstFilepath(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         # Define temporary directory structure and files.
@@ -135,8 +135,8 @@ class XDGDirectoryFindFirstFilepath(unittest.TestCase):
                 with open(filepath, 'w') as fh:
                     fh.write('dummy file contents')
 
-        # Create an XDGDirectory instance with a custom environ.
-        cls.xdgdir = envlauncher.XDGDirectory({
+        # Create an XDGDataPaths instance with a custom environ.
+        cls.xdgdir = envlauncher.XDGDataPaths({
             'XDG_DATA_HOME': os.path.join(tempname, 'highest/preference'),
             'XDG_DATA_DIRS': ':'.join([
                 os.path.join(tempname, 'middle/preference'),
@@ -168,9 +168,9 @@ class XDGDirectoryFindFirstFilepath(unittest.TestCase):
             self.xdgdir.find_first_filepath('applications', 'app4.desktop')
 
 
-class XDGDirectoryMakeHomeFilepath(unittest.TestCase):
+class XDGDataPathsMakeHomeFilepath(unittest.TestCase):
     def test_home_filepath(self):
-        xdgdir = envlauncher.XDGDirectory({
+        xdgdir = envlauncher.XDGDataPaths({
             'XDG_DATA_HOME': os.path.join('/base/directory'),
         })
         filepath = xdgdir.make_home_filepath('applications', 'app1.desktop')
