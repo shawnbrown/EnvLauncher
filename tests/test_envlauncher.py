@@ -168,12 +168,12 @@ class XDGDataPathsFindResourcePath(unittest.TestCase):
             self.xdgdir.find_resource_path('applications', 'app4.desktop')
 
 
-class XDGDataPathsMakeHomeFilepath(unittest.TestCase):
+class XDGDataPathsMakeHomePath(unittest.TestCase):
     def test_home_filepath(self):
         xdgdir = envlauncher.XDGDataPaths({
             'XDG_DATA_HOME': os.path.join('/base/directory'),
         })
-        filepath = xdgdir.make_home_filepath('applications', 'app1.desktop')
+        filepath = xdgdir.make_home_path('applications', 'app1.desktop')
         expected = '/base/directory/applications/app1.desktop'
         self.assertEqual(filepath, expected)
 
