@@ -44,8 +44,11 @@ class XDGDataPaths(object):
         """Directories to search for data files in order of preference."""
         return self._data_dirs
 
-    def find_first_filepath(self, subdir, filename) -> str:
-        """Return first matching resource from XDG data locations."""
+    def find_resource_path(self, subdir, filename) -> str:
+        """Return file path for the first matching data resource
+        found in XDG data locations. If no file is found, raises
+        a FileNotFoundError.
+        """
         search_dirs = [self.data_home] + self.data_dirs
         resource = os.path.join(subdir, filename)
         for data_dir in search_dirs:

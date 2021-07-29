@@ -106,7 +106,7 @@ class TestXDGDataPathsAttributes(unittest.TestCase):
         self.assertEqual(xdgdir.data_dirs, ['/usr/local/share', '/usr/share'])
 
 
-class XDGDataPathsFindFirstFilepath(unittest.TestCase):
+class XDGDataPathsFindResourcePath(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         # Define temporary directory structure and files.
@@ -149,23 +149,23 @@ class XDGDataPathsFindFirstFilepath(unittest.TestCase):
         cls.tempdir.cleanup()
 
     def test_highest_preference(self):
-        filepath = self.xdgdir.find_first_filepath('applications', 'app1.desktop')
+        filepath = self.xdgdir.find_resource_path('applications', 'app1.desktop')
         regex = r'/highest/preference/applications/app1[.]desktop$'
         self.assertRegex(filepath, regex)
 
     def test_middle_preference(self):
-        filepath = self.xdgdir.find_first_filepath('applications', 'app2.desktop')
+        filepath = self.xdgdir.find_resource_path('applications', 'app2.desktop')
         regex = r'/middle/preference/applications/app2[.]desktop$'
         self.assertRegex(filepath, regex)
 
     def test_lowest_preference(self):
-        filepath = self.xdgdir.find_first_filepath('applications', 'app3.desktop')
+        filepath = self.xdgdir.find_resource_path('applications', 'app3.desktop')
         regex = r'/lowest/preference/applications/app3[.]desktop$'
         self.assertRegex(filepath, regex)
 
     def test_no_matching_file(self):
         with self.assertRaises(FileNotFoundError):
-            self.xdgdir.find_first_filepath('applications', 'app4.desktop')
+            self.xdgdir.find_resource_path('applications', 'app4.desktop')
 
 
 class XDGDataPathsMakeHomeFilepath(unittest.TestCase):
