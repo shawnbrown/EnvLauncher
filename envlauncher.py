@@ -25,6 +25,9 @@ import tempfile
 from typing import List
 
 
+APP_NAME = 'com.github.shawnbrown.EnvLauncher'
+
+
 class XDGDataPaths(object):
     """Class to fetch data paths that conform to the "XDG Base
     Directory Specification" version 0.8.
@@ -150,9 +153,22 @@ def activate_environment(script_path, working_dir):
         process.wait(10)
 
 
-def edit_preferences(reset_all=False):
+def edit_preferences(reset_all=False, environ=None):
     """Edit preferences."""
-    raise NotImplementedError
+    paths = XDGDataPaths(os.environ if environ is None else environ)
+
+    # Temporarily use shutil.copy() to prevent users from directly
+    # opening a file they don't have write permissions for (e.g.
+    # a file in "/usr/local/share/applications/...").
+    import shutil
+    desktop_home = paths.make_home_path('applications', f'{APP_NAME}.desktop')
+    if not os.path.exists(desktop_home):
+        desktop_path = paths.find_resource_path('applications', f'{APP_NAME}.desktop')
+        shutil.copy(src=desktop_path, dst=desktop_home)
+
+    # Temporarily open file in Gedit until GUI is ready.
+    args = ['gedit', '--standalone', '--class', APP_NAME, desktop_home]
+    process = subprocess.Popen(args)
 
 
 def main():
