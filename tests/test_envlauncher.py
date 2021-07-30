@@ -179,9 +179,6 @@ class XDGDataPathsMakeHomePath(unittest.TestCase):
 
 
 class TestDesktopEntryParser(unittest.TestCase):
-    def setUp(self):
-        self.desktop = envlauncher.DesktopEntryParser()
-
     @staticmethod
     def textformat(text):  # <- Helper method.
         """Format string for ConfigParser compatibility."""
@@ -196,8 +193,8 @@ class TestDesktopEntryParser(unittest.TestCase):
             Exec=gnome-terminal -- bash -c "echo Hello World;bash"
         """)
 
-        self.desktop.read_string(minimal_example)
-        export = self.desktop.export_string()
+        desktop = envlauncher.DesktopEntryParser.from_string(minimal_example)
+        export = desktop.export_string()
         self.assertEqual(export, minimal_example, msg='should match original')
 
     def test_preserve_comments(self):
@@ -210,6 +207,6 @@ class TestDesktopEntryParser(unittest.TestCase):
             #Keywords=hello;world; <- A COMMENT!
         """)
 
-        self.desktop.read_string(minimal_example)
-        export = self.desktop.export_string()
+        desktop = envlauncher.DesktopEntryParser.from_string(minimal_example)
+        export = desktop.export_string()
         self.assertEqual(export, minimal_example)
