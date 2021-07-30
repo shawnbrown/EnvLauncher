@@ -1,7 +1,10 @@
 [Desktop Entry]
 Name=EnvLauncher
+Name[ja]=Envランチャー
 Comment=Launch a Python development environment
+Comment[ja]=Pythonの仮想環境を備えたコマンドラインターミナル
 Keywords=venv;virtual;virtualenv;conda;environment;launcher;python;
+Keywords[ja]=venv;virtual;virtualenv;conda;environment;launcher;python;ランチャー;仮想環境;
 TryExec=envlauncher
 #Exec=envlauncher --activate "~/Projects/.venv39/bin/activate" --directory "~/Projects/"
 Exec=envlauncher --preferences
