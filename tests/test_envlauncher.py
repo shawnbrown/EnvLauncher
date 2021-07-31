@@ -249,20 +249,20 @@ class TestDesktopEntryParserFormatting(unittest.TestCase):
         """Check that parser exports keys as given (preserves case)
         and maintains format (no space around the "=" delimeter).
         """
-        minimal_example = self.textformat("""
+        desktop_entry = self.textformat("""
             [Desktop Entry]
             Type=Application
             Name=Hello World
             Exec=gnome-terminal -- bash -c "echo Hello World;bash"
         """)
 
-        desktop = envlauncher.DesktopEntryParser.from_string(minimal_example)
-        export = desktop.export_string()
-        self.assertEqual(export, minimal_example, msg='should match original')
+        parser = envlauncher.DesktopEntryParser.from_string(desktop_entry)
+        export = parser.export_string()
+        self.assertEqual(export, desktop_entry, msg='should match original')
 
     def test_preserve_comments(self):
         """Comments should be preserved, too."""
-        minimal_example = self.textformat("""
+        desktop_entry = self.textformat("""
             [Desktop Entry]
             Type=Application
             Name=Hello World
@@ -270,9 +270,9 @@ class TestDesktopEntryParserFormatting(unittest.TestCase):
             #Keywords=hello;world; <- A COMMENT!
         """)
 
-        desktop = envlauncher.DesktopEntryParser.from_string(minimal_example)
-        export = desktop.export_string()
-        self.assertEqual(export, minimal_example)
+        parser = envlauncher.DesktopEntryParser.from_string(desktop_entry)
+        export = parser.export_string()
+        self.assertEqual(export, desktop_entry)
 
     def test_preserve_duplicate_comments_and_whitespace(self):
         """Duplicate comments and whitespace should also be preserved."""
@@ -287,6 +287,6 @@ class TestDesktopEntryParserFormatting(unittest.TestCase):
             Exec=gnome-terminal -- bash -c "echo Hello World;bash"
         """)
 
-        desktop = envlauncher.DesktopEntryParser.from_string(desktop_entry)
-        export = desktop.export_string()
+        parser = envlauncher.DesktopEntryParser.from_string(desktop_entry)
+        export = parser.export_string()
         self.assertEqual(export, desktop_entry)
