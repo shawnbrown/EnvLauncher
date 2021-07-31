@@ -238,14 +238,17 @@ class TestDesktopEntryParserEscaping(unittest.TestCase):
         self.assertEqual(unescaped, self.unescaped)
 
 
-class TestDesktopEntryParser(unittest.TestCase):
+class TestDesktopEntryParserFormatting(unittest.TestCase):
+    """Make sure parser preserves desktop entry format."""
     @staticmethod
     def textformat(string):  # <- Helper method.
         """Format string for ConfigParser compatibility."""
         return textwrap.dedent(string).lstrip()
 
     def test_unchanged(self):
-        """Check that parser exports values as they are given."""
+        """Check that parser exports keys as given (preserves case)
+        and maintains format (no space around the "=" delimeter).
+        """
         minimal_example = self.textformat("""
             [Desktop Entry]
             Type=Application
