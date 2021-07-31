@@ -81,6 +81,10 @@ class DesktopEntryParser(object):
         https://specifications.freedesktop.org/desktop-entry-spec/
     """
     def __init__(self, f):
+        string = f.read(128 * 1024)  # Read 128 kB from file.
+        if f.read(1):
+            raise RuntimeError('Desktop entry file exceeds 128 kB.')
+
         self._parser = configparser.ConfigParser(
             dict_type=collections.OrderedDict,
             delimiters=('=',),
@@ -88,7 +92,8 @@ class DesktopEntryParser(object):
             comment_prefixes=None,
         )
         self._parser.optionxform = str  # Use option names as-is (no case-folding).
-        self._parser.read_file(f)
+        string = self._escape_comments(string)
+        self._parser.read_string(string)
 
     _escape_prefix = '_COMMENT'
     _escape_suffix = 'ZZZZ'
@@ -125,7 +130,8 @@ class DesktopEntryParser(object):
     def export_string(self):
         f = io.StringIO()
         self._parser.write(f, space_around_delimiters=False)
-        return f.getvalue()
+        string = f.getvalue().strip()
+        return self._unescape_comments(string)
 
 
 def parse_args(args=None):

@@ -228,9 +228,9 @@ class TestDesktopEntryParserEscaping(unittest.TestCase):
 
 class TestDesktopEntryParser(unittest.TestCase):
     @staticmethod
-    def textformat(text):  # <- Helper method.
+    def textformat(string):  # <- Helper method.
         """Format string for ConfigParser compatibility."""
-        return f'{textwrap.dedent(text).strip()}\n\n'
+        return textwrap.dedent(string).lstrip()
 
     def test_unchanged(self):
         """Check that parser exports values as they are given."""
@@ -258,3 +258,20 @@ class TestDesktopEntryParser(unittest.TestCase):
         desktop = envlauncher.DesktopEntryParser.from_string(minimal_example)
         export = desktop.export_string()
         self.assertEqual(export, minimal_example)
+
+    def test_preserve_duplicate_comments_and_whitespace(self):
+        """Duplicate comments and whitespace should also be preserved."""
+        desktop_entry = self.textformat("""
+            [Desktop Entry]
+            Type=Application
+
+
+            #Foo
+            #Foo
+            Name=Hello World
+            Exec=gnome-terminal -- bash -c "echo Hello World;bash"
+        """)
+
+        desktop = envlauncher.DesktopEntryParser.from_string(desktop_entry)
+        export = desktop.export_string()
+        self.assertEqual(export, desktop_entry)
