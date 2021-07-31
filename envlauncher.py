@@ -20,6 +20,7 @@ import collections
 import configparser
 import io
 import os
+import re
 import subprocess
 import tempfile
 from typing import List
@@ -88,6 +89,34 @@ class DesktopEntryParser(object):
         )
         self._parser.optionxform = str  # Use option names as-is (no case-folding).
         self._parser.read_file(f)
+
+    _escape_prefix = '_COMMENT'
+    _escape_suffix = 'ZZZZ'
+    assert _escape_suffix not in _escape_prefix
+    _escape_regex = re.compile(f'{_escape_prefix}\\d+{_escape_suffix}')
+
+    @classmethod
+    def _escape_comments(cls, string) -> str:
+        """Escape comment lines so that ConfigParser will retain them."""
+        escaped = []
+        for index, line in enumerate(string.split('\n'), 1):
+            if line.startswith('#') or line == '':
+                line = ''.join([cls._escape_prefix,
+                                str(index),
+                                cls._escape_suffix,
+                                line])
+            escaped.append(line)
+        return '\n'.join(escaped)
+
+    @classmethod
+    def _unescape_comments(cls, string) -> str:
+        """Unescape lines to recover original comments."""
+        escaped = []
+        for line in string.split('\n'):
+            if cls._escape_regex.match(line):
+                _, _, line = line.partition(cls._escape_suffix)
+            escaped.append(line)
+        return '\n'.join(escaped)
 
     @classmethod
     def from_string(cls, string):

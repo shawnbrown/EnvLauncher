@@ -178,6 +178,54 @@ class XDGDataPathsMakeHomePath(unittest.TestCase):
         self.assertEqual(filepath, expected)
 
 
+class TestDesktopEntryParserEscaping(unittest.TestCase):
+    """Since ConfigParser discards comments and extra empty lines,
+    we need to escape these lines so we can preserve them when
+    saving the config file.
+
+    From the XDG Desktop Entry Specification (version 1.5):
+
+      "Lines beginning with a # and blank lines are considered
+      comments and will be ignored, however they should be
+      preserved across reads and writes of the desktop entry
+      file."
+    """
+
+    def setUp(self):
+        self.unescaped = textwrap.dedent("""
+            [Desktop Entry]
+            Type=Application
+
+
+            Exec=gnome-terminal
+            #Keywords=hello;world; <- A COMMENT!
+        """).strip()
+
+        self.escaped = textwrap.dedent("""
+            [Desktop Entry]
+            Type=Application
+            _COMMENT3ZZZZ
+            _COMMENT4ZZZZ
+            Exec=gnome-terminal
+            _COMMENT6ZZZZ#Keywords=hello;world; <- A COMMENT!
+        """).strip()
+
+    def test_escape_comments(self):
+        """Should escape comments and blank lines."""
+        escaped = envlauncher.DesktopEntryParser._escape_comments(self.unescaped)
+        self.assertEqual(escaped, self.escaped)
+
+    def test_unescape_comments(self):
+        """Should escape comments and blank lines."""
+        unescaped = envlauncher.DesktopEntryParser._unescape_comments(self.escaped)
+        self.assertEqual(unescaped, self.unescaped)
+
+    def test_roundtrip(self):
+        escaped = envlauncher.DesktopEntryParser._escape_comments(self.unescaped)
+        unescaped = envlauncher.DesktopEntryParser._unescape_comments(escaped)
+        self.assertEqual(unescaped, self.unescaped)
+
+
 class TestDesktopEntryParser(unittest.TestCase):
     @staticmethod
     def textformat(text):  # <- Helper method.
