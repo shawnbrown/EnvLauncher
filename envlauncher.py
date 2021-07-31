@@ -96,8 +96,7 @@ class DesktopEntryParser(object):
         self._parser.read_string(string)
 
     _escape_prefix = '_COMMENT'
-    _escape_suffix = 'ZZZZ'
-    assert _escape_suffix not in _escape_prefix
+    _escape_suffix = 'ZZ=ZZ'
     _escape_regex = re.compile(f'{_escape_prefix}\\d+{_escape_suffix}')
 
     @classmethod

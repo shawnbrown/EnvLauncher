@@ -213,6 +213,15 @@ class TestDesktopEntryParserEscaping(unittest.TestCase):
             {prefix}6{suffix}#Keywords=hello;world; <- A COMMENT!
         """).strip()
 
+    def test_prefix_and_suffix(self):
+        prefix = envlauncher.DesktopEntryParser._escape_prefix
+        suffix = envlauncher.DesktopEntryParser._escape_suffix
+
+        self.assertNotIn(suffix, prefix, msg='Suffix must not be a substring of prefix.')
+        self.assertEqual(suffix.count('='), 1, msg='Must contain one equals sign.')
+        self.assertNotEqual(suffix[0], '=', msg='Equals sign must not be first character.')
+        self.assertNotEqual(suffix[-1], '=', msg='Equals sign must not be last character.')
+
     def test_escape_comments(self):
         """Should escape comments and blank lines."""
         escaped = envlauncher.DesktopEntryParser._escape_comments(self.unescaped)
