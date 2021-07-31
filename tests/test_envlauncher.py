@@ -192,6 +192,9 @@ class TestDesktopEntryParserEscaping(unittest.TestCase):
     """
 
     def setUp(self):
+        prefix = envlauncher.DesktopEntryParser._escape_prefix
+        suffix = envlauncher.DesktopEntryParser._escape_suffix
+
         self.unescaped = textwrap.dedent("""
             [Desktop Entry]
             Type=Application
@@ -201,13 +204,13 @@ class TestDesktopEntryParserEscaping(unittest.TestCase):
             #Keywords=hello;world; <- A COMMENT!
         """).strip()
 
-        self.escaped = textwrap.dedent("""
+        self.escaped = textwrap.dedent(f"""
             [Desktop Entry]
             Type=Application
-            _COMMENT3ZZZZ
-            _COMMENT4ZZZZ
+            {prefix}3{suffix}
+            {prefix}4{suffix}
             Exec=gnome-terminal
-            _COMMENT6ZZZZ#Keywords=hello;world; <- A COMMENT!
+            {prefix}6{suffix}#Keywords=hello;world; <- A COMMENT!
         """).strip()
 
     def test_escape_comments(self):
