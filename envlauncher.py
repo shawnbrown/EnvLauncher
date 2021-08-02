@@ -95,6 +95,8 @@ class DesktopEntryParser(object):
         string = self._escape_comments(string)
         self._parser.read_string(string)
 
+        self._rcfile = self._parser.get('X-EnvLauncher Preferences', 'Rcfile', fallback='')
+
     _escape_prefix = '_COMMENT'
     _escape_suffix = 'ZZ=ZZ'
     _escape_regex = re.compile(f'{_escape_prefix}\\d+{_escape_suffix}')
@@ -131,6 +133,19 @@ class DesktopEntryParser(object):
         self._parser.write(f, space_around_delimiters=False)
         string = f.getvalue().strip()
         return self._unescape_comments(string)
+
+    @property
+    def rcfile(self):
+        """An "rc" file to execute after activating the environment
+        (e.g., ~/.bashrc).
+        """
+        return self._rcfile
+
+    @rcfile.setter
+    def rcfile(self, value):
+        if not isinstance(value, str):
+            value = ''
+        self._rcfile = value
 
 
 def parse_args(args=None):

@@ -290,3 +290,25 @@ class TestDesktopEntryParserFormatting(unittest.TestCase):
         parser = envlauncher.DesktopEntryParser.from_string(desktop_entry)
         export = parser.export_string()
         self.assertEqual(export, desktop_entry)
+
+
+class TestDesktopEntryParserConfiguration(unittest.TestCase):
+    def test_rcfile(self):
+        desktop_entry = textwrap.dedent("""
+            [Desktop Entry]
+            Name=EnvLauncher
+            Exec=envlauncher --preferences
+            Type=Application
+
+            [X-EnvLauncher Preferences]
+            Rcfile=~/.bashrc
+        """).lstrip()
+        config = envlauncher.DesktopEntryParser.from_string(desktop_entry)
+
+        self.assertEqual(config.rcfile, '~/.bashrc')
+
+        config.rcfile = '.venvrc'
+        self.assertEqual(config.rcfile, '.venvrc')
+
+        config.rcfile = 1234  # <- Bogus value.
+        self.assertEqual(config.rcfile, '')  # <- Empty string.
