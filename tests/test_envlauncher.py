@@ -312,3 +312,26 @@ class TestDesktopEntryParserConfiguration(unittest.TestCase):
 
         config.rcfile = 1234  # <- Bogus value.
         self.assertEqual(config.rcfile, '')  # <- Empty string.
+
+    def test_banner(self):
+        desktop_entry = textwrap.dedent("""
+            [Desktop Entry]
+            Name=EnvLauncher
+            Exec=envlauncher --preferences
+            Type=Application
+
+            [X-EnvLauncher Preferences]
+            Banner=color
+        """).lstrip()
+        config = envlauncher.DesktopEntryParser.from_string(desktop_entry)
+
+        self.assertEqual(config.banner, 'color')
+
+        config.banner = 'plain'
+        self.assertEqual(config.banner, 'plain')
+
+        config.banner = 'none'
+        self.assertEqual(config.banner, 'none')
+
+        config.banner = 1234  # <- Bogus value.
+        self.assertEqual(config.banner, 'color')  # <- Defaults to color.

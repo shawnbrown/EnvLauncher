@@ -100,6 +100,7 @@ class DesktopEntryParser(object):
         self._parser.read_string(string)
 
         self._rcfile = self._parser.get('X-EnvLauncher Preferences', 'Rcfile', fallback='')
+        self._banner = self._parser.get('X-EnvLauncher Preferences', 'Banner', fallback='color')
 
     @classmethod
     def _escape_comments(cls, string) -> str:
@@ -146,6 +147,17 @@ class DesktopEntryParser(object):
         if not isinstance(value, str):
             value = ''
         self._rcfile = value
+
+    @property
+    def banner(self):
+        """Python logo banner option."""
+        return self._banner
+
+    @banner.setter
+    def banner(self, value):
+        if value not in {'color', 'plain', 'none'}:
+            value = 'color'
+        self._banner = value
 
 
 def parse_args(args=None):
