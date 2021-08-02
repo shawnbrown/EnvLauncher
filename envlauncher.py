@@ -80,6 +80,10 @@ class DesktopEntryParser(object):
     For details see:
         https://specifications.freedesktop.org/desktop-entry-spec/
     """
+    _escape_prefix = '_COMMENT'
+    _escape_suffix = 'ZZ=ZZ'
+    _escape_regex = re.compile(f'{_escape_prefix}\\d+{_escape_suffix}')
+
     def __init__(self, f):
         string = f.read(128 * 1024)  # Read 128 kB from file.
         if f.read(1):
@@ -96,10 +100,6 @@ class DesktopEntryParser(object):
         self._parser.read_string(string)
 
         self._rcfile = self._parser.get('X-EnvLauncher Preferences', 'Rcfile', fallback='')
-
-    _escape_prefix = '_COMMENT'
-    _escape_suffix = 'ZZ=ZZ'
-    _escape_regex = re.compile(f'{_escape_prefix}\\d+{_escape_suffix}')
 
     @classmethod
     def _escape_comments(cls, string) -> str:
