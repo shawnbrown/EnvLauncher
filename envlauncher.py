@@ -159,6 +159,30 @@ class DesktopEntryParser(object):
             value = 'color'
         self._banner = value
 
+    def get_actions(self):
+        """Return sorted list of virtual environment launcher actions."""
+        regex = re.compile(r'^envlauncher --activate "(.+)" --directory "(.+)"$')
+        action_data = {}
+        for section in self._parser.sections():
+            if not section.startswith('Desktop Action venv'):
+                continue
+            _, _, identifier = section.partition('Desktop Action ')
+            name = self._parser[section]['Name']
+            match = regex.match(self._parser[section]['Exec'])
+            activate, directory = match.group(1, 2)
+            action_data[identifier] = (name, activate, directory)
+
+        identifiers = self._parser.get('Desktop Entry', 'Actions', fallback='')
+        identifiers = identifiers.rstrip(';').split(';')
+
+        # Get action data in identifier order.
+        actions = []
+        for ident in identifiers:
+            action = action_data.pop(ident, None)
+            if action:
+                actions.append(action)
+        return actions
+
 
 def parse_args(args=None):
     """Parse command line arguments."""

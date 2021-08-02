@@ -335,3 +335,61 @@ class TestDesktopEntryParserConfiguration(unittest.TestCase):
 
         config.banner = 1234  # <- Bogus value.
         self.assertEqual(config.banner, 'color')  # <- Defaults to color.
+
+    def test_get_actions(self):
+        desktop_entry = textwrap.dedent("""
+            [Desktop Entry]
+            Name=EnvLauncher
+            Exec=envlauncher --preferences
+            Type=Application
+            Actions=venv1;venv2;preferences;
+
+            [Desktop Action venv1]
+            Name=Python 3.9
+            Exec=envlauncher --activate "~/.venv39/bin/activate" --directory "~/Projects/"
+
+            [Desktop Action venv2]
+            Name=Python 2.7
+            Exec=envlauncher --activate "~/.venv27/bin/activate" --directory "~/Projects/legacy/"
+
+            [Desktop Action preferences]
+            Name=Preferences
+            Exec=envlauncher --preferences
+        """).lstrip()
+        config = envlauncher.DesktopEntryParser.from_string(desktop_entry)
+
+        actual = config.get_actions()
+        expected = [
+            ('Python 3.9', '~/.venv39/bin/activate', '~/Projects/'),
+            ('Python 2.7', '~/.venv27/bin/activate', '~/Projects/legacy/'),
+        ]
+        self.assertEqual(actual, expected)
+
+        # Same as above but action identifiers are reordered (venv2;venv1;preferences;)
+        desktop_entry = textwrap.dedent("""
+            [Desktop Entry]
+            Name=EnvLauncher
+            Exec=envlauncher --preferences
+            Type=Application
+            Actions=venv2;venv1;preferences;
+
+            [Desktop Action venv1]
+            Name=Python 3.9
+            Exec=envlauncher --activate "~/.venv39/bin/activate" --directory "~/Projects/"
+
+            [Desktop Action venv2]
+            Name=Python 2.7
+            Exec=envlauncher --activate "~/.venv27/bin/activate" --directory "~/Projects/legacy/"
+
+            [Desktop Action preferences]
+            Name=Preferences
+            Exec=envlauncher --preferences
+        """).lstrip()
+        config = envlauncher.DesktopEntryParser.from_string(desktop_entry)
+
+        actual = config.get_actions()
+        expected = [
+            ('Python 2.7', '~/.venv27/bin/activate', '~/Projects/legacy/'),
+            ('Python 3.9', '~/.venv39/bin/activate', '~/Projects/'),
+        ]
+        self.assertEqual(actual, expected)
