@@ -23,7 +23,7 @@ import os
 import re
 import subprocess
 import tempfile
-from typing import List
+from typing import List, Tuple
 
 
 APP_NAME = 'com.github.shawnbrown.EnvLauncher'
@@ -159,7 +159,7 @@ class DesktopEntryParser(object):
             value = 'color'
         self._banner = value
 
-    def get_actions(self):
+    def get_actions(self) -> List[Tuple[str, str, str]]:  # -> [(str, str, str)]
         """Return sorted list of virtual environment launcher actions."""
         regex = re.compile(r'^envlauncher --activate "(.+)" --directory "(.+)"$')
         action_data = {}
