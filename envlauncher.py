@@ -184,6 +184,28 @@ class DesktopEntryParser(object):
                 actions.append(action)
         return actions
 
+    def set_actions(self, actions):
+        """Set virtual environment launcher actions."""
+        # Remove existing venv actions.
+        for section in self._parser.sections():
+            if section.startswith('Desktop Action venv'):
+                del self._parser[section]
+
+        identifiers = []
+        for index, action in enumerate(actions, 1):
+            name, activate, directory = action
+            identifier = f'venv{index}'
+            identifiers.append(identifier)
+
+            #self._parser.add_section('Desktop Action {identifier}')
+            self._parser[f'Desktop Action {identifier}'] = {
+                'Name': name.strip(),
+                'Exec': f'envlauncher --activate "{activate}" --directory "{directory}"',
+            }
+
+        actions_identifiers = f'{";".join(identifiers)};preferences;'
+        self._parser['Desktop Entry']['Actions'] = actions_identifiers
+
 
 def parse_args(args=None):
     """Parse command line arguments."""

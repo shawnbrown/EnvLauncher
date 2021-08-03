@@ -382,3 +382,34 @@ class TestDesktopEntryParserConfiguration(unittest.TestCase):
             ('Python 3.9', '~/.venv39/bin/activate', '~/Projects/'),
         ]
         self.assertEqual(actual, expected)
+
+    def test_set_actions(self):
+        desktop_entry = textwrap.dedent("""
+            [Desktop Entry]
+            Name=EnvLauncher
+            Exec=envlauncher --preferences
+            Type=Application
+            Actions=preferences;
+
+            [Desktop Action preferences]
+            Name=Preferences
+            Exec=envlauncher --preferences
+        """).lstrip()
+        config = envlauncher.DesktopEntryParser.from_string(desktop_entry)
+
+        actions = [
+            ('Python 3.9', '~/.venv39/bin/activate', '~/Projects/'),
+            ('Python 2.7', '~/.venv27/bin/activate', '~/Projects/legacy/'),
+        ]
+        config.set_actions(actions)
+
+        section = config._parser['Desktop Entry']
+        self.assertEqual(section['Actions'], 'venv1;venv2;preferences;')
+
+        section = config._parser['Desktop Action venv1']
+        self.assertEqual(section['Name'], 'Python 3.9')
+        self.assertEqual(section['Exec'], 'envlauncher --activate "~/.venv39/bin/activate" --directory "~/Projects/"')
+
+        section = config._parser['Desktop Action venv2']
+        self.assertEqual(section['Name'], 'Python 2.7')
+        self.assertEqual(section['Exec'], 'envlauncher --activate "~/.venv27/bin/activate" --directory "~/Projects/legacy/"')
