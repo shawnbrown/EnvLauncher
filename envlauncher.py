@@ -129,14 +129,14 @@ class DesktopEntryParser(object):
     def from_string(cls, string):
         return cls(io.StringIO(string))
 
-    def export_string(self):
+    def export_string(self) -> str:
         f = io.StringIO()
         self._parser.write(f, space_around_delimiters=False)
         string = f.getvalue().strip()
         return self._unescape_comments(string)
 
     @property
-    def rcfile(self):
+    def rcfile(self) -> str:
         """An "rc" file to execute after activating the environment
         (e.g., ~/.bashrc).
         """
@@ -149,7 +149,7 @@ class DesktopEntryParser(object):
         self._rcfile = value
 
     @property
-    def banner(self):
+    def banner(self) -> str:
         """Python logo banner option."""
         return self._banner
 
