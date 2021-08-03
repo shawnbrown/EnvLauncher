@@ -174,7 +174,7 @@ class DesktopEntryParser(object):
                 action_data[identifier] = (name, activate, directory)
 
         identifiers = self._parser.get('Desktop Entry', 'Actions', fallback='')
-        identifiers = identifiers.rstrip(';').split(';')
+        identifiers = [x.strip() for x in identifiers.rstrip(';').split(';')]
 
         # Get action data in identifier order.
         actions = []
