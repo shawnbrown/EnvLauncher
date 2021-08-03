@@ -365,28 +365,17 @@ class TestDesktopEntryParserConfiguration(unittest.TestCase):
         ]
         self.assertEqual(actual, expected)
 
-        # Same as above but action identifiers are reordered (venv2;venv1;preferences;)
-        desktop_entry = textwrap.dedent("""
-            [Desktop Entry]
-            Name=EnvLauncher
-            Exec=envlauncher --preferences
-            Type=Application
-            Actions=venv2;venv1;preferences;
+        # Check identifier/group mismatch (there's no "venv3" group).
+        config._parser['Desktop Entry']['Actions'] = 'venv1;venv2;venv3;preferences;'
+        actual = config.get_actions()
+        expected = [
+            ('Python 3.9', '~/.venv39/bin/activate', '~/Projects/'),
+            ('Python 2.7', '~/.venv27/bin/activate', '~/Projects/legacy/'),
+        ]
+        self.assertEqual(actual, expected)
 
-            [Desktop Action venv1]
-            Name=Python 3.9
-            Exec=envlauncher --activate "~/.venv39/bin/activate" --directory "~/Projects/"
-
-            [Desktop Action venv2]
-            Name=Python 2.7
-            Exec=envlauncher --activate "~/.venv27/bin/activate" --directory "~/Projects/legacy/"
-
-            [Desktop Action preferences]
-            Name=Preferences
-            Exec=envlauncher --preferences
-        """).lstrip()
-        config = envlauncher.DesktopEntryParser.from_string(desktop_entry)
-
+        # Action identifiers are reordered.
+        config._parser['Desktop Entry']['Actions'] = 'venv2;venv1;preferences;'
         actual = config.get_actions()
         expected = [
             ('Python 2.7', '~/.venv27/bin/activate', '~/Projects/legacy/'),
