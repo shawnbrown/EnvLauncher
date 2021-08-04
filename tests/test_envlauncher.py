@@ -413,3 +413,26 @@ class TestDesktopEntryParserConfiguration(unittest.TestCase):
         section = config._parser['Desktop Action venv2']
         self.assertEqual(section['Name'], 'Python 2.7')
         self.assertEqual(section['Exec'], 'envlauncher --activate "~/.venv27/bin/activate" --directory "~/Projects/legacy/"')
+
+        expected = textwrap.dedent("""
+            [Desktop Entry]
+            Name=EnvLauncher
+            Exec=envlauncher --preferences
+            Type=Application
+            Actions=venv1;venv2;preferences;
+
+
+            [Desktop Action preferences]
+            Name=Preferences
+            Exec=envlauncher --preferences
+
+
+            [Desktop Action venv1]
+            Name=Python 3.9
+            Exec=envlauncher --activate "~/.venv39/bin/activate" --directory "~/Projects/"
+
+            [Desktop Action venv2]
+            Name=Python 2.7
+            Exec=envlauncher --activate "~/.venv27/bin/activate" --directory "~/Projects/legacy/"
+        """).strip()
+        self.assertEqual(config.export_string(), expected)
