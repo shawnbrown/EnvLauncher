@@ -202,7 +202,7 @@ class TestDesktopEntryParserEscaping(unittest.TestCase):
 
             Exec=gnome-terminal
             #Keywords=hello;world; <- A COMMENT!
-        """).strip()
+        """).lstrip()
 
         self.escaped = textwrap.dedent(f"""
             [Desktop Entry]
@@ -211,7 +211,7 @@ class TestDesktopEntryParserEscaping(unittest.TestCase):
             {prefix}4{suffix}
             Exec=gnome-terminal
             {prefix}6{suffix}#Keywords=hello;world; <- A COMMENT!
-        """).strip()
+        """).lstrip()
 
     def test_prefix_and_suffix(self):
         prefix = envlauncher.DesktopEntryParser._escape_prefix
@@ -421,11 +421,9 @@ class TestDesktopEntryParserConfiguration(unittest.TestCase):
             Type=Application
             Actions=venv1;venv2;preferences;
 
-
             [Desktop Action preferences]
             Name=Preferences
             Exec=envlauncher --preferences
-
 
             [Desktop Action venv1]
             Name=Python 3.9

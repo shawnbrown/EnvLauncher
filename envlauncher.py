@@ -19,6 +19,7 @@ import argparse
 import collections
 import configparser
 import io
+import itertools
 import os
 import re
 import subprocess
@@ -102,16 +103,32 @@ class DesktopEntryParser(object):
         self._rcfile = self._parser.get('X-EnvLauncher Preferences', 'Rcfile', fallback='')
         self._banner = self._parser.get('X-EnvLauncher Preferences', 'Banner', fallback='color')
 
+    @staticmethod
+    def lookahead(iterable, sentinal=None):
+        """s -> (s0,s1), (s1,s2), ..., (sN,sentinal)
+
+        Adapted from "pairwise()" recipe in itertools docs.
+        """
+        a, b = itertools.tee(iterable)
+        next(b, None)
+        return itertools.zip_longest(a, b, fillvalue=sentinal)
+
     @classmethod
     def _escape_comments(cls, string) -> str:
         """Escape comment lines so that ConfigParser will retain them."""
         escaped = []
-        for index, line in enumerate(string.split('\n'), 1):
-            if line.startswith('#') or line == '':
-                line = ''.join([cls._escape_prefix,
-                                str(index),
-                                cls._escape_suffix,
-                                line])
+        for index, pair in enumerate(cls.lookahead(string.split('\n')), 1):
+            line, nextline = pair
+            if (line.startswith('#')                         # <- comment
+                    or (line == ''                           # <- blank line
+                        and nextline is not None             # <- next not last
+                        and not nextline.startswith('['))):  # <- next not section
+                line = ''.join([
+                    cls._escape_prefix,
+                    str(index),
+                    cls._escape_suffix,
+                    line,
+                ])
             escaped.append(line)
         return '\n'.join(escaped)
 
