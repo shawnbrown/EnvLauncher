@@ -434,5 +434,5 @@ class TestDesktopEntryParserConfiguration(unittest.TestCase):
             [Desktop Action venv2]
             Name=Python 2.7
             Exec=envlauncher --activate "~/.venv27/bin/activate" --directory "~/Projects/legacy/"
-        """).strip()
+        """).lstrip()
         self.assertEqual(config.export_string(), expected)

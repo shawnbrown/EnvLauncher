@@ -132,8 +132,8 @@ class DesktopEntryParser(object):
     def export_string(self) -> str:
         f = io.StringIO()
         self._parser.write(f, space_around_delimiters=False)
-        string = f.getvalue().strip()
-        return self._unescape_comments(string)
+        string = self._unescape_comments(f.getvalue())
+        return f'{string.strip()}\n'
 
     @property
     def rcfile(self) -> str:
