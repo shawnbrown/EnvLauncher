@@ -360,8 +360,8 @@ class TestDesktopEntryParserConfiguration(unittest.TestCase):
 
         actual = config.get_actions()
         expected = [
-            ('Python 3.9', '~/.venv39/bin/activate', '~/Projects/'),
-            ('Python 2.7', '~/.venv27/bin/activate', '~/Projects/legacy/'),
+            ('venv1', 'Python 3.9', '~/.venv39/bin/activate', '~/Projects/'),
+            ('venv2', 'Python 2.7', '~/.venv27/bin/activate', '~/Projects/legacy/'),
         ]
         self.assertEqual(actual, expected)
 
@@ -369,8 +369,8 @@ class TestDesktopEntryParserConfiguration(unittest.TestCase):
         config._parser['Desktop Entry']['Actions'] = 'venv1;venv2;venv3;preferences;'
         actual = config.get_actions()
         expected = [
-            ('Python 3.9', '~/.venv39/bin/activate', '~/Projects/'),
-            ('Python 2.7', '~/.venv27/bin/activate', '~/Projects/legacy/'),
+            ('venv1', 'Python 3.9', '~/.venv39/bin/activate', '~/Projects/'),
+            ('venv2', 'Python 2.7', '~/.venv27/bin/activate', '~/Projects/legacy/'),
         ]
         self.assertEqual(actual, expected)
 
@@ -378,8 +378,8 @@ class TestDesktopEntryParserConfiguration(unittest.TestCase):
         config._parser['Desktop Entry']['Actions'] = 'venv2;venv1;preferences;'
         actual = config.get_actions()
         expected = [
-            ('Python 2.7', '~/.venv27/bin/activate', '~/Projects/legacy/'),
-            ('Python 3.9', '~/.venv39/bin/activate', '~/Projects/'),
+            ('venv2', 'Python 2.7', '~/.venv27/bin/activate', '~/Projects/legacy/'),
+            ('venv1', 'Python 3.9', '~/.venv39/bin/activate', '~/Projects/'),
         ]
         self.assertEqual(actual, expected)
 

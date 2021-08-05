@@ -171,7 +171,7 @@ class DesktopEntryParser(object):
             value = 'color'
         self._banner = value
 
-    def get_actions(self) -> List[Tuple[str, str, str]]:
+    def get_actions(self) -> List[Tuple[str, str, str, str]]:
         """Return sorted list of virtual environment launcher actions."""
         regex = re.compile(r'^envlauncher --activate "(.+)" --directory "(.+)"$')
         action_data = {}
@@ -183,7 +183,7 @@ class DesktopEntryParser(object):
             match = regex.match(self._parser[section]['Exec'])
             if match:
                 activate, directory = match.group(1, 2)
-                action_data[identifier] = (name, activate, directory)
+                action_data[identifier] = (identifier, name, activate, directory)
 
         identifiers = self._parser.get('Desktop Entry', 'Actions', fallback='')
         identifiers = [x.strip() for x in identifiers.rstrip(';').split(';')]
