@@ -123,12 +123,7 @@ class DesktopEntryParser(object):
                     or (line == ''                           # <- blank line
                         and nextline is not None             # <- next not last
                         and not nextline.startswith('['))):  # <- next not section
-                line = ''.join([
-                    cls._escape_prefix,
-                    str(index),
-                    cls._escape_suffix,
-                    line,
-                ])
+                line = f'{cls._escape_prefix}{index}{cls._escape_suffix}{line}'
             escaped.append(line)
         return '\n'.join(escaped)
 
