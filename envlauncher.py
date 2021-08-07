@@ -85,7 +85,7 @@ class DesktopEntryParser(object):
     _escape_suffix = 'ZZ=ZZ'
     _escape_regex = re.compile(f'{_escape_prefix}\\d+{_escape_suffix}')
     _venv_prefix = 'venv'
-    _identifier_num = itertools.count(1)
+    _venv_number = itertools.count(1)
 
     def __init__(self, f):
         string = f.read(128 * 1024)  # Read 128 kB from file.
@@ -178,9 +178,9 @@ class DesktopEntryParser(object):
         actions_value = self._parser['Desktop Entry']['Actions']
         identifiers = {x for x in actions_value.split(';') if x.startswith(self._venv_prefix)}
 
-        candidate = f'{self._venv_prefix}{next(self._identifier_num)}'
+        candidate = f'{self._venv_prefix}{next(self._venv_number)}'
         while candidate in identifiers:
-            candidate = f'{self._venv_prefix}{next(self._identifier_num)}'
+            candidate = f'{self._venv_prefix}{next(self._venv_number)}'
         return candidate
 
     def get_actions(self) -> List[Tuple[str, str, str, str]]:
