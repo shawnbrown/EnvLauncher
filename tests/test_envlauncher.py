@@ -376,21 +376,21 @@ class TestSettingsMakeIdentifier(unittest.TestCase):
         self.assertEqual(settings.make_identifier(), f'{prefix}4')
 
 
-class TestSettingsConfiguration(unittest.TestCase):
-    def test_get_actions(self):
-        prefix = envlauncher.Settings._venv_prefix
+class TestSettingsGetActions(unittest.TestCase):
+    def setUp(self):
+        self.prefix = envlauncher.Settings._venv_prefix
         desktop_entry = textwrap.dedent(f"""
             [Desktop Entry]
             Name=EnvLauncher
             Exec=envlauncher --preferences
             Type=Application
-            Actions={prefix}1;{prefix}2;preferences;
+            Actions={self.prefix}1;{self.prefix}2;preferences;
 
-            [Desktop Action {prefix}1]
+            [Desktop Action {self.prefix}1]
             Name=Python 3.9
             Exec=envlauncher --activate "~/.venv39/bin/activate" --directory "~/Projects/"
 
-            [Desktop Action {prefix}2]
+            [Desktop Action {self.prefix}2]
             Name=Python 2.7
             Exec=envlauncher --activate "~/.venv27/bin/activate" --directory "~/Projects/legacy/"
 
@@ -398,33 +398,47 @@ class TestSettingsConfiguration(unittest.TestCase):
             Name=Preferences
             Exec=envlauncher --preferences
         """).lstrip()
-        config = envlauncher.Settings.from_string(desktop_entry)
+        self.settings = envlauncher.Settings.from_string(desktop_entry)
 
-        actual = config.get_actions()
+    def test_basic_behavior(self):
+        actual = self.settings.get_actions()
+        expected = [
+            (f'{self.prefix}1', 'Python 3.9', '~/.venv39/bin/activate', '~/Projects/'),
+            (f'{self.prefix}2', 'Python 2.7', '~/.venv27/bin/activate', '~/Projects/legacy/'),
+        ]
+        self.assertEqual(actual, expected)
+
+    def test_mismatched_actions_and_groups(self):
+        """The Actions value includes "venv3" but there is no matching group.
+        The method should return the existing groups without errors.
+        """
+        prefix = self.prefix
+
+        self.settings._parser['Desktop Entry']['Actions'] = f'{prefix}1;{prefix}2;{prefix}3;preferences;'
+        actual = self.settings.get_actions()
         expected = [
             (f'{prefix}1', 'Python 3.9', '~/.venv39/bin/activate', '~/Projects/'),
             (f'{prefix}2', 'Python 2.7', '~/.venv27/bin/activate', '~/Projects/legacy/'),
         ]
         self.assertEqual(actual, expected)
 
-        # Check identifier/group mismatch (there's no "venv3" group).
-        config._parser['Desktop Entry']['Actions'] = f'{prefix}1;{prefix}2;{prefix}3;preferences;'
-        actual = config.get_actions()
-        expected = [
-            (f'{prefix}1', 'Python 3.9', '~/.venv39/bin/activate', '~/Projects/'),
-            (f'{prefix}2', 'Python 2.7', '~/.venv27/bin/activate', '~/Projects/legacy/'),
-        ]
-        self.assertEqual(actual, expected)
+    def test_actions_value_order(self):
+        """Actions should be returned in the order they are listed in
+        the Desktop Entry's Actions value.
+        """
+        prefix = self.prefix
 
-        # Action identifiers are reordered.
-        config._parser['Desktop Entry']['Actions'] = f'{prefix}2;{prefix}1;preferences;'
-        actual = config.get_actions()
+        # Action identifiers are in a different order ("venv2" before "venv1").
+        self.settings._parser['Desktop Entry']['Actions'] = f'{prefix}2;{prefix}1;preferences;'
+        actual = self.settings.get_actions()
         expected = [
             (f'{prefix}2', 'Python 2.7', '~/.venv27/bin/activate', '~/Projects/legacy/'),
             (f'{prefix}1', 'Python 3.9', '~/.venv39/bin/activate', '~/Projects/'),
         ]
         self.assertEqual(actual, expected)
 
+
+class TestSettingsSetActions(unittest.TestCase):
     def test_set_actions(self):
         prefix = envlauncher.Settings._venv_prefix
         desktop_entry = textwrap.dedent(f"""
