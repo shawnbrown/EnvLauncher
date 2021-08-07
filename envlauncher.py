@@ -30,6 +30,10 @@ from typing import List, Tuple
 APP_NAME = 'com.github.shawnbrown.EnvLauncher'
 
 
+###################
+# Application Logic
+###################
+
 class XDGDataPaths(object):
     """Class to fetch data paths that conform to the "XDG Base
     Directory Specification" version 0.8.
@@ -233,6 +237,10 @@ class DesktopEntryParser(object):
         actions_value = ';'.join(venv_identifiers + other_identifiers)
         self._parser['Desktop Entry']['Actions'] = f'{actions_value};'
 
+
+########################
+# Command Line Interface
+########################
 
 def parse_args(args=None):
     """Parse command line arguments."""
