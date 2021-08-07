@@ -84,6 +84,7 @@ class DesktopEntryParser(object):
     _escape_prefix = '_COMMENT'
     _escape_suffix = 'ZZ=ZZ'
     _escape_regex = re.compile(f'{_escape_prefix}\\d+{_escape_suffix}')
+    _venv_prefix = 'venv'
     _identifier_num = itertools.count(1)
 
     def __init__(self, f):
@@ -175,11 +176,11 @@ class DesktopEntryParser(object):
     def make_identifier(self) -> str:
         """Generate and return a new action identifier."""
         actions_value = self._parser['Desktop Entry']['Actions']
-        identifiers = {x for x in actions_value.split(';') if x.startswith('venv')}
+        identifiers = {x for x in actions_value.split(';') if x.startswith(self._venv_prefix)}
 
-        candidate = f'venv{next(self._identifier_num)}'
+        candidate = f'{self._venv_prefix}{next(self._identifier_num)}'
         while candidate in identifiers:
-            candidate = f'venv{next(self._identifier_num)}'
+            candidate = f'{self._venv_prefix}{next(self._identifier_num)}'
         return candidate
 
     def get_actions(self) -> List[Tuple[str, str, str, str]]:
@@ -187,7 +188,7 @@ class DesktopEntryParser(object):
         regex = re.compile(r'^envlauncher --activate "(.+)" --directory "(.+)"$')
         action_data = {}
         for section in self._parser.sections():
-            if not section.startswith('Desktop Action venv'):
+            if not section.startswith(f'Desktop Action {self._venv_prefix}'):
                 continue
             _, _, identifier = section.partition('Desktop Action ')
             name = self._parser[section]['Name']
@@ -211,7 +212,7 @@ class DesktopEntryParser(object):
         """Set virtual environment launcher actions."""
         # Remove existing venv action groups.
         for section in self._parser.sections():
-            if section.startswith('Desktop Action venv'):
+            if section.startswith(f'Desktop Action {self._venv_prefix}'):
                 del self._parser[section]
 
         # Add venv action groups and collect identifiers.
@@ -226,7 +227,7 @@ class DesktopEntryParser(object):
         # Get current identifiers and remove old venv identifiers.
         actions_value = self._parser['Desktop Entry']['Actions']
         other_identifiers = actions_value.rstrip(';').split(';')
-        other_identifiers = [x for x in other_identifiers if not x.startswith('venv')]
+        other_identifiers = [x for x in other_identifiers if not x.startswith(self._venv_prefix)]
 
         # Update the Desktop Entry group's Actions value.
         actions_value = ';'.join(venv_identifiers + other_identifiers)
