@@ -336,6 +336,27 @@ class TestDesktopEntryParserConfiguration(unittest.TestCase):
         config.banner = 1234  # <- Bogus value.
         self.assertEqual(config.banner, 'color')  # <- Defaults to color.
 
+    def test_make_identifier(self):
+        desktop_entry = textwrap.dedent("""
+            [Desktop Entry]
+            Name=EnvLauncher
+            Exec=envlauncher --preferences
+            Type=Application
+            Actions=venv2;preferences;
+
+            [Desktop Action venv2]
+            Name=Python 3.9
+            Exec=envlauncher --activate "~/.venv39/bin/activate" --directory "~/Projects/"
+
+            [Desktop Action preferences]
+            Name=Preferences
+            Exec=envlauncher --preferences
+        """).lstrip()
+        config = envlauncher.DesktopEntryParser.from_string(desktop_entry)
+
+        self.assertEqual(config.make_identifier(), 'venv1')
+        self.assertEqual(config.make_identifier(), 'venv3')
+
     def test_get_actions(self):
         desktop_entry = textwrap.dedent("""
             [Desktop Entry]

@@ -84,6 +84,7 @@ class DesktopEntryParser(object):
     _escape_prefix = '_COMMENT'
     _escape_suffix = 'ZZ=ZZ'
     _escape_regex = re.compile(f'{_escape_prefix}\\d+{_escape_suffix}')
+    _identifier_num = itertools.count(1)
 
     def __init__(self, f):
         string = f.read(128 * 1024)  # Read 128 kB from file.
@@ -170,6 +171,16 @@ class DesktopEntryParser(object):
         if value not in {'color', 'plain', 'none'}:
             value = 'color'
         self._banner = value
+
+    def make_identifier(self) -> str:
+        """Generate and return a new action identifier."""
+        actions_value = self._parser['Desktop Entry']['Actions']
+        identifiers = {x for x in actions_value.split(';') if x.startswith('venv')}
+
+        candidate = f'venv{next(self._identifier_num)}'
+        while candidate in identifiers:
+            candidate = f'venv{next(self._identifier_num)}'
+        return candidate
 
     def get_actions(self) -> List[Tuple[str, str, str, str]]:
         """Return sorted list of virtual environment launcher actions."""
