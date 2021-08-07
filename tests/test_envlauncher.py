@@ -292,8 +292,8 @@ class TestSettingsFormatting(unittest.TestCase):
         self.assertEqual(export, desktop_entry)
 
 
-class TestSettingsConfiguration(unittest.TestCase):
-    def test_rcfile(self):
+class TestSettingsRcfile(unittest.TestCase):
+    def setUp(self):
         desktop_entry = textwrap.dedent("""
             [Desktop Entry]
             Name=EnvLauncher
@@ -303,16 +303,21 @@ class TestSettingsConfiguration(unittest.TestCase):
             [X-EnvLauncher Preferences]
             Rcfile=~/.bashrc
         """).lstrip()
-        config = envlauncher.Settings.from_string(desktop_entry)
+        self.settings = envlauncher.Settings.from_string(desktop_entry)
 
-        self.assertEqual(config.rcfile, '~/.bashrc')
+    def test_read(self):
+        self.assertEqual(self.settings.rcfile, '~/.bashrc')
 
-        config.rcfile = '.venvrc'
-        self.assertEqual(config.rcfile, '.venvrc')
+    def test_set_value(self):
+        self.settings.rcfile = '.venvrc'
+        self.assertEqual(self.settings.rcfile, '.venvrc')
 
-        config.rcfile = 1234  # <- Bogus value.
-        self.assertEqual(config.rcfile, '')  # <- Empty string.
+    def test_invalid_value(self):
+        self.settings.rcfile = 1234  # <- Bogus value.
+        self.assertEqual(self.settings.rcfile, '')  # <- Empty string.
 
+
+class TestSettingsConfiguration(unittest.TestCase):
     def test_banner(self):
         desktop_entry = textwrap.dedent("""
             [Desktop Entry]
