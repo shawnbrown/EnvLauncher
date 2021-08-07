@@ -110,7 +110,7 @@ class DesktopEntryParser(object):
         self._banner = self._parser.get('X-EnvLauncher Preferences', 'Banner', fallback='color')
 
     @staticmethod
-    def lookahead(iterable, sentinal=None):
+    def _lookahead(iterable, sentinal=None):
         """s -> (s0,s1), (s1,s2), ..., (sN,sentinal)
 
         Adapted from "pairwise()" recipe in itertools docs.
@@ -123,7 +123,7 @@ class DesktopEntryParser(object):
     def _escape_comments(cls, string) -> str:
         """Escape comment lines so that ConfigParser will retain them."""
         escaped = []
-        for index, pair in enumerate(cls.lookahead(string.split('\n')), 1):
+        for index, pair in enumerate(cls._lookahead(string.split('\n')), 1):
             line, nextline = pair
             if (line.startswith('#')                         # <- comment
                     or (line == ''                           # <- blank line
