@@ -317,8 +317,8 @@ class TestSettingsRcfile(unittest.TestCase):
         self.assertEqual(self.settings.rcfile, '')  # <- Empty string.
 
 
-class TestSettingsConfiguration(unittest.TestCase):
-    def test_banner(self):
+class TestSettingsBanner(unittest.TestCase):
+    def setUp(self):
         desktop_entry = textwrap.dedent("""
             [Desktop Entry]
             Name=EnvLauncher
@@ -328,19 +328,24 @@ class TestSettingsConfiguration(unittest.TestCase):
             [X-EnvLauncher Preferences]
             Banner=color
         """).lstrip()
-        config = envlauncher.Settings.from_string(desktop_entry)
+        self.settings = envlauncher.Settings.from_string(desktop_entry)
 
-        self.assertEqual(config.banner, 'color')
+    def test_read(self):
+        self.assertEqual(self.settings.banner, 'color')
 
-        config.banner = 'plain'
-        self.assertEqual(config.banner, 'plain')
+    def test_set_value(self):
+        self.settings.banner = 'plain'
+        self.assertEqual(self.settings.banner, 'plain')
 
-        config.banner = 'none'
-        self.assertEqual(config.banner, 'none')
+        self.settings.banner = 'none'
+        self.assertEqual(self.settings.banner, 'none')
 
-        config.banner = 1234  # <- Bogus value.
-        self.assertEqual(config.banner, 'color')  # <- Defaults to color.
+    def test_invalid_value(self):
+        self.settings.banner = 1234  # <- Bogus value.
+        self.assertEqual(self.settings.banner, 'color')  # <- Defaults to color.
 
+
+class TestSettingsConfiguration(unittest.TestCase):
     def test_make_identifier(self):
         prefix = envlauncher.Settings._venv_prefix
         desktop_entry = textwrap.dedent(f"""
