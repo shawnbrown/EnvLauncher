@@ -93,7 +93,6 @@ class Settings(object):
     _escape_suffix = 'ZZ=ZZ'
     _escape_regex = re.compile(f'{_escape_prefix}\\d+{_escape_suffix}')
     _venv_prefix = 'venv'
-    _venv_number = itertools.count(1)
 
     def __init__(self, f):
         """Read desktop entry file and load it into a ConfigParser."""
@@ -113,6 +112,7 @@ class Settings(object):
 
         self._rcfile = self._parser.get('X-EnvLauncher Preferences', 'Rcfile', fallback='')
         self._banner = self._parser.get('X-EnvLauncher Preferences', 'Banner', fallback='color')
+        self._venv_number = itertools.count(1)
 
     @staticmethod
     def _lookahead(iterable, sentinal=None):
