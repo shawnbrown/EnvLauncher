@@ -178,7 +178,7 @@ class XDGDataPathsMakeHomePath(unittest.TestCase):
         self.assertEqual(filepath, expected)
 
 
-class TestDesktopEntryParserEscaping(unittest.TestCase):
+class TestSettingsEscaping(unittest.TestCase):
     """Since ConfigParser discards comments and extra empty lines,
     we need to escape these lines so we can preserve them when
     saving the config file.
@@ -192,8 +192,8 @@ class TestDesktopEntryParserEscaping(unittest.TestCase):
     """
 
     def setUp(self):
-        prefix = envlauncher.DesktopEntryParser._escape_prefix
-        suffix = envlauncher.DesktopEntryParser._escape_suffix
+        prefix = envlauncher.Settings._escape_prefix
+        suffix = envlauncher.Settings._escape_suffix
 
         self.unescaped = textwrap.dedent("""
             [Desktop Entry]
@@ -214,8 +214,8 @@ class TestDesktopEntryParserEscaping(unittest.TestCase):
         """).lstrip()
 
     def test_prefix_and_suffix(self):
-        prefix = envlauncher.DesktopEntryParser._escape_prefix
-        suffix = envlauncher.DesktopEntryParser._escape_suffix
+        prefix = envlauncher.Settings._escape_prefix
+        suffix = envlauncher.Settings._escape_suffix
 
         self.assertNotIn(suffix, prefix, msg='Suffix must not be a substring of prefix.')
         self.assertEqual(suffix.count('='), 1, msg='Must contain one equals sign.')
@@ -224,21 +224,21 @@ class TestDesktopEntryParserEscaping(unittest.TestCase):
 
     def test_escape_comments(self):
         """Should escape comments and blank lines."""
-        escaped = envlauncher.DesktopEntryParser._escape_comments(self.unescaped)
+        escaped = envlauncher.Settings._escape_comments(self.unescaped)
         self.assertEqual(escaped, self.escaped)
 
     def test_unescape_comments(self):
         """Should escape comments and blank lines."""
-        unescaped = envlauncher.DesktopEntryParser._unescape_comments(self.escaped)
+        unescaped = envlauncher.Settings._unescape_comments(self.escaped)
         self.assertEqual(unescaped, self.unescaped)
 
     def test_roundtrip(self):
-        escaped = envlauncher.DesktopEntryParser._escape_comments(self.unescaped)
-        unescaped = envlauncher.DesktopEntryParser._unescape_comments(escaped)
+        escaped = envlauncher.Settings._escape_comments(self.unescaped)
+        unescaped = envlauncher.Settings._unescape_comments(escaped)
         self.assertEqual(unescaped, self.unescaped)
 
 
-class TestDesktopEntryParserFormatting(unittest.TestCase):
+class TestSettingsFormatting(unittest.TestCase):
     """Make sure parser preserves desktop entry format."""
     @staticmethod
     def textformat(string):  # <- Helper method.
@@ -256,7 +256,7 @@ class TestDesktopEntryParserFormatting(unittest.TestCase):
             Exec=gnome-terminal -- bash -c "echo Hello World;bash"
         """)
 
-        parser = envlauncher.DesktopEntryParser.from_string(desktop_entry)
+        parser = envlauncher.Settings.from_string(desktop_entry)
         export = parser.export_string()
         self.assertEqual(export, desktop_entry, msg='should match original')
 
@@ -270,7 +270,7 @@ class TestDesktopEntryParserFormatting(unittest.TestCase):
             #Keywords=hello;world; <- A COMMENT!
         """)
 
-        parser = envlauncher.DesktopEntryParser.from_string(desktop_entry)
+        parser = envlauncher.Settings.from_string(desktop_entry)
         export = parser.export_string()
         self.assertEqual(export, desktop_entry)
 
@@ -287,12 +287,12 @@ class TestDesktopEntryParserFormatting(unittest.TestCase):
             Exec=gnome-terminal -- bash -c "echo Hello World;bash"
         """)
 
-        parser = envlauncher.DesktopEntryParser.from_string(desktop_entry)
+        parser = envlauncher.Settings.from_string(desktop_entry)
         export = parser.export_string()
         self.assertEqual(export, desktop_entry)
 
 
-class TestDesktopEntryParserConfiguration(unittest.TestCase):
+class TestSettingsConfiguration(unittest.TestCase):
     def test_rcfile(self):
         desktop_entry = textwrap.dedent("""
             [Desktop Entry]
@@ -303,7 +303,7 @@ class TestDesktopEntryParserConfiguration(unittest.TestCase):
             [X-EnvLauncher Preferences]
             Rcfile=~/.bashrc
         """).lstrip()
-        config = envlauncher.DesktopEntryParser.from_string(desktop_entry)
+        config = envlauncher.Settings.from_string(desktop_entry)
 
         self.assertEqual(config.rcfile, '~/.bashrc')
 
@@ -323,7 +323,7 @@ class TestDesktopEntryParserConfiguration(unittest.TestCase):
             [X-EnvLauncher Preferences]
             Banner=color
         """).lstrip()
-        config = envlauncher.DesktopEntryParser.from_string(desktop_entry)
+        config = envlauncher.Settings.from_string(desktop_entry)
 
         self.assertEqual(config.banner, 'color')
 
@@ -337,7 +337,7 @@ class TestDesktopEntryParserConfiguration(unittest.TestCase):
         self.assertEqual(config.banner, 'color')  # <- Defaults to color.
 
     def test_make_identifier(self):
-        prefix = envlauncher.DesktopEntryParser._venv_prefix
+        prefix = envlauncher.Settings._venv_prefix
         desktop_entry = textwrap.dedent(f"""
             [Desktop Entry]
             Name=EnvLauncher
@@ -353,13 +353,13 @@ class TestDesktopEntryParserConfiguration(unittest.TestCase):
             Name=Preferences
             Exec=envlauncher --preferences
         """).lstrip()
-        config = envlauncher.DesktopEntryParser.from_string(desktop_entry)
+        config = envlauncher.Settings.from_string(desktop_entry)
 
         self.assertEqual(config.make_identifier(), f'{prefix}1')
         self.assertEqual(config.make_identifier(), f'{prefix}3')
 
     def test_get_actions(self):
-        prefix = envlauncher.DesktopEntryParser._venv_prefix
+        prefix = envlauncher.Settings._venv_prefix
         desktop_entry = textwrap.dedent(f"""
             [Desktop Entry]
             Name=EnvLauncher
@@ -379,7 +379,7 @@ class TestDesktopEntryParserConfiguration(unittest.TestCase):
             Name=Preferences
             Exec=envlauncher --preferences
         """).lstrip()
-        config = envlauncher.DesktopEntryParser.from_string(desktop_entry)
+        config = envlauncher.Settings.from_string(desktop_entry)
 
         actual = config.get_actions()
         expected = [
@@ -407,7 +407,7 @@ class TestDesktopEntryParserConfiguration(unittest.TestCase):
         self.assertEqual(actual, expected)
 
     def test_set_actions(self):
-        prefix = envlauncher.DesktopEntryParser._venv_prefix
+        prefix = envlauncher.Settings._venv_prefix
         desktop_entry = textwrap.dedent(f"""
             [Desktop Entry]
             Name=EnvLauncher
@@ -423,7 +423,7 @@ class TestDesktopEntryParserConfiguration(unittest.TestCase):
             Name=Preferences
             Exec=envlauncher --preferences
         """).lstrip()
-        config = envlauncher.DesktopEntryParser.from_string(desktop_entry)
+        config = envlauncher.Settings.from_string(desktop_entry)
 
         actions = [
             (f'{prefix}1', 'Python 3.9', '~/.venv39/bin/activate', '~/Projects/'),

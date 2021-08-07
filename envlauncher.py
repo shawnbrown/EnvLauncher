@@ -78,11 +78,15 @@ class XDGDataPaths(object):
         return os.path.realpath(path)
 
 
-class DesktopEntryParser(object):
-    """Class to parse .desktop files that conform to the "Desktop Entry
-    Specification" version 1.5.
+class Settings(object):
+    """Class to manage settings for EnvLauncher application.
+
+    Settings are loaded from and saved to the desktop entry file used
+    to launch the application (the ".desktop" file). This file should
+    conform to the "Desktop Entry Specification" version 1.5.
 
     For details see:
+
         https://specifications.freedesktop.org/desktop-entry-spec/
     """
     _escape_prefix = '_COMMENT'
@@ -92,6 +96,7 @@ class DesktopEntryParser(object):
     _venv_number = itertools.count(1)
 
     def __init__(self, f):
+        """Read desktop entry file and load it into a ConfigParser."""
         string = f.read(128 * 1024)  # Read 128 kB from file.
         if f.read(1):
             raise RuntimeError('Desktop entry file exceeds 128 kB.')
