@@ -345,8 +345,22 @@ class TestSettingsBanner(unittest.TestCase):
         self.assertEqual(self.settings.banner, 'color')  # <- Defaults to color.
 
 
-class TestSettingsConfiguration(unittest.TestCase):
-    def test_make_identifier(self):
+class TestSettingsMakeIdentifier(unittest.TestCase):
+    def test_no_existing_venv_actions(self):
+        prefix = envlauncher.Settings._venv_prefix
+        desktop_entry = textwrap.dedent(f"""
+            [Desktop Entry]
+            Name=EnvLauncher
+            Exec=envlauncher --preferences
+            Type=Application
+            Actions=preferences;
+        """)
+        settings = envlauncher.Settings.from_string(desktop_entry)
+        self.assertEqual(settings.make_identifier(), f'{prefix}1')
+        self.assertEqual(settings.make_identifier(), f'{prefix}2')
+        self.assertEqual(settings.make_identifier(), f'{prefix}3')
+
+    def test_has_existing_venv_actions(self):
         prefix = envlauncher.Settings._venv_prefix
         desktop_entry = textwrap.dedent(f"""
             [Desktop Entry]
@@ -354,20 +368,15 @@ class TestSettingsConfiguration(unittest.TestCase):
             Exec=envlauncher --preferences
             Type=Application
             Actions={prefix}2;preferences;
+        """)
+        settings = envlauncher.Settings.from_string(desktop_entry)
+        self.assertEqual(settings.make_identifier(), f'{prefix}1')
+        self.assertEqual(settings.make_identifier(), f'{prefix}3',
+                         msg='skips 2 since "venv2" already exists')
+        self.assertEqual(settings.make_identifier(), f'{prefix}4')
 
-            [Desktop Action {prefix}2]
-            Name=Python 3.9
-            Exec=envlauncher --activate "~/.venv39/bin/activate" --directory "~/Projects/"
 
-            [Desktop Action preferences]
-            Name=Preferences
-            Exec=envlauncher --preferences
-        """).lstrip()
-        config = envlauncher.Settings.from_string(desktop_entry)
-
-        self.assertEqual(config.make_identifier(), f'{prefix}1')
-        self.assertEqual(config.make_identifier(), f'{prefix}3')
-
+class TestSettingsConfiguration(unittest.TestCase):
     def test_get_actions(self):
         prefix = envlauncher.Settings._venv_prefix
         desktop_entry = textwrap.dedent(f"""
