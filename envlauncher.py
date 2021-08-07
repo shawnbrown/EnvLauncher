@@ -196,27 +196,25 @@ class DesktopEntryParser(object):
                 actions.append(action)
         return actions
 
-    def set_actions(self, actions):
+    def set_actions(self, actions: List[Tuple[str, str, str, str]]):
         """Set virtual environment launcher actions."""
-        # Remove existing venv actions.
+        # Remove existing venv action groups.
         for section in self._parser.sections():
             if section.startswith('Desktop Action venv'):
                 del self._parser[section]
 
-        identifiers = []
-        for index, action in enumerate(actions, 1):
-            name, activate, directory = action
-            identifier = f'venv{index}'
-            identifiers.append(identifier)
-
-            #self._parser.add_section('Desktop Action {identifier}')
+        # Add action groups and collect identifiers.
+        action_identifiers = []
+        for identifier, name, activate, directory in actions:
             self._parser[f'Desktop Action {identifier}'] = {
                 'Name': name.strip(),
                 'Exec': f'envlauncher --activate "{activate}" --directory "{directory}"',
             }
+            action_identifiers.append(identifier)
 
-        actions_identifiers = f'{";".join(identifiers)};preferences;'
-        self._parser['Desktop Entry']['Actions'] = actions_identifiers
+        # Update the Desktop Entry group's Actions key.
+        actions_key = f'{";".join(action_identifiers)};preferences;'
+        self._parser['Desktop Entry']['Actions'] = actions_key
 
 
 def parse_args(args=None):

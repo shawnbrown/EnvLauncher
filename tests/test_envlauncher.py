@@ -398,8 +398,8 @@ class TestDesktopEntryParserConfiguration(unittest.TestCase):
         config = envlauncher.DesktopEntryParser.from_string(desktop_entry)
 
         actions = [
-            ('Python 3.9', '~/.venv39/bin/activate', '~/Projects/'),
-            ('Python 2.7', '~/.venv27/bin/activate', '~/Projects/legacy/'),
+            ('venv1', 'Python 3.9', '~/.venv39/bin/activate', '~/Projects/'),
+            ('venv2', 'Python 2.7', '~/.venv27/bin/activate', '~/Projects/legacy/'),
         ]
         config.set_actions(actions)
 
