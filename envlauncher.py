@@ -214,18 +214,23 @@ class DesktopEntryParser(object):
             if section.startswith('Desktop Action venv'):
                 del self._parser[section]
 
-        # Add action groups and collect identifiers.
-        action_identifiers = []
+        # Add venv action groups and collect identifiers.
+        venv_identifiers = []
         for identifier, name, activate, directory in actions:
             self._parser[f'Desktop Action {identifier}'] = {
                 'Name': name.strip(),
                 'Exec': f'envlauncher --activate "{activate}" --directory "{directory}"',
             }
-            action_identifiers.append(identifier)
+            venv_identifiers.append(identifier)
 
-        # Update the Desktop Entry group's Actions key.
-        actions_key = f'{";".join(action_identifiers)};preferences;'
-        self._parser['Desktop Entry']['Actions'] = actions_key
+        # Get current identifiers and remove old venv identifiers.
+        actions_value = self._parser['Desktop Entry']['Actions']
+        other_identifiers = actions_value.rstrip(';').split(';')
+        other_identifiers = [x for x in other_identifiers if not x.startswith('venv')]
+
+        # Update the Desktop Entry group's Actions value.
+        actions_value = ';'.join(venv_identifiers + other_identifiers)
+        self._parser['Desktop Entry']['Actions'] = f'{actions_value};'
 
 
 def parse_args(args=None):

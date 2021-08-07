@@ -410,7 +410,11 @@ class TestDesktopEntryParserConfiguration(unittest.TestCase):
             Name=EnvLauncher
             Exec=envlauncher --preferences
             Type=Application
-            Actions=preferences;
+            Actions=other;preferences;
+
+            [Desktop Action other]
+            Name=Other
+            Exec=envlauncher --preferences
 
             [Desktop Action preferences]
             Name=Preferences
@@ -425,7 +429,7 @@ class TestDesktopEntryParserConfiguration(unittest.TestCase):
         config.set_actions(actions)
 
         section = config._parser['Desktop Entry']
-        self.assertEqual(section['Actions'], 'venv1;venv2;preferences;')
+        self.assertEqual(section['Actions'], 'venv1;venv2;other;preferences;')
 
         section = config._parser['Desktop Action venv1']
         self.assertEqual(section['Name'], 'Python 3.9')
@@ -440,7 +444,11 @@ class TestDesktopEntryParserConfiguration(unittest.TestCase):
             Name=EnvLauncher
             Exec=envlauncher --preferences
             Type=Application
-            Actions=venv1;venv2;preferences;
+            Actions=venv1;venv2;other;preferences;
+
+            [Desktop Action other]
+            Name=Other
+            Exec=envlauncher --preferences
 
             [Desktop Action preferences]
             Name=Preferences
