@@ -312,10 +312,8 @@ def activate_environment(script_path, working_dir):
         process.wait(10)
 
 
-def edit_preferences(reset_all=False, environ=None):
+def edit_preferences(paths, reset_all=False):
     """Edit preferences."""
-    paths = DataPaths(os.environ if environ is None else environ)
-
     # Temporarily use shutil.copy() to prevent users from directly
     # opening a file they don't have write permissions for (e.g.
     # a file in "/usr/local/share/applications/...").
@@ -335,7 +333,8 @@ def main():
     if args.activate:
         activate_environment(args.activate, args.directory)
     elif args.preferences:
-        edit_preferences(args.reset_all)
+        paths = DataPaths()
+        edit_preferences(paths, args.reset_all)
 
 
 if __name__ == '__main__':
