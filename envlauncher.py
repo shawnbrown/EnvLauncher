@@ -218,7 +218,11 @@ class Settings(object):
         return actions
 
     def set_actions(self, actions: List[Tuple[str, str, str, str]]):
-        """Set virtual environment launcher actions."""
+        """Set virtual environment launcher actions.
+
+        This replaces all of the existing launcher actions with the
+        given list.
+        """
         # Remove existing venv action groups.
         for section in self._parser.sections():
             if section.startswith(f'Desktop Action {self._venv_prefix}'):
