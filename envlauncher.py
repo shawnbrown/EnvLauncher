@@ -95,11 +95,20 @@ class Settings(object):
     _escape_regex = re.compile(f'{_escape_prefix}\\d+{_escape_suffix}')
     _venv_prefix = 'venv'
 
-    def __init__(self, f):
+    def __init__(self, file_or_path):
         """Read desktop entry file and load it into a ConfigParser."""
-        string = f.read(128 * 1024)  # Read 128 kB from file.
-        if f.read(1):
-            raise RuntimeError('Desktop entry file exceeds 128 kB.')
+        if isinstance(file_or_path, str):
+            f = open(file_or_path)
+        else:
+            f = file_or_path  # When file opened elsewhere, use it as-is.
+
+        try:
+            string = f.read(128 * 1024)  # Read 128 kB from file.
+            if f.read(1):
+                raise RuntimeError('Desktop entry file exceeds 128 kB.')
+        finally:
+            if f != file_or_path:  # If file not opened elsewhere, then close it.
+                f.close()
 
         self._parser = configparser.ConfigParser(
             dict_type=collections.OrderedDict,
