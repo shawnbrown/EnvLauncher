@@ -437,6 +437,17 @@ class TestSettingsGetActions(unittest.TestCase):
         ]
         self.assertEqual(actual, expected)
 
+    def test_missing_actions_section(self):
+        """Should still work when "Actions" key and action groups missing."""
+        desktop_entry = textwrap.dedent(f"""
+            [Desktop Entry]
+            Name=EnvLauncher
+            Exec=envlauncher --preferences
+            Type=Application
+        """).lstrip()
+        settings = envlauncher.Settings.from_string(desktop_entry)
+        self.assertEqual(settings.get_actions(), [])
+
 
 class TestSettingsSetActions(unittest.TestCase):
     def setUp(self):
@@ -522,3 +533,36 @@ class TestSettingsSetActions(unittest.TestCase):
             ],
             msg='should preserve "other" and "preferences" groups',
         )
+
+    def test_missing_actions_section(self):
+        """Should still work when "Actions" key and action groups missing."""
+        prefix = self.prefix
+        desktop_entry = textwrap.dedent(f"""
+            [Desktop Entry]
+            Name=EnvLauncher
+            Exec=envlauncher --preferences
+            Type=Application
+        """).lstrip()
+        settings = envlauncher.Settings.from_string(desktop_entry)
+        settings.set_actions([
+            (f'{prefix}1', 'Python 3.9', '~/.venv39/bin/activate', '~/Projects/'),
+            (f'{prefix}2', 'Python 2.7', '~/.venv27/bin/activate', '~/Projects/legacy/'),
+        ])
+
+        export = settings.export_string()
+        expected = textwrap.dedent(f"""
+            [Desktop Entry]
+            Name=EnvLauncher
+            Exec=envlauncher --preferences
+            Type=Application
+            Actions={prefix}1;{prefix}2;
+
+            [Desktop Action {prefix}1]
+            Name=Python 3.9
+            Exec=envlauncher --activate "~/.venv39/bin/activate" --directory "~/Projects/"
+
+            [Desktop Action {prefix}2]
+            Name=Python 2.7
+            Exec=envlauncher --activate "~/.venv27/bin/activate" --directory "~/Projects/legacy/"
+        """).lstrip()
+        self.assertEqual(export, expected)

@@ -206,8 +206,8 @@ class Settings(object):
                 activate, directory = match.group(1, 2)
                 action_data[identifier] = (identifier, name, activate, directory)
 
-        identifiers = self._parser.get('Desktop Entry', 'Actions', fallback='')
-        identifiers = [x.strip() for x in identifiers.rstrip(';').split(';')]
+        actions_value = self._parser.get('Desktop Entry', 'Actions', fallback='')
+        identifiers = [x.strip() for x in actions_value.rstrip(';').split(';')]
 
         # Get action data in identifier order.
         actions = []
@@ -238,9 +238,10 @@ class Settings(object):
             venv_identifiers.append(identifier)
 
         # Get current identifiers and remove old venv identifiers.
-        actions_value = self._parser['Desktop Entry']['Actions']
-        other_identifiers = actions_value.rstrip(';').split(';')
-        other_identifiers = [x for x in other_identifiers if not x.startswith(self._venv_prefix)]
+        actions_value = self._parser.get('Desktop Entry', 'Actions', fallback='')
+        identifiers = actions_value.rstrip(';').split(';')
+        func = lambda x: x and not x.startswith(self._venv_prefix)
+        other_identifiers = [x for x in identifiers if func(x)]
 
         # Update the Desktop Entry group's Actions value.
         actions_value = ';'.join(venv_identifiers + other_identifiers)
