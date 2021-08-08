@@ -305,11 +305,12 @@ def parse_args(args=None):
     return args
 
 
-def activate_environment(script_path, working_dir):
+def activate_environment(settings, script_path, working_dir):
     """Launch a gnome-terminal and activate a development environment."""
     rcfile_lines = [
-        f'source {script_path}',
         f'cd {working_dir}' if working_dir else '',
+        f'source {settings.rcfile}' if settings.rcfile else '',
+        f'source {script_path}',
     ]
 
     with tempfile.NamedTemporaryFile(mode='w+') as fh:
@@ -339,10 +340,12 @@ def edit_preferences(paths, reset_all=False):
 
 def main():
     args = parse_args()
+    paths = DataPaths()
     if args.activate:
-        activate_environment(args.activate, args.directory)
+        desktop_path = paths.find_resource_path('applications', f'{APP_NAME}.desktop')
+        settings = Settings(desktop_path)
+        activate_environment(settings, args.activate, args.directory)
     elif args.preferences:
-        paths = DataPaths()
         edit_preferences(paths, args.reset_all)
 
 
