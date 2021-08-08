@@ -305,12 +305,23 @@ def parse_args(args=None):
     return args
 
 
-def activate_environment(settings, script_path, working_dir):
+def activate_environment(settings, paths, script_path, working_dir):
     """Launch a gnome-terminal and activate a development environment."""
+    if settings.banner == 'color':
+        banner_file = 'banner-color.ascii'
+    elif settings.banner == 'plain':
+        banner_file = 'banner-plain.ascii'
+    else:
+        banner_file = None
+
+    if banner_file:
+        banner_path = paths.find_resource_path('envlauncher', banner_file)
+
     rcfile_lines = [
         f'cd {working_dir}' if working_dir else '',
         f'source {settings.rcfile}' if settings.rcfile else '',
         f'source {script_path}',
+        f'cat {banner_path}' if banner_path else '',
     ]
 
     with tempfile.NamedTemporaryFile(mode='w+') as fh:
@@ -344,7 +355,7 @@ def main():
     if args.activate:
         desktop_path = paths.find_resource_path('applications', f'{APP_NAME}.desktop')
         settings = Settings(desktop_path)
-        activate_environment(settings, args.activate, args.directory)
+        activate_environment(settings, paths, args.activate, args.directory)
     elif args.preferences:
         edit_preferences(paths, args.reset_all)
 

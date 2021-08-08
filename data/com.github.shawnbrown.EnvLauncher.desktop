@@ -25,3 +25,7 @@ Actions=preferences;
 Name=Preferences
 Name[ja]=設定
 Exec=envlauncher --preferences
+
+[X-EnvLauncher Preferences]
+Rcfile=~/.bashrc
+Banner=color
