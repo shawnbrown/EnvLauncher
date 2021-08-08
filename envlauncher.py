@@ -34,11 +34,12 @@ APP_NAME = 'com.github.shawnbrown.EnvLauncher'
 # Application Logic
 ###################
 
-class XDGDataPaths(object):
+class DataPaths(object):
     """Class to fetch data paths that conform to the "XDG Base
     Directory Specification" version 0.8.
 
     For details see:
+
         http://standards.freedesktop.org/basedir-spec/
     """
     def __init__(self, environ=None):
@@ -313,7 +314,7 @@ def activate_environment(script_path, working_dir):
 
 def edit_preferences(reset_all=False, environ=None):
     """Edit preferences."""
-    paths = XDGDataPaths(os.environ if environ is None else environ)
+    paths = DataPaths(os.environ if environ is None else environ)
 
     # Temporarily use shutil.copy() to prevent users from directly
     # opening a file they don't have write permissions for (e.g.

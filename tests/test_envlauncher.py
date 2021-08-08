@@ -78,35 +78,35 @@ class TestParseArgs(unittest.TestCase):
         )
 
 
-class TestXDGDataPathsAttributes(unittest.TestCase):
+class TestDataPathsAttributes(unittest.TestCase):
     def test_data_home(self):
-        xdgdir = envlauncher.XDGDataPaths({
+        datapaths = envlauncher.DataPaths({
             'XDG_DATA_HOME': '/other/location/share',
             'HOME': '/home/testuser',
         })
-        self.assertEqual(xdgdir.data_home, '/other/location/share')
+        self.assertEqual(datapaths.data_home, '/other/location/share')
 
     def test_data_home_default(self):
-        xdgdir = envlauncher.XDGDataPaths({
+        datapaths = envlauncher.DataPaths({
             'HOME': '/home/testuser',
         })
-        self.assertEqual(xdgdir.data_home, '/home/testuser/.local/share')
+        self.assertEqual(datapaths.data_home, '/home/testuser/.local/share')
 
     def test_data_dirs(self):
-        xdgdir = envlauncher.XDGDataPaths({
+        datapaths = envlauncher.DataPaths({
             'HOME': '/home/testuser',
             'XDG_DATA_DIRS': '/foo/bar:/var/lib/baz',
         })
-        self.assertEqual(xdgdir.data_dirs, ['/foo/bar', '/var/lib/baz'])
+        self.assertEqual(datapaths.data_dirs, ['/foo/bar', '/var/lib/baz'])
 
     def test_data_dirs_default(self):
-        xdgdir = envlauncher.XDGDataPaths({
+        datapaths = envlauncher.DataPaths({
             'HOME': '/home/testuser',
         })
-        self.assertEqual(xdgdir.data_dirs, ['/usr/local/share', '/usr/share'])
+        self.assertEqual(datapaths.data_dirs, ['/usr/local/share', '/usr/share'])
 
 
-class XDGDataPathsFindResourcePath(unittest.TestCase):
+class DataPathsFindResourcePath(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         # Define temporary directory structure and files.
@@ -135,8 +135,8 @@ class XDGDataPathsFindResourcePath(unittest.TestCase):
                 with open(filepath, 'w') as fh:
                     fh.write('dummy file contents')
 
-        # Create an XDGDataPaths instance with a custom environ.
-        cls.xdgdir = envlauncher.XDGDataPaths({
+        # Create a DataPaths instance with a custom environ.
+        cls.datapaths = envlauncher.DataPaths({
             'XDG_DATA_HOME': os.path.join(tempname, 'highest/preference'),
             'XDG_DATA_DIRS': ':'.join([
                 os.path.join(tempname, 'middle/preference'),
@@ -149,31 +149,31 @@ class XDGDataPathsFindResourcePath(unittest.TestCase):
         cls.tempdir.cleanup()
 
     def test_highest_preference(self):
-        filepath = self.xdgdir.find_resource_path('applications', 'app1.desktop')
+        filepath = self.datapaths.find_resource_path('applications', 'app1.desktop')
         regex = r'/highest/preference/applications/app1[.]desktop$'
         self.assertRegex(filepath, regex)
 
     def test_middle_preference(self):
-        filepath = self.xdgdir.find_resource_path('applications', 'app2.desktop')
+        filepath = self.datapaths.find_resource_path('applications', 'app2.desktop')
         regex = r'/middle/preference/applications/app2[.]desktop$'
         self.assertRegex(filepath, regex)
 
     def test_lowest_preference(self):
-        filepath = self.xdgdir.find_resource_path('applications', 'app3.desktop')
+        filepath = self.datapaths.find_resource_path('applications', 'app3.desktop')
         regex = r'/lowest/preference/applications/app3[.]desktop$'
         self.assertRegex(filepath, regex)
 
     def test_no_matching_file(self):
         with self.assertRaises(FileNotFoundError):
-            self.xdgdir.find_resource_path('applications', 'app4.desktop')
+            self.datapaths.find_resource_path('applications', 'app4.desktop')
 
 
-class XDGDataPathsMakeHomePath(unittest.TestCase):
+class DataPathsMakeHomePath(unittest.TestCase):
     def test_home_filepath(self):
-        xdgdir = envlauncher.XDGDataPaths({
+        datapaths = envlauncher.DataPaths({
             'XDG_DATA_HOME': os.path.join('/base/directory'),
         })
-        filepath = xdgdir.make_home_path('applications', 'app1.desktop')
+        filepath = datapaths.make_home_path('applications', 'app1.desktop')
         expected = '/base/directory/applications/app1.desktop'
         self.assertEqual(filepath, expected)
 
