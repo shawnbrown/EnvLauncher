@@ -439,63 +439,86 @@ class TestSettingsGetActions(unittest.TestCase):
 
 
 class TestSettingsSetActions(unittest.TestCase):
-    def test_set_actions(self):
-        prefix = envlauncher.Settings._venv_prefix
+    def setUp(self):
         desktop_entry = textwrap.dedent(f"""
             [Desktop Entry]
             Name=EnvLauncher
             Exec=envlauncher --preferences
             Type=Application
-            Actions=other;preferences;
-
-            [Desktop Action other]
-            Name=Other
-            Exec=envlauncher --preferences
+            Actions=preferences;
 
             [Desktop Action preferences]
             Name=Preferences
             Exec=envlauncher --preferences
         """).lstrip()
-        config = envlauncher.Settings.from_string(desktop_entry)
+        self.settings = envlauncher.Settings.from_string(desktop_entry)
+        self.prefix = envlauncher.Settings._venv_prefix
 
+    def test_set_actions(self):
+        prefix = self.prefix
         actions = [
             (f'{prefix}1', 'Python 3.9', '~/.venv39/bin/activate', '~/Projects/'),
             (f'{prefix}2', 'Python 2.7', '~/.venv27/bin/activate', '~/Projects/legacy/'),
         ]
-        config.set_actions(actions)
+        self.settings.set_actions(actions)
 
-        section = config._parser['Desktop Entry']
-        self.assertEqual(section['Actions'], f'{prefix}1;{prefix}2;other;preferences;')
+        action_values = self.settings._parser['Desktop Entry']['Actions']
+        self.assertEqual(action_values, f'{prefix}1;{prefix}2;preferences;')
 
-        section = config._parser[f'Desktop Action {prefix}1']
-        self.assertEqual(section['Name'], 'Python 3.9')
-        self.assertEqual(section['Exec'], 'envlauncher --activate "~/.venv39/bin/activate" --directory "~/Projects/"')
+        actual_venv_groups = [
+            self.settings._parser[f'Desktop Action {prefix}1'],
+            self.settings._parser[f'Desktop Action {prefix}2'],
+        ]
+        expected_venv_groups = [
+            {'Name': 'Python 3.9',
+             'Exec': 'envlauncher --activate "~/.venv39/bin/activate" --directory "~/Projects/"'},
+            {'Name': 'Python 2.7',
+             'Exec': 'envlauncher --activate "~/.venv27/bin/activate" --directory "~/Projects/legacy/"'},
+        ]
+        self.assertEqual(actual_venv_groups, expected_venv_groups)
 
-        section = config._parser[f'Desktop Action {prefix}2']
-        self.assertEqual(section['Name'], 'Python 2.7')
-        self.assertEqual(section['Exec'], 'envlauncher --activate "~/.venv27/bin/activate" --directory "~/Projects/legacy/"')
-
-        expected = textwrap.dedent(f"""
+    def test_arbitrary_action_groups(self):
+        """Non-venv action groups should be preserved between updates."""
+        prefix = self.prefix
+        desktop_entry = textwrap.dedent(f"""
             [Desktop Entry]
             Name=EnvLauncher
             Exec=envlauncher --preferences
             Type=Application
-            Actions={prefix}1;{prefix}2;other;preferences;
+            Actions=other;{prefix}3;preferences;
 
             [Desktop Action other]
-            Name=Other
+            Name=Other Action
             Exec=envlauncher --preferences
+
+            [Desktop Action {self.prefix}3]
+            Name=Python 3.10
+            Exec=envlauncher --activate "~/.venv310/bin/activate" --directory "~/Projects/"
 
             [Desktop Action preferences]
             Name=Preferences
             Exec=envlauncher --preferences
-
-            [Desktop Action {prefix}1]
-            Name=Python 3.9
-            Exec=envlauncher --activate "~/.venv39/bin/activate" --directory "~/Projects/"
-
-            [Desktop Action {prefix}2]
-            Name=Python 2.7
-            Exec=envlauncher --activate "~/.venv27/bin/activate" --directory "~/Projects/legacy/"
         """).lstrip()
-        self.assertEqual(config.export_string(), expected)
+        settings = envlauncher.Settings.from_string(desktop_entry)
+        settings.set_actions([
+            (f'{prefix}1', 'Python 3.9', '~/.venv39/bin/activate', '~/Projects/'),
+            (f'{prefix}2', 'Python 2.7', '~/.venv27/bin/activate', '~/Projects/legacy/'),
+        ])
+
+        self.assertEqual(
+            settings._parser['Desktop Entry']['Actions'],
+            f'{prefix}1;{prefix}2;other;preferences;',
+            msg='should preserve "other" and "preferences" identifiers',
+        )
+
+        self.assertEqual(
+            settings._parser.sections(),
+            [
+                'Desktop Entry',
+                'Desktop Action other',
+                'Desktop Action preferences',
+                f'Desktop Action {prefix}1',
+                f'Desktop Action {prefix}2',
+            ],
+            msg='should preserve "other" and "preferences" groups',
+        )
