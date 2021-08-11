@@ -24,6 +24,7 @@ import os
 import re
 import subprocess
 import tempfile
+from time import time
 from typing import List, Tuple, Optional
 
 
@@ -356,9 +357,24 @@ def activate_environment(settings, paths, script_path, working_dir):
         fh.write('\n'.join(rcfile_lines))
         fh.seek(0)
 
-        args = ['gnome-terminal', '--', 'bash', '--rcfile', fh.name]
+        if name_has_owner(APP_NAME):
+            app_id_args = ['--app-id', APP_NAME]
+        else:
+            gnome_terminal_server = find_gnome_terminal_server()
+            if gnome_terminal_server:
+                args = [gnome_terminal_server, '--app-id', APP_NAME]
+                process = subprocess.Popen(args)
+                timeout = time() + 1
+                while not name_has_owner(APP_NAME) and time() <= timeout:
+                    pass
+                app_id_args = ['--app-id', APP_NAME]
+            else:
+                # Fallback to older `--class` argument.
+                app_id_args = ['--class', APP_NAME]
+
+        args = ['gnome-terminal'] + app_id_args + ['--', 'bash', '--rcfile', fh.name]
         process = subprocess.Popen(args)
-        process.wait(10)
+        process.wait(timeout=5)
 
 
 def edit_preferences(paths, reset_all=False):
