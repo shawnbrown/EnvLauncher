@@ -342,6 +342,7 @@ def edit_preferences(paths, reset_all=False):
     desktop_home = paths.make_home_path('applications', f'{APP_NAME}.desktop')
     if not os.path.exists(desktop_home):
         desktop_path = paths.find_resource_path('applications', f'{APP_NAME}.desktop')
+        os.makedirs(os.path.dirname(desktop_home), exist_ok=True)
         shutil.copy(src=desktop_path, dst=desktop_home)
 
     # Temporarily open file in Gedit until GUI is ready.
