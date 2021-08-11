@@ -597,3 +597,10 @@ class TestDBusInteraction(unittest.TestCase):
 
         result = envlauncher.name_has_owner('org.gnome.Shell')
         self.assertTrue(result)
+
+
+class TestFindGnomeTerminalServer(unittest.TestCase):
+    def test_find_gnome_terminal_server(self):
+        result = envlauncher.find_gnome_terminal_server()
+        self.assertIsNotNone(result)
+        self.assertRegex(result, 'gnome-terminal-server$')

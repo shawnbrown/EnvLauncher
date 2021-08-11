@@ -24,7 +24,7 @@ import os
 import re
 import subprocess
 import tempfile
-from typing import List, Tuple
+from typing import List, Tuple, Optional
 
 
 APP_NAME = 'com.github.shawnbrown.EnvLauncher'
@@ -271,6 +271,19 @@ def name_has_owner(name) -> bool:
         f'string:{name}',                     # <- message CONTENTS
     ])
     return b'true' in reply.lower()
+
+
+def find_gnome_terminal_server() -> Optional[str]:
+    """Find and return the path to gnome-terminal-server."""
+    search_paths = [
+        '/usr/libexec/gnome-terminal-server',
+        '/usr/lib/gnome-terminal/gnome-terminal-server',
+        '/usr/lib/gnome-terminal-server',
+    ]
+    for path in search_paths:
+        if os.path.exists(path):
+            return path
+    return None
 
 
 ########################
