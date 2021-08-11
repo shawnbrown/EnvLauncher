@@ -258,6 +258,21 @@ class Settings(object):
         self._parser['Desktop Entry']['Actions'] = f'{actions_value};'
 
 
+def name_has_owner(name) -> bool:
+    """Check if the name exists on the session bus (has an owner)."""
+    reply = subprocess.check_output([
+        'dbus-send',
+        '--session',                          # <- use session message bus
+        '--dest=org.freedesktop.DBus',        # <- message destination
+        '--print-reply=literal',              # <- set reply format
+        '--type=method_call',                 # <- message type
+        '/',                                  # <- OBJECT_PATH
+        'org.freedesktop.DBus.NameHasOwner',  # <- INTERFACE.MEMBER (method)
+        f'string:{name}',                     # <- message CONTENTS
+    ])
+    return b'true' in reply.lower()
+
+
 ########################
 # Command Line Interface
 ########################
