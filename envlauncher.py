@@ -24,7 +24,7 @@ import os
 import re
 import subprocess
 import tempfile
-from time import time
+from time import sleep, time
 from typing import List, Tuple, Optional
 
 
@@ -366,7 +366,7 @@ def activate_environment(settings, paths, script_path, working_dir):
                 process = subprocess.Popen(args)
                 timeout = time() + 1
                 while not name_has_owner(APP_NAME) and time() <= timeout:
-                    pass
+                    sleep(0.03125)  # 1/32nd of a second polling interval
                 app_id_args = ['--app-id', APP_NAME]
             else:
                 # Fallback to older `--class` argument.
