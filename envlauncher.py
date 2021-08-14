@@ -99,16 +99,18 @@ class Settings(object):
     def __init__(self, file_or_path):
         """Read desktop entry file and load it into a ConfigParser."""
         if isinstance(file_or_path, str):
-            f = open(file_or_path)
+            f = open(file_or_path)  # If not already open, open file locally.
         else:
-            f = file_or_path  # When file opened elsewhere, use it as-is.
+            f = file_or_path
 
         try:
             string = f.read(128 * 1024)  # Read 128 kB from file.
             if f.read(1):
                 raise RuntimeError('Desktop entry file exceeds 128 kB.')
+                # If a desktop entry file is anywhere near 128 kB,
+                # then something unexpected is going on.
         finally:
-            if f != file_or_path:  # If file not opened elsewhere, then close it.
+            if f != file_or_path:  # If opened locally, then close it.
                 f.close()
 
         self._parser = configparser.ConfigParser(
