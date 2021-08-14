@@ -363,7 +363,7 @@ def activate_environment(settings, paths, script_path, working_dir):
         fh.write('\n'.join(rcfile_lines))
 
         if name_has_owner(APP_NAME):
-            app_id_args = ['--app-id', APP_NAME]
+            id_arg = '--app-id'
         else:
             gnome_terminal_server = find_gnome_terminal_server()
             if gnome_terminal_server:
@@ -372,12 +372,12 @@ def activate_environment(settings, paths, script_path, working_dir):
                 timeout = time() + 1
                 while not name_has_owner(APP_NAME) and time() <= timeout:
                     sleep(0.03125)  # 1/32nd of a second polling interval
-                app_id_args = ['--app-id', APP_NAME]
+                id_arg = '--app-id'
             else:
                 # Fallback to older `--class` argument.
-                app_id_args = ['--class', APP_NAME]
+                id_arg = '--class'
 
-        args = ['gnome-terminal'] + app_id_args + ['--', 'bash', '--rcfile', fh.name]
+        args = ['gnome-terminal', id_arg, APP_NAME, '--', 'bash', '--rcfile', fh.name]
         process = subprocess.Popen(args)
     except Exception:
         try:
