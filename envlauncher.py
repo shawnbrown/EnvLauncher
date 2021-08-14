@@ -356,7 +356,8 @@ def activate_environment(settings, paths, script_path, working_dir):
         f'cat {banner_path}' if banner_path else '',
     ]
 
-    with tempfile.NamedTemporaryFile(mode='w', delete=False) as fh:
+    try:
+        fh = tempfile.NamedTemporaryFile(mode='w', delete=False)
         # Add `rm` line so the rcfile removes itself when executed.
         rcfile_lines.append(f'rm {shlex.quote(fh.name)}')
         fh.write('\n'.join(rcfile_lines))
@@ -378,6 +379,12 @@ def activate_environment(settings, paths, script_path, working_dir):
 
         args = ['gnome-terminal'] + app_id_args + ['--', 'bash', '--rcfile', fh.name]
         process = subprocess.Popen(args)
+    except Exception:
+        try:
+            os.remove(fh.name)
+        except FileNotFoundError:
+            pass
+        raise
 
 
 def edit_preferences(paths, reset_all=False):
