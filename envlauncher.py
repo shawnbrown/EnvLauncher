@@ -376,7 +376,8 @@ def activate_environment(settings, paths, script_path, working_dir):
 
         args = ['gnome-terminal'] + app_id_args + ['--', 'bash', '--rcfile', fh.name]
         process = subprocess.Popen(args)
-        sleep(2)
+        sleep(2)  # Pause briefly so the temporary file isn't deleted
+                  # before it can be used with the `--rcfile` argument.
 
 
 def edit_preferences(paths, reset_all=False):
