@@ -22,6 +22,7 @@ import io
 import itertools
 import os
 import re
+import shlex
 import subprocess
 import tempfile
 from time import sleep, time
@@ -355,9 +356,10 @@ def activate_environment(settings, paths, script_path, working_dir):
         f'cat {banner_path}' if banner_path else '',
     ]
 
-    with tempfile.NamedTemporaryFile(mode='w+') as fh:
+    with tempfile.NamedTemporaryFile(mode='w', delete=False) as fh:
+        # Add `rm` line so the rcfile removes itself when executed.
+        rcfile_lines.append(f'rm {shlex.quote(fh.name)}')
         fh.write('\n'.join(rcfile_lines))
-        fh.seek(0)
 
         if name_has_owner(APP_NAME):
             app_id_args = ['--app-id', APP_NAME]
@@ -376,8 +378,6 @@ def activate_environment(settings, paths, script_path, working_dir):
 
         args = ['gnome-terminal'] + app_id_args + ['--', 'bash', '--rcfile', fh.name]
         process = subprocess.Popen(args)
-        sleep(2)  # Pause briefly so the temporary file isn't deleted
-                  # before it can be used with the `--rcfile` argument.
 
 
 def edit_preferences(paths, reset_all=False):
