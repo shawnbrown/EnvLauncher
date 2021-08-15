@@ -317,7 +317,9 @@ class EnvLauncherApp(object):
             banner_path = self.paths.find_resource_path('envlauncher', banner_file)
             rcfile_lines.append(f'cat {banner_path}')
 
-        # Add `rm` line so this rcfile removes itself when executed.
+        # The *file_to_delete* should be the name of the rcfile itself.
+        # This way, it will remove itself when executed and we won't
+        # need to wait before cleaning it up later.
         rcfile_lines.append(f'rm {shlex.quote(file_to_delete)}')
 
         # Blank entry to assure trailing "\n".
@@ -347,20 +349,24 @@ class EnvLauncherApp(object):
     def __call__(self, environment, working_dir=None):
         """Launch a gnome-terminal and activate a development environment."""
         try:
-            fh = tempfile.NamedTemporaryFile(mode='w', delete=False)
-            rcfile_data = self._build_rcfile(environment, working_dir, fh.name)
-            fh.write(rcfile_data)
+            with tempfile.NamedTemporaryFile(mode='w', delete=False) as rcfile:
+                rcfile_text = self._build_rcfile(environment,
+                                                 working_dir,
+                                                 file_to_delete=rcfile.name)
+                rcfile.write(rcfile_text)
+
             try:
                 self._register_app_id(APP_NAME)
                 id_arg = '--app-id'
             except OSError:
                 id_arg = '--class'
 
-            args = ['gnome-terminal', id_arg, APP_NAME, '--', 'bash', '--rcfile', fh.name]
+            args = ['gnome-terminal', id_arg, APP_NAME, '--', 'bash', '--rcfile', rcfile.name]
             process = subprocess.Popen(args)
+
         except Exception:
             try:
-                os.remove(fh.name)
+                os.remove(rcfile.name)
             except FileNotFoundError:
                 pass
             raise
