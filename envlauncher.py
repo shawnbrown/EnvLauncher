@@ -297,8 +297,7 @@ class EnvLauncherApp(object):
         desktop_path = self.paths.find_resource_path('applications', f'{APP_NAME}.desktop')
         self.settings = Settings(desktop_path)
 
-    def __call__(self, environment, working_dir=None):
-        """Launch a gnome-terminal and activate a development environment."""
+    def _build_rcfile(self, environment, working_dir, file_to_delete):
         if self.settings.banner == 'color':
             banner_file = 'banner-color.ascii'
         elif self.settings.banner == 'plain':
@@ -315,12 +314,16 @@ class EnvLauncherApp(object):
             f'source {environment}',
             f'cat {banner_path}' if banner_path else '',
         ]
+        # Add `rm` line so the rcfile removes itself when executed.
+        rcfile_lines.append(f'rm {shlex.quote(file_to_delete)}')
+        return '\n'.join(rcfile_lines)
 
+    def __call__(self, environment, working_dir=None):
+        """Launch a gnome-terminal and activate a development environment."""
         try:
             fh = tempfile.NamedTemporaryFile(mode='w', delete=False)
-            # Add `rm` line so the rcfile removes itself when executed.
-            rcfile_lines.append(f'rm {shlex.quote(fh.name)}')
-            fh.write('\n'.join(rcfile_lines))
+            rcfile_data = self._build_rcfile(environment, working_dir, fh.name)
+            fh.write(rcfile_data)
 
             # Use `--app-id` or fall back to `--class` argument.
             if name_has_owner(APP_NAME):
