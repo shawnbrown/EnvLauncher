@@ -318,30 +318,24 @@ class EnvLauncherApp(object):
         rcfile_lines.append(f'rm {shlex.quote(file_to_delete)}')
         return '\n'.join(rcfile_lines)
 
-    def _register_app_id(self):
-        """Register the app-id and return "--app-id" or fall back to
-        "--class" argument.
-        """
+    def _register_app_id(self) -> bool:
+        """Register app-id and return success code--True or False."""
         if name_has_owner(APP_NAME):
-            id_arg = '--app-id'
-        else:
-            gnome_terminal_server = find_gnome_terminal_server()
-            if gnome_terminal_server:
-                # Register app-id with gnome-terminal-server.
-                args = [gnome_terminal_server, '--app-id', APP_NAME]
-                process = subprocess.Popen(args)
-                timeout = time() + 1
-                while True:  # <- Keep "True" as body MUST execute at least once.
-                    sleep(0.03125)  # 1/32nd of a second polling interval
-                    if name_has_owner(APP_NAME):
-                        id_arg = '--app-id'
-                        break
-                    if time() > timeout:
-                        id_arg = '--class'
-                        break
-            else:
-                id_arg = '--class'
-        return id_arg
+            return True  # <- EXIT!
+
+        gnome_terminal_server = find_gnome_terminal_server()
+        if gnome_terminal_server:
+            args = [gnome_terminal_server, '--app-id', APP_NAME]
+            process = subprocess.Popen(args)
+
+            timeout = time() + 1
+            while True:  # <- Keep "True" as body MUST execute at least once.
+                sleep(0.03125)  # 1/32nd of a second polling interval
+                if name_has_owner(APP_NAME):
+                    return True
+                if time() > timeout:
+                    return False
+        return False
 
     def __call__(self, environment, working_dir=None):
         """Launch a gnome-terminal and activate a development environment."""
@@ -349,7 +343,10 @@ class EnvLauncherApp(object):
             fh = tempfile.NamedTemporaryFile(mode='w', delete=False)
             rcfile_data = self._build_rcfile(environment, working_dir, fh.name)
             fh.write(rcfile_data)
-            id_arg = self._register_app_id()
+            if self._register_app_id():
+                id_arg = '--app-id'
+            else:
+                id_arg = '--class'
             args = ['gnome-terminal', id_arg, APP_NAME, '--', 'bash', '--rcfile', fh.name]
             process = subprocess.Popen(args)
         except Exception:
