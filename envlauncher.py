@@ -298,24 +298,21 @@ class EnvLauncherApp(object):
         self.settings = Settings(desktop_path)
 
     def __call__(self, environment, working_dir=None):
-        self.activate_environment(self.settings, self.paths, environment, working_dir)
-
-    def activate_environment(self, settings, paths, script_path, working_dir):
         """Launch a gnome-terminal and activate a development environment."""
-        if settings.banner == 'color':
+        if self.settings.banner == 'color':
             banner_file = 'banner-color.ascii'
-        elif settings.banner == 'plain':
+        elif self.settings.banner == 'plain':
             banner_file = 'banner-plain.ascii'
         else:
             banner_file = None
 
         if banner_file:
-            banner_path = paths.find_resource_path('envlauncher', banner_file)
+            banner_path = self.paths.find_resource_path('envlauncher', banner_file)
 
         rcfile_lines = [
             f'cd {working_dir}' if working_dir else '',
-            f'source {settings.rcfile}' if settings.rcfile else '',
-            f'source {script_path}',
+            f'source {self.settings.rcfile}' if self.settings.rcfile else '',
+            f'source {environment}',
             f'cat {banner_path}' if banner_path else '',
         ]
 
