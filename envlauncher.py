@@ -318,24 +318,24 @@ class EnvLauncherApp(object):
         rcfile_lines.append(f'rm {shlex.quote(file_to_delete)}')
         return '\n'.join(rcfile_lines)
 
-    def _register_app_id(self) -> bool:
-        """Register app-id and return success code--True or False."""
-        if name_has_owner(APP_NAME):
-            return True  # <- EXIT!
+    def _register_app_id(self, app_id) -> None:
+        """Register *app_id* with gnome-terminal-server."""
+        if name_has_owner(app_id):
+            return  # <- Already registered, EXIT!
 
         gnome_terminal_server = find_gnome_terminal_server()
         if gnome_terminal_server:
-            args = [gnome_terminal_server, '--app-id', APP_NAME]
+            args = [gnome_terminal_server, '--app-id', app_id]
             process = subprocess.Popen(args)
 
             timeout = time() + 1
             while True:  # <- Keep "True" as body MUST execute at least once.
                 sleep(0.03125)  # 1/32nd of a second polling interval
-                if name_has_owner(APP_NAME):
-                    return True
+                if name_has_owner(app_id):
+                    return  # <- Now registered, EXIT!
                 if time() > timeout:
-                    return False
-        return False
+                    raise TimeoutError  # (a subclass of OSError)
+        raise OSError
 
     def __call__(self, environment, working_dir=None):
         """Launch a gnome-terminal and activate a development environment."""
@@ -343,10 +343,12 @@ class EnvLauncherApp(object):
             fh = tempfile.NamedTemporaryFile(mode='w', delete=False)
             rcfile_data = self._build_rcfile(environment, working_dir, fh.name)
             fh.write(rcfile_data)
-            if self._register_app_id():
+            try:
+                self._register_app_id(APP_NAME)
                 id_arg = '--app-id'
-            else:
+            except OSError:
                 id_arg = '--class'
+
             args = ['gnome-terminal', id_arg, APP_NAME, '--', 'bash', '--rcfile', fh.name]
             process = subprocess.Popen(args)
         except Exception:
