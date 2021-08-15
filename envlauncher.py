@@ -297,25 +297,32 @@ class EnvLauncherApp(object):
         desktop_path = self.paths.find_resource_path('applications', f'{APP_NAME}.desktop')
         self.settings = Settings(desktop_path)
 
-    def _build_rcfile(self, environment, working_dir, file_to_delete):
-        if self.settings.banner == 'color':
-            banner_file = 'banner-color.ascii'
-        elif self.settings.banner == 'plain':
-            banner_file = 'banner-plain.ascii'
-        else:
-            banner_file = None
+    def _build_rcfile(self, environment, working_dir, file_to_delete) -> str:
+        """Build and return rcfile text to use when launching bash."""
+        rcfile_lines = []
 
-        if banner_file:
+        # First, change directory so relative paths reference new location.
+        rcfile_lines.append(f'cd {working_dir}')
+
+        # Execute user rcfile (~/.bashrc or other).
+        if self.settings.rcfile:
+            rcfile_lines.append(f'source {self.settings.rcfile}')
+
+        # Add line to activate the environment!
+        rcfile_lines.append(f'source {environment}')
+
+        # Display the ASCII banner.
+        if self.settings.banner in {'color', 'plain'}:
+            banner_file = f'banner-{self.settings.banner}.ascii'
             banner_path = self.paths.find_resource_path('envlauncher', banner_file)
+            rcfile_lines.append(f'cat {banner_path}')
 
-        rcfile_lines = [
-            f'cd {working_dir}' if working_dir else '',
-            f'source {self.settings.rcfile}' if self.settings.rcfile else '',
-            f'source {environment}',
-            f'cat {banner_path}' if banner_path else '',
-        ]
-        # Add `rm` line so the rcfile removes itself when executed.
+        # Add `rm` line so this rcfile removes itself when executed.
         rcfile_lines.append(f'rm {shlex.quote(file_to_delete)}')
+
+        # Blank entry to assure trailing "\n".
+        rcfile_lines.append('')
+
         return '\n'.join(rcfile_lines)
 
     def _register_app_id(self, app_id) -> None:
