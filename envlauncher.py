@@ -298,7 +298,62 @@ class EnvLauncherApp(object):
         self.settings = Settings(desktop_path)
 
     def __call__(self, environment, working_dir=None):
-        activate_environment(self.settings, self.paths, environment, working_dir)
+        self.activate_environment(self.settings, self.paths, environment, working_dir)
+
+    def activate_environment(self, settings, paths, script_path, working_dir):
+        """Launch a gnome-terminal and activate a development environment."""
+        if settings.banner == 'color':
+            banner_file = 'banner-color.ascii'
+        elif settings.banner == 'plain':
+            banner_file = 'banner-plain.ascii'
+        else:
+            banner_file = None
+
+        if banner_file:
+            banner_path = paths.find_resource_path('envlauncher', banner_file)
+
+        rcfile_lines = [
+            f'cd {working_dir}' if working_dir else '',
+            f'source {settings.rcfile}' if settings.rcfile else '',
+            f'source {script_path}',
+            f'cat {banner_path}' if banner_path else '',
+        ]
+
+        try:
+            fh = tempfile.NamedTemporaryFile(mode='w', delete=False)
+            # Add `rm` line so the rcfile removes itself when executed.
+            rcfile_lines.append(f'rm {shlex.quote(fh.name)}')
+            fh.write('\n'.join(rcfile_lines))
+
+            # Use `--app-id` or fall back to `--class` argument.
+            if name_has_owner(APP_NAME):
+                id_arg = '--app-id'
+            else:
+                gnome_terminal_server = find_gnome_terminal_server()
+                if gnome_terminal_server:
+                    # Register app-id with gnome-terminal-server.
+                    args = [gnome_terminal_server, '--app-id', APP_NAME]
+                    process = subprocess.Popen(args)
+                    timeout = time() + 1
+                    while True:  # <- Keep "True" as body MUST execute at least once.
+                        sleep(0.03125)  # 1/32nd of a second polling interval
+                        if name_has_owner(APP_NAME):
+                            id_arg = '--app-id'
+                            break
+                        if time() > timeout:
+                            id_arg = '--class'
+                            break
+                else:
+                    id_arg = '--class'
+
+            args = ['gnome-terminal', id_arg, APP_NAME, '--', 'bash', '--rcfile', fh.name]
+            process = subprocess.Popen(args)
+        except Exception:
+            try:
+                os.remove(fh.name)
+            except FileNotFoundError:
+                pass
+            raise
 
 
 ########################
@@ -346,62 +401,6 @@ def parse_args(args=None):
         parser.error('argument --settings is required when using --reset-all')
 
     return args
-
-
-def activate_environment(settings, paths, script_path, working_dir):
-    """Launch a gnome-terminal and activate a development environment."""
-    if settings.banner == 'color':
-        banner_file = 'banner-color.ascii'
-    elif settings.banner == 'plain':
-        banner_file = 'banner-plain.ascii'
-    else:
-        banner_file = None
-
-    if banner_file:
-        banner_path = paths.find_resource_path('envlauncher', banner_file)
-
-    rcfile_lines = [
-        f'cd {working_dir}' if working_dir else '',
-        f'source {settings.rcfile}' if settings.rcfile else '',
-        f'source {script_path}',
-        f'cat {banner_path}' if banner_path else '',
-    ]
-
-    try:
-        fh = tempfile.NamedTemporaryFile(mode='w', delete=False)
-        # Add `rm` line so the rcfile removes itself when executed.
-        rcfile_lines.append(f'rm {shlex.quote(fh.name)}')
-        fh.write('\n'.join(rcfile_lines))
-
-        # Use `--app-id` or fall back to `--class` argument.
-        if name_has_owner(APP_NAME):
-            id_arg = '--app-id'
-        else:
-            gnome_terminal_server = find_gnome_terminal_server()
-            if gnome_terminal_server:
-                # Register app-id with gnome-terminal-server.
-                args = [gnome_terminal_server, '--app-id', APP_NAME]
-                process = subprocess.Popen(args)
-                timeout = time() + 1
-                while True:  # <- Keep "True" as body MUST execute at least once.
-                    sleep(0.03125)  # 1/32nd of a second polling interval
-                    if name_has_owner(APP_NAME):
-                        id_arg = '--app-id'
-                        break
-                    if time() > timeout:
-                        id_arg = '--class'
-                        break
-            else:
-                id_arg = '--class'
-
-        args = ['gnome-terminal', id_arg, APP_NAME, '--', 'bash', '--rcfile', fh.name]
-        process = subprocess.Popen(args)
-    except Exception:
-        try:
-            os.remove(fh.name)
-        except FileNotFoundError:
-            pass
-        raise
 
 
 def edit_settings(paths, reset_all=False):
