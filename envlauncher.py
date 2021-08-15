@@ -362,19 +362,25 @@ def activate_environment(settings, paths, script_path, working_dir):
         rcfile_lines.append(f'rm {shlex.quote(fh.name)}')
         fh.write('\n'.join(rcfile_lines))
 
+        # Use `--app-id` or fall back to `--class` argument.
         if name_has_owner(APP_NAME):
             id_arg = '--app-id'
         else:
             gnome_terminal_server = find_gnome_terminal_server()
             if gnome_terminal_server:
+                # Register app-id with gnome-terminal-server.
                 args = [gnome_terminal_server, '--app-id', APP_NAME]
                 process = subprocess.Popen(args)
                 timeout = time() + 1
-                while not name_has_owner(APP_NAME) and time() <= timeout:
+                while True:  # <- Keep "True" as body MUST execute at least once.
                     sleep(0.03125)  # 1/32nd of a second polling interval
-                id_arg = '--app-id'
+                    if name_has_owner(APP_NAME):
+                        id_arg = '--app-id'
+                        break
+                    if time() > timeout:
+                        id_arg = '--class'
+                        break
             else:
-                # Fallback to older `--class` argument.
                 id_arg = '--class'
 
         args = ['gnome-terminal', id_arg, APP_NAME, '--', 'bash', '--rcfile', fh.name]
