@@ -290,6 +290,17 @@ def find_gnome_terminal_server() -> Optional[str]:
     return None
 
 
+class EnvLauncherApp(object):
+    """A class to prepare and launch virtual environment sessions."""
+    def __init__(self):
+        self.paths = DataPaths()
+        desktop_path = self.paths.find_resource_path('applications', f'{APP_NAME}.desktop')
+        self.settings = Settings(desktop_path)
+
+    def __call__(self, environment, working_dir=None):
+        activate_environment(self.settings, self.paths, environment, working_dir)
+
+
 ########################
 # Command Line Interface
 ########################
@@ -412,12 +423,11 @@ def edit_settings(paths, reset_all=False):
 
 def main():
     args = parse_args()
-    paths = DataPaths()
     if args.activate:
-        desktop_path = paths.find_resource_path('applications', f'{APP_NAME}.desktop')
-        settings = Settings(desktop_path)
-        activate_environment(settings, paths, args.activate, args.directory)
+        launcher = EnvLauncherApp()
+        launcher(args.activate, args.directory)
     elif args.settings:
+        paths = DataPaths()
         edit_settings(paths, args.reset_all)
 
 
