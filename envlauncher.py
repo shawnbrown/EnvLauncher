@@ -124,8 +124,8 @@ class Settings(object):
         string = self._escape_comments(string)
         self._parser.read_string(string)
 
-        self._rcfile = self._parser.get('X-EnvLauncher Preferences', 'Rcfile', fallback='')
-        self._banner = self._parser.get('X-EnvLauncher Preferences', 'Banner', fallback='color')
+        self._rcfile = self._parser.get('X-EnvLauncher Options', 'Rcfile', fallback='')
+        self._banner = self._parser.get('X-EnvLauncher Options', 'Banner', fallback='color')
         self._venv_number = itertools.count(1)
 
     @staticmethod
@@ -300,7 +300,7 @@ def parse_args(args=None):
         '\n'
         '  %(prog)s [-h]\n'
         '  %(prog)s --activate SCRIPT [--directory PATH]\n'
-        '  %(prog)s --preferences [--reset-all]'
+        '  %(prog)s --settings [--reset-all]'
     )
     parser = argparse.ArgumentParser(usage=usage)
     parser.add_argument(
@@ -314,25 +314,25 @@ def parse_args(args=None):
         metavar='PATH',
     )
     parser.add_argument(
-        '--preferences',
+        '--settings',
         action='store_true',
-        help='show preferences window',
+        help='open settings manager',
     )
     parser.add_argument(
         '--reset-all',
         action='store_true',
-        help='reset all preferences',
+        help='reset all settings',
     )
 
     args = parser.parse_args(args=args)
 
     # Check that arguments conform to `usage` examples.
-    if args.activate and args.preferences:
-        parser.error('argument --activate cannot be used with --preferences')
+    if args.activate and args.settings:
+        parser.error('argument --activate cannot be used with --settings')
     if args.directory and not args.activate:
         parser.error('argument --activate is required when using --directory')
-    if args.reset_all and not args.preferences:
-        parser.error('argument --preferences is required when using --reset-all')
+    if args.reset_all and not args.settings:
+        parser.error('argument --settings is required when using --reset-all')
 
     return args
 
@@ -393,8 +393,8 @@ def activate_environment(settings, paths, script_path, working_dir):
         raise
 
 
-def edit_preferences(paths, reset_all=False):
-    """Edit preferences."""
+def edit_settings(paths, reset_all=False):
+    """Edit settings."""
     # Temporarily use shutil.copy() to prevent users from directly
     # opening a file they don't have write permissions for (e.g.
     # a file in "/usr/local/share/applications/...").
@@ -417,8 +417,8 @@ def main():
         desktop_path = paths.find_resource_path('applications', f'{APP_NAME}.desktop')
         settings = Settings(desktop_path)
         activate_environment(settings, paths, args.activate, args.directory)
-    elif args.preferences:
-        edit_preferences(paths, args.reset_all)
+    elif args.settings:
+        edit_settings(paths, args.reset_all)
 
 
 if __name__ == '__main__':

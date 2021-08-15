@@ -37,21 +37,21 @@ class TestParseArgs(unittest.TestCase):
         args = envlauncher.parse_args([])
         self.assertEqual(args.activate, None)
         self.assertEqual(args.directory, None)
-        self.assertEqual(args.preferences, False)
+        self.assertEqual(args.settings, False)
         self.assertEqual(args.reset_all, False)
 
     def test_activate(self):
         args = envlauncher.parse_args(['--activate', 'myscript'])
         self.assertEqual(args.activate, 'myscript')
         self.assertEqual(args.directory, None)
-        self.assertEqual(args.preferences, False)
+        self.assertEqual(args.settings, False)
         self.assertEqual(args.reset_all, False)
 
     def test_activate_directory(self):
         args = envlauncher.parse_args(['--activate', 'myscript', '--directory', 'mydir'])
         self.assertEqual(args.activate, 'myscript')
         self.assertEqual(args.directory, 'mydir')
-        self.assertEqual(args.preferences, False)
+        self.assertEqual(args.settings, False)
         self.assertEqual(args.reset_all, False)
 
     def test_directory(self):
@@ -63,18 +63,18 @@ class TestParseArgs(unittest.TestCase):
             self.exit_message.getvalue(),
         )
 
-    def test_preferences(self):
-        args = envlauncher.parse_args(['--preferences'])
+    def test_settings(self):
+        args = envlauncher.parse_args(['--settings'])
         self.assertEqual(args.activate, None)
         self.assertEqual(args.directory, None)
-        self.assertEqual(args.preferences, True)
+        self.assertEqual(args.settings, True)
         self.assertEqual(args.reset_all, False)
 
-    def test_preferences_reset_all(self):
-        args = envlauncher.parse_args(['--preferences', '--reset-all'])
+    def test_settings_reset_all(self):
+        args = envlauncher.parse_args(['--settings', '--reset-all'])
         self.assertEqual(args.activate, None)
         self.assertEqual(args.directory, None)
-        self.assertEqual(args.preferences, True)
+        self.assertEqual(args.settings, True)
         self.assertEqual(args.reset_all, True)
 
     def test_reset_all(self):
@@ -82,16 +82,16 @@ class TestParseArgs(unittest.TestCase):
             args = envlauncher.parse_args(['--reset-all'])
 
         self.assertIn(
-            'argument --preferences is required when using --reset-all',
+            'argument --settings is required when using --reset-all',
             self.exit_message.getvalue(),
         )
 
     def test_mutually_exclusive_groups(self):
         with self.assertRaises(SystemExit):
-            args = envlauncher.parse_args(['--activate', 'myscript', '--preferences'])
+            args = envlauncher.parse_args(['--activate', 'myscript', '--settings'])
 
         self.assertIn(
-            'argument --activate cannot be used with --preferences',
+            'argument --activate cannot be used with --settings',
             self.exit_message.getvalue(),
         )
 
@@ -315,10 +315,10 @@ class TestSettingsRcfile(unittest.TestCase):
         desktop_entry = textwrap.dedent("""
             [Desktop Entry]
             Name=EnvLauncher
-            Exec=envlauncher --preferences
+            Exec=envlauncher --settings
             Type=Application
 
-            [X-EnvLauncher Preferences]
+            [X-EnvLauncher Options]
             Rcfile=~/.bashrc
         """).lstrip()
         self.settings = envlauncher.Settings.from_string(desktop_entry)
@@ -340,10 +340,10 @@ class TestSettingsBanner(unittest.TestCase):
         desktop_entry = textwrap.dedent("""
             [Desktop Entry]
             Name=EnvLauncher
-            Exec=envlauncher --preferences
+            Exec=envlauncher --settings
             Type=Application
 
-            [X-EnvLauncher Preferences]
+            [X-EnvLauncher Options]
             Banner=color
         """).lstrip()
         self.settings = envlauncher.Settings.from_string(desktop_entry)
@@ -369,9 +369,9 @@ class TestSettingsMakeIdentifier(unittest.TestCase):
         desktop_entry = textwrap.dedent(f"""
             [Desktop Entry]
             Name=EnvLauncher
-            Exec=envlauncher --preferences
+            Exec=envlauncher --settings
             Type=Application
-            Actions=preferences;
+            Actions=settings;
         """)
         settings = envlauncher.Settings.from_string(desktop_entry)
         self.assertEqual(settings.make_identifier(), f'{prefix}1')
@@ -383,9 +383,9 @@ class TestSettingsMakeIdentifier(unittest.TestCase):
         desktop_entry = textwrap.dedent(f"""
             [Desktop Entry]
             Name=EnvLauncher
-            Exec=envlauncher --preferences
+            Exec=envlauncher --settings
             Type=Application
-            Actions={prefix}2;preferences;
+            Actions={prefix}2;settings;
         """)
         settings = envlauncher.Settings.from_string(desktop_entry)
         self.assertEqual(settings.make_identifier(), f'{prefix}1')
@@ -400,9 +400,9 @@ class TestSettingsGetActions(unittest.TestCase):
         desktop_entry = textwrap.dedent(f"""
             [Desktop Entry]
             Name=EnvLauncher
-            Exec=envlauncher --preferences
+            Exec=envlauncher --settings
             Type=Application
-            Actions={self.prefix}1;{self.prefix}2;preferences;
+            Actions={self.prefix}1;{self.prefix}2;settings;
 
             [Desktop Action {self.prefix}1]
             Name=Python 3.9
@@ -412,9 +412,9 @@ class TestSettingsGetActions(unittest.TestCase):
             Name=Python 2.7
             Exec=envlauncher --activate "~/.venv27/bin/activate" --directory "~/Projects/legacy/"
 
-            [Desktop Action preferences]
-            Name=Preferences
-            Exec=envlauncher --preferences
+            [Desktop Action settings]
+            Name=EnvLauncher Settings
+            Exec=envlauncher --settings
         """).lstrip()
         self.settings = envlauncher.Settings.from_string(desktop_entry)
 
@@ -432,7 +432,7 @@ class TestSettingsGetActions(unittest.TestCase):
         """
         prefix = self.prefix
 
-        self.settings._parser['Desktop Entry']['Actions'] = f'{prefix}1;{prefix}2;{prefix}3;preferences;'
+        self.settings._parser['Desktop Entry']['Actions'] = f'{prefix}1;{prefix}2;{prefix}3;settings;'
         actual = self.settings.get_actions()
         expected = [
             (f'{prefix}1', 'Python 3.9', '~/.venv39/bin/activate', '~/Projects/'),
@@ -447,7 +447,7 @@ class TestSettingsGetActions(unittest.TestCase):
         prefix = self.prefix
 
         # Action identifiers are in a different order ("venv2" before "venv1").
-        self.settings._parser['Desktop Entry']['Actions'] = f'{prefix}2;{prefix}1;preferences;'
+        self.settings._parser['Desktop Entry']['Actions'] = f'{prefix}2;{prefix}1;settings;'
         actual = self.settings.get_actions()
         expected = [
             (f'{prefix}2', 'Python 2.7', '~/.venv27/bin/activate', '~/Projects/legacy/'),
@@ -460,7 +460,7 @@ class TestSettingsGetActions(unittest.TestCase):
         desktop_entry = textwrap.dedent(f"""
             [Desktop Entry]
             Name=EnvLauncher
-            Exec=envlauncher --preferences
+            Exec=envlauncher --settings
             Type=Application
         """).lstrip()
         settings = envlauncher.Settings.from_string(desktop_entry)
@@ -472,13 +472,13 @@ class TestSettingsSetActions(unittest.TestCase):
         desktop_entry = textwrap.dedent(f"""
             [Desktop Entry]
             Name=EnvLauncher
-            Exec=envlauncher --preferences
+            Exec=envlauncher --settings
             Type=Application
-            Actions=preferences;
+            Actions=settings;
 
-            [Desktop Action preferences]
-            Name=Preferences
-            Exec=envlauncher --preferences
+            [Desktop Action settings]
+            Name=EnvLauncher Settings
+            Exec=envlauncher --settings
         """).lstrip()
         self.settings = envlauncher.Settings.from_string(desktop_entry)
         self.prefix = envlauncher.Settings._venv_prefix
@@ -492,7 +492,7 @@ class TestSettingsSetActions(unittest.TestCase):
         self.settings.set_actions(actions)
 
         action_values = self.settings._parser['Desktop Entry']['Actions']
-        self.assertEqual(action_values, f'{prefix}1;{prefix}2;preferences;')
+        self.assertEqual(action_values, f'{prefix}1;{prefix}2;settings;')
 
         actual_venv_groups = [
             self.settings._parser[f'Desktop Action {prefix}1'],
@@ -512,21 +512,21 @@ class TestSettingsSetActions(unittest.TestCase):
         desktop_entry = textwrap.dedent(f"""
             [Desktop Entry]
             Name=EnvLauncher
-            Exec=envlauncher --preferences
+            Exec=envlauncher --settings
             Type=Application
-            Actions=other;{prefix}3;preferences;
+            Actions=other;{prefix}3;settings;
 
             [Desktop Action other]
             Name=Other Action
-            Exec=envlauncher --preferences
+            Exec=envlauncher --settings
 
             [Desktop Action {self.prefix}3]
             Name=Python 3.10
             Exec=envlauncher --activate "~/.venv310/bin/activate" --directory "~/Projects/"
 
-            [Desktop Action preferences]
-            Name=Preferences
-            Exec=envlauncher --preferences
+            [Desktop Action settings]
+            Name=EnvLauncher Settings
+            Exec=envlauncher --settings
         """).lstrip()
         settings = envlauncher.Settings.from_string(desktop_entry)
         settings.set_actions([
@@ -536,8 +536,8 @@ class TestSettingsSetActions(unittest.TestCase):
 
         self.assertEqual(
             settings._parser['Desktop Entry']['Actions'],
-            f'{prefix}1;{prefix}2;other;preferences;',
-            msg='should preserve "other" and "preferences" identifiers',
+            f'{prefix}1;{prefix}2;other;settings;',
+            msg='should preserve "other" and "settings" identifiers',
         )
 
         self.assertEqual(
@@ -545,11 +545,11 @@ class TestSettingsSetActions(unittest.TestCase):
             [
                 'Desktop Entry',
                 'Desktop Action other',
-                'Desktop Action preferences',
+                'Desktop Action settings',
                 f'Desktop Action {prefix}1',
                 f'Desktop Action {prefix}2',
             ],
-            msg='should preserve "other" and "preferences" groups',
+            msg='should preserve "other" and "settings" groups',
         )
 
     def test_missing_actions_section(self):
@@ -558,7 +558,7 @@ class TestSettingsSetActions(unittest.TestCase):
         desktop_entry = textwrap.dedent(f"""
             [Desktop Entry]
             Name=EnvLauncher
-            Exec=envlauncher --preferences
+            Exec=envlauncher --settings
             Type=Application
         """).lstrip()
         settings = envlauncher.Settings.from_string(desktop_entry)
@@ -571,7 +571,7 @@ class TestSettingsSetActions(unittest.TestCase):
         expected = textwrap.dedent(f"""
             [Desktop Entry]
             Name=EnvLauncher
-            Exec=envlauncher --preferences
+            Exec=envlauncher --settings
             Type=Application
             Actions={prefix}1;{prefix}2;
 
