@@ -330,7 +330,7 @@ class EnvLauncherApp(object):
     def _register_app_id(self, app_id) -> None:
         """Register *app_id* with gnome-terminal-server."""
         if name_has_owner(app_id):
-            return  # <- Already registered, EXIT!
+            return  # <- EXIT! (already registered)
 
         gnome_terminal_server = find_gnome_terminal_server()
         if gnome_terminal_server:
@@ -338,13 +338,13 @@ class EnvLauncherApp(object):
             process = subprocess.Popen(args)
 
             timeout = time() + 1
-            while True:  # <- Keep "True" as body MUST execute at least once.
+            while True:
                 sleep(0.03125)  # 1/32nd of a second polling interval
                 if name_has_owner(app_id):
-                    return  # <- Now registered, EXIT!
-                if time() > timeout:
-                    raise TimeoutError  # (a subclass of OSError)
-        raise OSError
+                    return  # <- EXIT! (successfully registered)
+                if time() > timeout:    # Timeout check must not be used in
+                    raise TimeoutError  # the `while` condition--body of loop
+        raise OSError                   # MUST execute at least once.
 
     def __call__(self, environment, working_dir=None):
         """Launch a gnome-terminal and activate a development environment."""
@@ -358,7 +358,7 @@ class EnvLauncherApp(object):
             try:
                 self._register_app_id(APP_NAME)
                 id_arg = '--app-id'
-            except OSError:
+            except (OSError, TimeoutError):
                 id_arg = '--class'
 
             args = ['gnome-terminal', id_arg, APP_NAME, '--', 'bash', '--rcfile', rcfile.name]
