@@ -601,6 +601,6 @@ class TestDBusInteraction(unittest.TestCase):
 
 class TestFindGnomeTerminalServer(unittest.TestCase):
     def test_find_gnome_terminal_server(self):
-        result = envlauncher.find_gnome_terminal_server()
+        result = envlauncher.EnvLauncherApp._find_gnome_terminal_server()
         self.assertIsNotNone(result)
         self.assertRegex(result, 'gnome-terminal-server$')

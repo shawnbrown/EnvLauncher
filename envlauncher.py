@@ -277,19 +277,6 @@ def name_has_owner(name) -> bool:
     return b'true' in reply.lower()
 
 
-def find_gnome_terminal_server() -> Optional[str]:
-    """Find and return the path to gnome-terminal-server."""
-    search_paths = [
-        '/usr/libexec/gnome-terminal-server',
-        '/usr/lib/gnome-terminal/gnome-terminal-server',
-        '/usr/lib/gnome-terminal-server',
-    ]
-    for path in search_paths:
-        if os.path.exists(path):
-            return path
-    return None
-
-
 class EnvLauncherApp(object):
     """A class to prepare and launch virtual environment sessions."""
     def __init__(self):
@@ -327,12 +314,26 @@ class EnvLauncherApp(object):
 
         return '\n'.join(rcfile_lines)
 
-    def _register_app_id(self, app_id) -> None:
+    @staticmethod
+    def _find_gnome_terminal_server() -> Optional[str]:
+        """Find and return the path to gnome-terminal-server."""
+        search_paths = [
+            '/usr/libexec/gnome-terminal-server',
+            '/usr/lib/gnome-terminal/gnome-terminal-server',
+            '/usr/lib/gnome-terminal-server',
+        ]
+        for path in search_paths:
+            if os.path.exists(path):
+                return path
+        return None
+
+    @classmethod
+    def _register_app_id(cls, app_id) -> None:
         """Register *app_id* with gnome-terminal-server."""
         if name_has_owner(app_id):
             return  # <- EXIT! (already registered)
 
-        gnome_terminal_server = find_gnome_terminal_server()
+        gnome_terminal_server = cls._find_gnome_terminal_server()
         if gnome_terminal_server:
             args = [gnome_terminal_server, '--app-id', app_id]
             process = subprocess.Popen(args)
