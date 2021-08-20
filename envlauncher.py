@@ -127,6 +127,7 @@ class Settings(object):
         self._rcfile = self._parser.get('X-EnvLauncher Options', 'Rcfile', fallback='')
         self._banner = self._parser.get('X-EnvLauncher Options', 'Banner', fallback='color')
         self._venv_number = itertools.count(1)
+        self._app_data_subdir = 'envlauncher'
 
     @staticmethod
     def _lookahead(iterable, sentinal=None):
@@ -195,6 +196,19 @@ class Settings(object):
         if value not in {'color', 'plain', 'none'}:
             value = 'color'
         self._banner = value
+
+    @property
+    def banner_resource(self) -> Optional[Tuple[str, str]]:
+        """A two-tuple containing the subdirectory and filename of the
+        banner file (if defined).
+        """
+        if self.banner == 'color':
+            filename = 'banner-color.ascii'
+        elif self.banner == 'plain':
+            filename = 'banner-plain.ascii'
+        else:
+            return None
+        return (self._app_data_subdir, filename)
 
     def make_identifier(self) -> str:
         """Generate and return a new action identifier."""
@@ -299,9 +313,9 @@ class EnvLauncherApp(object):
         rcfile_lines.append(f'source {environment}')
 
         # Display the ASCII banner.
-        if self.settings.banner in {'color', 'plain'}:
-            banner_file = f'banner-{self.settings.banner}.ascii'
-            banner_path = self.paths.find_resource_path('envlauncher', banner_file)
+        if self.settings.banner_resource:
+            subdir, filename = self.settings.banner_resource
+            banner_path = self.paths.find_resource_path(subdir, filename)
             rcfile_lines.append(f'cat {banner_path}')
 
         # The *file_to_delete* should be the name of the rcfile itself.

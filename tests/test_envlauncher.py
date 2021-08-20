@@ -362,6 +362,17 @@ class TestSettingsBanner(unittest.TestCase):
         self.settings.banner = 1234  # <- Bogus value.
         self.assertEqual(self.settings.banner, 'color')  # <- Defaults to color.
 
+    def test_banner_resource(self):
+        self.assertEqual(self.settings.banner_resource,
+                         ('envlauncher', 'banner-color.ascii'))
+
+        self.settings.banner = 'plain'
+        self.assertEqual(self.settings.banner_resource,
+                         ('envlauncher', 'banner-plain.ascii'))
+
+        self.settings.banner = 'none'
+        self.assertIsNone(self.settings.banner_resource)
+
 
 class TestSettingsMakeIdentifier(unittest.TestCase):
     def test_no_existing_venv_actions(self):
