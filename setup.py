@@ -16,8 +16,18 @@
 # along with EnvLauncher.  If not, see <https://www.gnu.org/licenses/>.
 
 """EnvLauncher: Launch Python development environments."""
-
+import ast
 import setuptools
+
+
+def get_version(path):
+    """Return value of path's __version__ attribute."""
+    with open(path) as fh:
+        for line in fh:
+            line = line.strip()
+            if line.startswith('__version__'):
+                return ast.parse(line).body[0].value.s
+    raise Exception('Unable to find __version__ attribute.')
 
 
 def get_long_description(readmepath):
@@ -30,7 +40,7 @@ if __name__ == '__main__':
     setuptools.setup(
         # Required fields:
         name='EnvLauncher',
-        version='0.1a1.dev1',
+        version=get_version('envlauncher.py'),
         description=('A GNOME desktop launcher to activate Python '
                      'development environments.'),
         py_modules=['envlauncher'],
