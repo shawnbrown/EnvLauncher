@@ -399,7 +399,8 @@ def parse_args(args=None):
         '\n'
         '  %(prog)s [-h]\n'
         '  %(prog)s --activate SCRIPT [--directory PATH]\n'
-        '  %(prog)s --settings [--reset-all]'
+        '  %(prog)s --settings [--reset-all]\n'
+        '  %(prog)s --version'
     )
     parser = argparse.ArgumentParser(usage=usage)
     parser.add_argument(
@@ -422,7 +423,11 @@ def parse_args(args=None):
         action='store_true',
         help='reset all settings',
     )
-
+    parser.add_argument(
+        '--version',
+        action='store_true',
+        help='display EnvLauncher version and exit',
+    )
     args = parser.parse_args(args=args)
 
     # Check that arguments conform to `usage` examples.
@@ -432,6 +437,8 @@ def parse_args(args=None):
         parser.error('argument --activate is required when using --directory')
     if args.reset_all and not args.settings:
         parser.error('argument --settings is required when using --reset-all')
+    if args.version and (args.activate or args.settings):
+        parser.error('argument --version cannot be used with other arguments')
 
     return args
 
@@ -461,6 +468,8 @@ def main():
     elif args.settings:
         paths = DataPaths()
         edit_settings(paths, args.reset_all)
+    elif args.version:
+        print(__version__)
 
 
 if __name__ == '__main__':
