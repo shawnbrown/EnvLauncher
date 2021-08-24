@@ -23,6 +23,7 @@ import itertools
 import os
 import re
 import shlex
+import shutil
 import subprocess
 import tempfile
 from time import sleep, time
@@ -81,6 +82,29 @@ class DataPaths(object):
         """Return data home path for given resource."""
         path = os.path.join(self._data_home, subdir, filename)
         return os.path.realpath(path)
+
+
+def get_terminal_emulators() -> List[str]:
+    """Return a list of supported terminal emulators available
+    on the system.
+    """
+    # Should be ordered from most-common to least-common.
+    supported = [
+        'gnome-terminal',  # GNOME (Gtk)
+        'konsole',         # KDE (Qt)
+        'xfce4-terminal',  # XFCE (Gtk)
+        'qterminal',       # LXQt (Qt)
+    ]
+
+    available = []
+    for terminal_emulator in supported:
+        if shutil.which(terminal_emulator):
+            available.append(terminal_emulator)
+
+    if not available:
+        import warnings
+        warnings.warn('No supported terminal emulators available.')
+    return available
 
 
 class Settings(object):
@@ -448,7 +472,6 @@ def edit_settings(paths, reset_all=False):
     # Temporarily use shutil.copy() to prevent users from directly
     # opening a file they don't have write permissions for (e.g.
     # a file in "/usr/local/share/applications/...").
-    import shutil
     desktop_home = paths.make_home_path('applications', f'{APP_NAME}.desktop')
     if not os.path.exists(desktop_home):
         desktop_path = paths.find_resource_path('applications', f'{APP_NAME}.desktop')

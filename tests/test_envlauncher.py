@@ -20,6 +20,7 @@
 import contextlib
 import io
 import os
+import shutil
 import tempfile
 import textwrap
 import unittest
@@ -610,7 +611,12 @@ class TestDBusInteraction(unittest.TestCase):
         self.assertTrue(result)
 
 
-class TestFindGnomeTerminalServer(unittest.TestCase):
+@unittest.skipUnless(shutil.which('gnome-terminal'), 'requires gnome-terminal')
+class TestGnomeTerminalSupport(unittest.TestCase):
+    def test_get_terminal_emulators(self):
+        result = envlauncher.get_terminal_emulators()
+        self.assertIn('gnome-terminal', result)
+
     def test_find_gnome_terminal_server(self):
         result = envlauncher.EnvLauncherApp._find_gnome_terminal_server()
         self.assertIsNotNone(result)
