@@ -150,6 +150,7 @@ class Settings(object):
         string = self._escape_comments(string)
         self._parser.read_string(string)
 
+        self._terminal_emulator_choices = get_terminal_emulators()
         self._rcfile = self._parser.get('X-EnvLauncher Options', 'Rcfile', fallback='')
         self._banner = self._parser.get('X-EnvLauncher Options', 'Banner', fallback='color')
         self._venv_number = itertools.count(1)
@@ -211,6 +212,25 @@ class Settings(object):
         if not isinstance(value, str):
             value = ''
         self._rcfile = value
+
+    @property
+    def terminal_emulator_choices(self) -> List[str]:
+        return self._terminal_emulator_choices
+
+    @property
+    def terminal_emulator(self) -> Optional[str]:
+        """Terminal emulator to use when activating environment."""
+        value = self._parser.get(section='X-EnvLauncher Options',
+                                 option='TerminalEmulator')
+        if value in self.terminal_emulator_choices:
+            return value
+        if self.terminal_emulator_choices:
+            return self.terminal_emulator_choices[0]
+        return None
+
+    @terminal_emulator.setter
+    def terminal_emulator(self, value):
+        self._parser['X-EnvLauncher Options']['TerminalEmulator'] = value
 
     @property
     def banner(self) -> str:

@@ -336,6 +336,35 @@ class TestSettingsRcfile(unittest.TestCase):
         self.assertEqual(self.settings.rcfile, '')  # <- Empty string.
 
 
+class TestSettingsTerminalEmulator(unittest.TestCase):
+    def setUp(self):
+        desktop_entry = textwrap.dedent("""
+            [Desktop Entry]
+            Name=EnvLauncher
+            Exec=envlauncher --settings
+            Type=Application
+
+            [X-EnvLauncher Options]
+            TerminalEmulator=gnome-terminal
+        """).lstrip()
+        self.settings = envlauncher.Settings.from_string(desktop_entry)
+
+    def test_available(self):
+        """If TerminalEmulator in settings is available, it should be
+        available via `terminal_emulator` attribute.
+        """
+        self.settings._terminal_emulator_choices = ['guake', 'gnome-terminal']
+        self.assertEqual(self.settings.terminal_emulator, 'gnome-terminal')
+
+    def test_not_available(self):
+        """If TerminalEmulator in settings is not available, the
+        `terminal_emulator` property should return the first available
+        item from `terminal_emulator_choices`.
+        """
+        self.settings._terminal_emulator_choices = ['konsole', 'yakuake']
+        self.assertEqual(self.settings.terminal_emulator, 'konsole')
+
+
 class TestSettingsBanner(unittest.TestCase):
     def setUp(self):
         desktop_entry = textwrap.dedent("""
