@@ -90,12 +90,12 @@ def get_terminal_emulators() -> List[str]:
     """
     # Should be ordered from most-common to least-common.
     supported = [
-        'gnome-terminal',  # GNOME (Gtk)
-        'konsole',         # KDE (Qt)
-        'guake',           # Gtk
-        #'yakuake',         # Qt
-        'xfce4-terminal',  # XFCE (Gtk)
-        'qterminal',       # LXQt (Qt)
+        'gnome-terminal',  # GNOME default
+        'konsole',  # KDE default
+        'guake',
+        #'yakuake',
+        'xfce4-terminal',  # XFCE default
+        'qterminal',  # LXQt default
         'cool-retro-term',
     ]
 
@@ -414,7 +414,8 @@ class EnvLauncherApp(object):
         """Returns a function and arguments used to launch a terminal
         emulator and activate a virtual environment.
         """
-        if terminal_emulator == 'gnome-terminal':  # GNOME
+        # GNOME default terminal.
+        if terminal_emulator == 'gnome-terminal':
             def func(args):
                 # Register app-id or fallback to `--class` argument.
                 try:
@@ -427,7 +428,8 @@ class EnvLauncherApp(object):
 
             return func, (args,)
 
-        if terminal_emulator == 'konsole':  # KDE
+        # KDE default terminal.
+        if terminal_emulator == 'konsole':
             args = ['konsole',
                     '--name', APP_NAME,
                     '--icon', APP_NAME,
@@ -435,7 +437,7 @@ class EnvLauncherApp(object):
                     '-e', f'bash --rcfile {rcfile_name}']
             return subprocess.Popen, (args,)
 
-        if terminal_emulator == 'guake':  # Gtk (GNOME, etc.)
+        if terminal_emulator == 'guake':
             args = ['guake',
                     '--no-startup-script',
                     '--new-tab', '.',
@@ -443,7 +445,8 @@ class EnvLauncherApp(object):
                     '-e', f'clear;source {rcfile_name}']
             return subprocess.Popen, (args,)
 
-        if terminal_emulator == 'xfce4-terminal':  # XFCE
+        # XFCE default terminal.
+        if terminal_emulator == 'xfce4-terminal':
             args = ['xfce4-terminal',
                     '--startup-id', APP_NAME,
                     '--icon', APP_NAME,
@@ -451,7 +454,8 @@ class EnvLauncherApp(object):
                     '--command', f'bash --rcfile {rcfile_name}']
             return subprocess.Popen, (args,)
 
-        if terminal_emulator == 'qterminal':  # LXQt
+        # LXQt default terminal.
+        if terminal_emulator == 'qterminal':
             args = ['qterminal',
                     '--name', APP_NAME,
                     '-e', f'bash --rcfile {rcfile_name}']
