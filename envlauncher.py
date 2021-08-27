@@ -407,8 +407,25 @@ class EnvLauncherApp(object):
                     raise TimeoutError  # the `while` condition--body of loop
         raise OSError                   # MUST execute at least once.
 
+    def get_launcher(self, terminal_emulator, rcfile_name):
+        """Returns a function and arguments used to launch a terminal
+        emulator and activate a virtual environment.
+        """
+        if terminal_emulator == 'gnome-terminal':
+            def func(args):
+                try:
+                    self._register_app_id(APP_NAME)
+                except (OSError, TimeoutError):
+                    # Fallback: Replace `--app-id` with `--class` option.
+                    args[args.index('--app-id')] = '--class'
+                return subprocess.Popen(args)
+
+            args = ['gnome-terminal', '--app-id', APP_NAME, '--', 'bash', '--rcfile', rcfile_name]
+
+            return func, (args,)
+
     def __call__(self, environment, working_dir=None):
-        """Launch a gnome-terminal and activate a development environment."""
+        """Launch a terminal emulator and activate a dev environment."""
         try:
             with tempfile.NamedTemporaryFile(mode='w', delete=False) as rcfile:
                 rcfile_text = self._build_rcfile(environment,
@@ -416,14 +433,11 @@ class EnvLauncherApp(object):
                                                  file_to_delete=rcfile.name)
                 rcfile.write(rcfile_text)
 
-            try:
-                self._register_app_id(APP_NAME)
-                id_arg = '--app-id'
-            except (OSError, TimeoutError):
-                id_arg = '--class'
-
-            args = ['gnome-terminal', id_arg, APP_NAME, '--', 'bash', '--rcfile', rcfile.name]
-            process = subprocess.Popen(args)
+            func, args = self.get_launcher(
+                terminal_emulator=self.settings.terminal_emulator,
+                rcfile_name=rcfile.name,
+            )
+            func(*args)
 
         except Exception:
             try:
