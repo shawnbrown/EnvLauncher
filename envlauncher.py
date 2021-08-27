@@ -96,6 +96,7 @@ def get_terminal_emulators() -> List[str]:
         #'yakuake',         # Qt
         'xfce4-terminal',  # XFCE (Gtk)
         'qterminal',       # LXQt (Qt)
+        'cool-retro-term',
     ]
 
     available = []
@@ -454,6 +455,10 @@ class EnvLauncherApp(object):
             args = ['qterminal',
                     '--name', APP_NAME,
                     '-e', f'bash --rcfile {rcfile_name}']
+            return subprocess.Popen, (args,)
+
+        if terminal_emulator == 'cool-retro-term':
+            args = ['cool-retro-term', '-e', 'bash', '--rcfile', rcfile_name]
             return subprocess.Popen, (args,)
 
         raise Exception(f'Unsupported terminal emulator {terminal_emulator!r}')
