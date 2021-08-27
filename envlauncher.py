@@ -92,6 +92,8 @@ def get_terminal_emulators() -> List[str]:
     supported = [
         'gnome-terminal',  # GNOME (Gtk)
         'konsole',         # KDE (Qt)
+        'guake',           # Gtk
+        #'yakuake',         # Qt
         'xfce4-terminal',  # XFCE (Gtk)
         'qterminal',       # LXQt (Qt)
     ]
@@ -430,6 +432,14 @@ class EnvLauncherApp(object):
                     '--icon', APP_NAME,
                     '-p', 'tabtitle=EnvLauncher : %D : %n',
                     '-e', f'bash --rcfile {rcfile_name}']
+            return subprocess.Popen, (args,)
+
+        if terminal_emulator == 'guake':  # Gtk (GNOME, etc.)
+            args = ['guake',
+                    '--no-startup-script',
+                    '--new-tab', '.',
+                    '--show',
+                    '-e', f'clear;source {rcfile_name}']
             return subprocess.Popen, (args,)
 
         if terminal_emulator == 'xfce4-terminal':  # XFCE
