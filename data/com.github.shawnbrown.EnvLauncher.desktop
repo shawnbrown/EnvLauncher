@@ -29,3 +29,4 @@ Exec=envlauncher --settings
 [X-EnvLauncher Options]
 Rcfile=~/.bashrc
 Banner=color
+TerminalEmulator=gnome-terminal

@@ -411,18 +411,42 @@ class EnvLauncherApp(object):
         """Returns a function and arguments used to launch a terminal
         emulator and activate a virtual environment.
         """
-        if terminal_emulator == 'gnome-terminal':
+        if terminal_emulator == 'gnome-terminal':  # GNOME
             def func(args):
+                # Register app-id or fallback to `--class` argument.
                 try:
                     self._register_app_id(APP_NAME)
                 except (OSError, TimeoutError):
-                    # Fallback: Replace `--app-id` with `--class` option.
-                    args[args.index('--app-id')] = '--class'
+                    args[args.index('--app-id')] = '--class'  # Replace argument.
                 return subprocess.Popen(args)
 
             args = ['gnome-terminal', '--app-id', APP_NAME, '--', 'bash', '--rcfile', rcfile_name]
 
             return func, (args,)
+
+        if terminal_emulator == 'konsole':  # KDE
+            args = ['konsole',
+                    '--name', APP_NAME,
+                    '--icon', APP_NAME,
+                    '-p', 'tabtitle=EnvLauncher : %D : %n',
+                    '-e', f'bash --rcfile {rcfile_name}']
+            return subprocess.Popen, (args,)
+
+        if terminal_emulator == 'xfce4-terminal':  # XFCE
+            args = ['xfce4-terminal',
+                    '--startup-id', APP_NAME,
+                    '--icon', APP_NAME,
+                    '--initial-title', 'EnvLauncher',
+                    '--command', f'bash --rcfile {rcfile_name}']
+            return subprocess.Popen, (args,)
+
+        if terminal_emulator == 'qterminal':  # LXQt
+            args = ['qterminal',
+                    '--name', APP_NAME,
+                    '-e', f'bash --rcfile {rcfile_name}']
+            return subprocess.Popen, (args,)
+
+        raise Exception(f'Unsupported terminal emulator {terminal_emulator!r}')
 
     def __call__(self, environment, working_dir=None):
         """Launch a terminal emulator and activate a dev environment."""
