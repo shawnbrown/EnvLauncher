@@ -20,11 +20,13 @@ Actions=settings;
 #[Desktop Action actn1]
 #Name=Python 3.9
 #Exec=envlauncher --activate "~/Projects/.venv39/bin/activate" --directory "~/Projects/"
+#Icon=window-new
 
 [Desktop Action settings]
 Name=Configure EnvLauncher
 Name[ja]=Envランチャーを構成します
 Exec=envlauncher --settings
+Icon=preferences-other
 
 [X-EnvLauncher Options]
 Rcfile=~/.bashrc
