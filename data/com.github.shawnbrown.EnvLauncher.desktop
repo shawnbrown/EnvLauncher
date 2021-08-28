@@ -22,8 +22,8 @@ Actions=settings;
 #Exec=envlauncher --activate "~/Projects/.venv39/bin/activate" --directory "~/Projects/"
 
 [Desktop Action settings]
-Name=EnvLauncher Settings
-Name[ja]=設定
+Name=Configure EnvLauncher
+Name[ja]=Envランチャーを構成します
 Exec=envlauncher --settings
 
 [X-EnvLauncher Options]
