@@ -88,9 +88,9 @@ def get_terminal_emulators() -> List[str]:
     """Return a list of supported terminal emulators available
     on the system.
     """
-    # Should be ordered from most-common to least-common.
     supported = [
         'gnome-terminal',  # GNOME default
+        'terminator',
         'konsole',  # KDE default
         'guake',
         #'yakuake',
@@ -427,6 +427,13 @@ class EnvLauncherApp(object):
             args = ['gnome-terminal', '--app-id', APP_NAME, '--', 'bash', '--rcfile', rcfile_name]
 
             return func, (args,)
+
+        if terminal_emulator == 'terminator':
+            args = ['terminator',
+                    '--name', APP_NAME,
+                    '--icon', APP_NAME,
+                    '--execute', 'bash', '--rcfile', rcfile_name]
+            return subprocess.Popen, (args,)
 
         # KDE default terminal.
         if terminal_emulator == 'konsole':
