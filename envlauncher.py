@@ -224,7 +224,7 @@ class Settings(object):
     def terminal_emulator(self) -> Optional[str]:
         """Terminal emulator to use when activating environment."""
         value = self._parser.get(section='X-EnvLauncher Options',
-                                 option='TerminalEmulator')
+                                 option='TerminalEmulator', fallback=None)
         if value in self.terminal_emulator_choices:
             return value
         if self.terminal_emulator_choices:
