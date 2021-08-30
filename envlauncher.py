@@ -96,6 +96,7 @@ def get_terminal_emulators() -> List[str]:
         #'yakuake',
         'xfce4-terminal',  # XFCE default
         'qterminal',  # LXQt default
+        'xterm',
         'cool-retro-term',
     ]
 
@@ -434,6 +435,13 @@ class EnvLauncherApp(object):
                     '--icon', APP_NAME,
                     '--no-dbus',  # <- For clean grouping in dash/taskbar.
                     '--execute', 'bash', '--rcfile', rcfile_name]
+            return subprocess.Popen, (args,)
+
+        if terminal_emulator == 'xterm':
+            args = ['xterm',
+                    '-class', APP_NAME,
+                    '-n', APP_NAME,  # <- Defines iconName resource.
+                    '-e', 'bash', '--rcfile', rcfile_name]
             return subprocess.Popen, (args,)
 
         # KDE default terminal.
