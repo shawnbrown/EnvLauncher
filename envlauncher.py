@@ -432,6 +432,7 @@ class EnvLauncherApp(object):
             args = ['terminator',
                     '--name', APP_NAME,
                     '--icon', APP_NAME,
+                    '--no-dbus',  # <- For clean grouping in dash/taskbar.
                     '--execute', 'bash', '--rcfile', rcfile_name]
             return subprocess.Popen, (args,)
 
