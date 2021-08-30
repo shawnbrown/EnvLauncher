@@ -94,6 +94,8 @@ def get_terminal_emulators() -> List[str]:
         'konsole',  # KDE default
         'guake',
         #'yakuake',
+        'alacritty',
+        'kitty',
         'xfce4-terminal',  # XFCE default
         'qterminal',  # LXQt default
         'xterm',
@@ -452,6 +454,19 @@ class EnvLauncherApp(object):
             args.extend(['-p', f'Icon={APP_NAME}',
                          '-p', f'LocalTabTitleFormat=EnvLauncher : %D : %n',
                          '-e', 'bash', '--rcfile', rcfile_name])
+            return subprocess.Popen, (args,)
+
+        if terminal_emulator == 'alacritty':
+            args = ['alacritty',
+                    '--class', f'{APP_NAME},{APP_NAME}',
+                    '--title', 'EnvLauncher',
+                    '-e', 'bash', '--rcfile', rcfile_name]
+            return subprocess.Popen, (args,)
+
+        if terminal_emulator == 'kitty':
+            args = ['kitty',
+                    '--class', APP_NAME,
+                    'bash', '--rcfile', rcfile_name]
             return subprocess.Popen, (args,)
 
         if terminal_emulator == 'guake':
