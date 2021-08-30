@@ -437,11 +437,12 @@ class EnvLauncherApp(object):
 
         # KDE default terminal.
         if terminal_emulator == 'konsole':
-            args = ['konsole',
-                    '--name', APP_NAME,
-                    '-p', f'Icon={APP_NAME}',
-                    '-p', f'LocalTabTitleFormat=EnvLauncher : %D : %n',
-                    '-e', f'bash --rcfile {rcfile_name}']
+            args = ['konsole']
+            if os.environ.get('XDG_CURRENT_DESKTOP') == 'KDE':
+                args.extend(['--name', APP_NAME])  # Set WM_CLASSNAME in KDE.
+            args.extend(['-p', f'Icon={APP_NAME}',
+                         '-p', f'LocalTabTitleFormat=EnvLauncher : %D : %n',
+                         '-e', 'bash', '--rcfile', rcfile_name])
             return subprocess.Popen, (args,)
 
         if terminal_emulator == 'guake':
