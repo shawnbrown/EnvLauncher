@@ -440,7 +440,7 @@ class EnvLauncherApp(object):
             args = ['konsole',
                     '--name', APP_NAME,
                     '--icon', APP_NAME,
-                    '-p', 'tabtitle=EnvLauncher : %D : %n',
+                    '-p', f'LocalTabTitleFormat=EnvLauncher : %D : %n',
                     '-e', f'bash --rcfile {rcfile_name}']
             return subprocess.Popen, (args,)
 
