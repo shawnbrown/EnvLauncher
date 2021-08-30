@@ -439,7 +439,7 @@ class EnvLauncherApp(object):
         if terminal_emulator == 'konsole':
             args = ['konsole',
                     '--name', APP_NAME,
-                    '--icon', APP_NAME,
+                    '-p', f'Icon={APP_NAME}',
                     '-p', f'LocalTabTitleFormat=EnvLauncher : %D : %n',
                     '-e', f'bash --rcfile {rcfile_name}']
             return subprocess.Popen, (args,)
