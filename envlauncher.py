@@ -442,7 +442,7 @@ class EnvLauncherApp(object):
                     '--name', APP_NAME,
                     '--icon', APP_NAME,
                     '--no-dbus',  # <- For clean grouping in dash/taskbar.
-                    '--execute', 'bash', '--rcfile', rcfile_name]
+                    '-x', 'bash', '--rcfile', rcfile_name]
             return subprocess.Popen, (args,)
 
         if terminal_emulator == 'xterm':
