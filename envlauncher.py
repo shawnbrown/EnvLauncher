@@ -431,7 +431,9 @@ class EnvLauncherApp(object):
                     args[args.index('--app-id')] = '--class'  # Replace argument.
                 return subprocess.Popen(args)
 
-            args = ['gnome-terminal', '--app-id', APP_NAME, '--', 'bash', '--rcfile', rcfile_name]
+            args = ['gnome-terminal',
+                    '--app-id', APP_NAME,
+                    '--', 'bash', '--rcfile', rcfile_name]
 
             return func, (args,)
 
