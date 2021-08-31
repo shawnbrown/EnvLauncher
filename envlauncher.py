@@ -402,6 +402,9 @@ class EnvLauncherApp(object):
         gnome_terminal_server = cls._find_gnome_terminal_server()
         if gnome_terminal_server:
             args = [gnome_terminal_server, '--app-id', app_id]
+            if os.environ.get('XDG_CURRENT_DESKTOP') == 'KDE':
+                # Class and name determine grouping and icon in KDE.
+                args.extend(['--class', app_id, '--name', app_id])
             process = subprocess.Popen(args)
 
             timeout = time() + 1
