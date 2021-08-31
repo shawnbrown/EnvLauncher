@@ -480,7 +480,7 @@ class EnvLauncherApp(object):
                     '--no-startup-script',
                     '--new-tab', '.',
                     '--show',
-                    '-e', f'clear;source {rcfile_name}']
+                    '-e', f'clear;source {shlex.quote(rcfile_name)}']
             return subprocess.Popen, (args,)
 
         # XFCE default terminal.
@@ -496,7 +496,7 @@ class EnvLauncherApp(object):
         if terminal_emulator == 'qterminal':
             args = ['qterminal',
                     '--name', APP_NAME,
-                    '-e', f'bash --rcfile {rcfile_name}']
+                    '-e', f'bash --rcfile {shlex.quote(rcfile_name)}']
             return subprocess.Popen, (args,)
 
         if terminal_emulator == 'sakura':
