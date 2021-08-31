@@ -99,6 +99,7 @@ def get_terminal_emulators() -> List[str]:
         'xfce4-terminal',  # XFCE default
         'qterminal',  # LXQt default
         'xterm',
+        'sakura',
         'cool-retro-term',
     ]
 
@@ -494,6 +495,13 @@ class EnvLauncherApp(object):
             args = ['qterminal',
                     '--name', APP_NAME,
                     '-e', f'bash --rcfile {rcfile_name}']
+            return subprocess.Popen, (args,)
+
+        if terminal_emulator == 'sakura':
+            args = ['sakura',
+                    '--class', APP_NAME,
+                    '--icon', APP_NAME,
+                    '-e', 'bash', '--rcfile', rcfile_name]
             return subprocess.Popen, (args,)
 
         if terminal_emulator == 'cool-retro-term':
