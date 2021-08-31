@@ -489,7 +489,7 @@ class EnvLauncherApp(object):
                     '--startup-id', APP_NAME,
                     '--icon', APP_NAME,
                     '--initial-title', 'EnvLauncher',
-                    '--command', f'bash --rcfile {rcfile_name}']
+                    '-x', 'bash', '--rcfile', rcfile_name]
             return subprocess.Popen, (args,)
 
         # LXQt default terminal.
