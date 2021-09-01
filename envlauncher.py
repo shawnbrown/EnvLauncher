@@ -25,6 +25,7 @@ import re
 import shlex
 import shutil
 import subprocess
+import sys
 import tempfile
 from time import sleep, time
 from typing import List, Tuple, Optional
@@ -93,7 +94,7 @@ def get_terminal_emulators() -> List[str]:
         'terminator',
         'konsole',  # KDE default
         'guake',
-        #'yakuake',
+        'yakuake',
         'alacritty',
         'kitty',
         'xfce4-terminal',  # XFCE default
@@ -482,6 +483,53 @@ class EnvLauncherApp(object):
                     '--show',
                     '-e', f'clear;source {shlex.quote(rcfile_name)}']
             return subprocess.Popen, (args,)
+
+        if terminal_emulator == 'yakuake':
+            def func(args):
+                reply = subprocess.check_output([
+                    'dbus-send',
+                    '--session',
+                    '--dest=org.kde.yakuake',
+                    '--print-reply=literal',
+                    '--type=method_call',
+                    '/yakuake/sessions',
+                    'org.kde.yakuake.addSession',
+                ])
+                reply = str(reply, encoding=sys.stdout.encoding)
+                matched = re.search(r'(?:int16|int32|int64)[ ](\d+)', reply)
+                if matched:
+                    yakuake_session = matched.group(1)
+                else:
+                    msg = f'Unable to get Yakuake tab session id: {reply!r}'
+                    raise RuntimeError(msg)
+
+                subprocess.Popen([
+                    'dbus-send',
+                    '--type=method_call',
+                    '--dest=org.kde.yakuake',
+                    '/yakuake/sessions',
+                    'org.kde.yakuake.runCommandInTerminal',
+                    f'int32:{yakuake_session}',
+                    f'string:clear;source {rcfile_name}',
+                ])
+                subprocess.Popen([
+                    'dbus-send',
+                    '--type=method_call',
+                    '--dest=org.kde.yakuake',
+                    '/yakuake/tabs',
+                    'org.kde.yakuake.setTabTitle',
+                    f'int32:{yakuake_session}',
+                    'string:EnvLauncher',
+                ])
+                subprocess.Popen([
+                    'dbus-send',
+                    '--type=method_call',
+                    '--dest=org.kde.yakuake',
+                    '/yakuake/window',
+                    'org.kde.yakuake.toggleWindowState',
+                ])
+            args = [None]
+            return func, args
 
         # XFCE default terminal.
         if terminal_emulator == 'xfce4-terminal':
