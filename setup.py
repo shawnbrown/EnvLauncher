@@ -19,8 +19,8 @@
 import ast
 try:
     from distutils.core import setup
-except ModuleNotFoundError as error:
-    error.msg = f"""{error.msg}
+except (ModuleNotFoundError, ImportError) as error:
+    error.msg = """{0}
 
     Your system does not appear to have the full `distutils` package.
     Distutils is part of the Python Standard Library but some Linux
@@ -30,7 +30,7 @@ except ModuleNotFoundError as error:
     For Debian or Debian-based distributions (like Ubuntu, Mint, etc.):
 
         sudo apt install python3-distutils
-    """
+    """.format(error.msg)
     raise error
 
 
