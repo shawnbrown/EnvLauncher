@@ -16,7 +16,6 @@
 # along with EnvLauncher.  If not, see <https://www.gnu.org/licenses/>.
 
 """EnvLauncher: Launch Python development environments."""
-import ast
 try:
     from distutils.core import setup
 except (ModuleNotFoundError, ImportError) as error:
@@ -40,7 +39,8 @@ def get_version(path):
         for line in fh:
             line = line.strip()
             if line.startswith('__version__'):
-                return ast.parse(line).body[0].value.s
+                _, _, value = line.partition('=')
+                return value.strip(' \'"')
     raise Exception('Unable to find __version__ attribute.')
 
 
