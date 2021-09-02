@@ -54,10 +54,10 @@ if __name__ == '__main__':
     setup(
         # Required fields:
         name='EnvLauncher',
-        version=get_version('envlauncher.py'),
+        version=get_version('envlauncher/__init__.py'),
         description=('A GNOME desktop launcher to activate Python '
                      'development environments.'),
-        py_modules=['envlauncher'],
+        packages=['envlauncher'],
 
         # Recommended fields:
         url='https://github.com/shawnbrown/envlauncher',
