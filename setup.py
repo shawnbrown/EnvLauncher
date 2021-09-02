@@ -17,7 +17,21 @@
 
 """EnvLauncher: Launch Python development environments."""
 import ast
-import setuptools
+try:
+    from distutils.core import setup
+except ModuleNotFoundError as error:
+    error.msg = f"""{error.msg}
+
+    Your system does not appear to have the full `distutils` package.
+    Distutils is part of the Python Standard Library but some Linux
+    distributions are shipped with a minimal install of Python. You
+    may have to install `distutils` using your system's package manager.
+
+    For Debian or Debian-based distributions (like Ubuntu, Mint, etc.):
+
+        sudo apt install python3-distutils
+    """
+    raise error
 
 
 def get_version(path):
@@ -37,7 +51,7 @@ def get_long_description(readmepath):
 
 
 if __name__ == '__main__':
-    setuptools.setup(
+    setup(
         # Required fields:
         name='EnvLauncher',
         version=get_version('envlauncher.py'),
@@ -53,11 +67,7 @@ if __name__ == '__main__':
         # Other fields:
         long_description=get_long_description('README.md'),
         long_description_content_type='text/markdown',
-        entry_points={
-            'console_scripts': [
-                'envlauncher = envlauncher:main',
-            ],
-        },
+        scripts=['bin/envlauncher'],
         data_files = [
             ('share/applications', ['data/com.github.shawnbrown.EnvLauncher.desktop']),
             ('share/icons/hicolor/scalable/apps', ['data/hicolor/com.github.shawnbrown.EnvLauncher.svg']),
