@@ -589,6 +589,11 @@ def edit_settings(paths, reset_all=False):
         os.makedirs(os.path.dirname(desktop_home), exist_ok=True)
         shutil.copy(src=desktop_path, dst=desktop_home)
 
-    # Temporarily open file in Gedit until GUI is ready.
-    args = ['gedit', '--standalone', '--class', APP_NAME, desktop_home]
+    # Open file in text editor (will be replaced with GUI).
+    if shutil.which('gedit'):
+        args = ['gedit', '--standalone', '--class', APP_NAME, desktop_home]
+    elif shutil.which('kate'):
+        args = ['kate', '--new', '--desktopfile', APP_NAME, desktop_home]
+    elif shutil.which('featherpad'):
+        args = ['featherpad', '--standalone', desktop_home]
     process = subprocess.Popen(args)
