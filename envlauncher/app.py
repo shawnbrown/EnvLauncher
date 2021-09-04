@@ -31,8 +31,6 @@ from time import sleep, time
 from typing import List, Tuple, Optional
 
 
-__version__ = '0.1a1.dev1'
-
 APP_NAME = 'com.github.shawnbrown.EnvLauncher'
 
 
