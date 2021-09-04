@@ -15,7 +15,8 @@
 # You should have received a copy of the GNU General Public License
 # along with EnvLauncher.  If not, see <https://www.gnu.org/licenses/>.
 
-import argparse
+"""Application logic for EnvLauncher."""
+
 import collections
 import configparser
 import io
@@ -33,10 +34,6 @@ from typing import List, Tuple, Optional
 
 APP_NAME = 'com.github.shawnbrown.EnvLauncher'
 
-
-###################
-# Application Logic
-###################
 
 class DataPaths(object):
     """Class to fetch data paths that conform to the "XDG Base
@@ -581,60 +578,6 @@ class EnvLauncherApp(object):
             raise
 
 
-########################
-# Command Line Interface
-########################
-
-def parse_args(args=None):
-    """Parse command line arguments."""
-    usage = (
-        '\n'
-        '  %(prog)s [-h]\n'
-        '  %(prog)s --activate SCRIPT [--directory PATH]\n'
-        '  %(prog)s --settings [--reset-all]\n'
-        '  %(prog)s --version'
-    )
-    parser = argparse.ArgumentParser(usage=usage)
-    parser.add_argument(
-        '--activate',
-        help='environment activation script',
-        metavar='SCRIPT',
-    )
-    parser.add_argument(
-        '--directory',
-        help='working directory path',
-        metavar='PATH',
-    )
-    parser.add_argument(
-        '--settings',
-        action='store_true',
-        help='open settings manager',
-    )
-    parser.add_argument(
-        '--reset-all',
-        action='store_true',
-        help='reset all settings',
-    )
-    parser.add_argument(
-        '--version',
-        action='store_true',
-        help='display EnvLauncher version and exit',
-    )
-    args = parser.parse_args(args=args)
-
-    # Check that arguments conform to `usage` examples.
-    if args.activate and args.settings:
-        parser.error('argument --activate cannot be used with --settings')
-    if args.directory and not args.activate:
-        parser.error('argument --activate is required when using --directory')
-    if args.reset_all and not args.settings:
-        parser.error('argument --settings is required when using --reset-all')
-    if args.version and (args.activate or args.settings):
-        parser.error('argument --version cannot be used with other arguments')
-
-    return args
-
-
 def edit_settings(paths, reset_all=False):
     """Edit settings."""
     # Temporarily use shutil.copy() to prevent users from directly
@@ -649,19 +592,3 @@ def edit_settings(paths, reset_all=False):
     # Temporarily open file in Gedit until GUI is ready.
     args = ['gedit', '--standalone', '--class', APP_NAME, desktop_home]
     process = subprocess.Popen(args)
-
-
-def main():
-    args = parse_args()
-    if args.activate:
-        launcher = EnvLauncherApp()
-        launcher(args.activate, args.directory)
-    elif args.settings:
-        paths = DataPaths()
-        edit_settings(paths, args.reset_all)
-    elif args.version:
-        print(__version__)
-
-
-if __name__ == '__main__':
-    main()

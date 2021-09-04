@@ -16,5 +16,6 @@
 # along with EnvLauncher.  If not, see <https://www.gnu.org/licenses/>.
 
 from .app import *
+from .cli import main
 
 __version__ = '0.1a1.dev1'

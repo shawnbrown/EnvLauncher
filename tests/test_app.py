@@ -17,84 +17,12 @@
 
 """Tests for EnvLauncher."""
 
-import contextlib
-import io
 import os
 import shutil
 import tempfile
 import textwrap
 import unittest
 import envlauncher
-
-
-class TestParseArgs(unittest.TestCase):
-    def setUp(self):
-        self.exit_message = io.StringIO()
-        redirect = contextlib.redirect_stderr(self.exit_message)
-        redirect.__enter__()
-        self.addCleanup(lambda: redirect.__exit__(None, None, None))
-
-    def test_no_args(self):
-        args = envlauncher.parse_args([])
-        self.assertEqual(args.activate, None)
-        self.assertEqual(args.directory, None)
-        self.assertEqual(args.settings, False)
-        self.assertEqual(args.reset_all, False)
-
-    def test_activate(self):
-        args = envlauncher.parse_args(['--activate', 'myscript'])
-        self.assertEqual(args.activate, 'myscript')
-        self.assertEqual(args.directory, None)
-        self.assertEqual(args.settings, False)
-        self.assertEqual(args.reset_all, False)
-
-    def test_activate_directory(self):
-        args = envlauncher.parse_args(['--activate', 'myscript', '--directory', 'mydir'])
-        self.assertEqual(args.activate, 'myscript')
-        self.assertEqual(args.directory, 'mydir')
-        self.assertEqual(args.settings, False)
-        self.assertEqual(args.reset_all, False)
-
-    def test_directory(self):
-        with self.assertRaises(SystemExit):
-            args = envlauncher.parse_args(['--directory', 'mydir'])
-
-        self.assertIn(
-            'argument --activate is required when using --directory',
-            self.exit_message.getvalue(),
-        )
-
-    def test_settings(self):
-        args = envlauncher.parse_args(['--settings'])
-        self.assertEqual(args.activate, None)
-        self.assertEqual(args.directory, None)
-        self.assertEqual(args.settings, True)
-        self.assertEqual(args.reset_all, False)
-
-    def test_settings_reset_all(self):
-        args = envlauncher.parse_args(['--settings', '--reset-all'])
-        self.assertEqual(args.activate, None)
-        self.assertEqual(args.directory, None)
-        self.assertEqual(args.settings, True)
-        self.assertEqual(args.reset_all, True)
-
-    def test_reset_all(self):
-        with self.assertRaises(SystemExit):
-            args = envlauncher.parse_args(['--reset-all'])
-
-        self.assertIn(
-            'argument --settings is required when using --reset-all',
-            self.exit_message.getvalue(),
-        )
-
-    def test_mutually_exclusive_groups(self):
-        with self.assertRaises(SystemExit):
-            args = envlauncher.parse_args(['--activate', 'myscript', '--settings'])
-
-        self.assertIn(
-            'argument --activate cannot be used with --settings',
-            self.exit_message.getvalue(),
-        )
 
 
 class TestDataPathsAttributes(unittest.TestCase):
