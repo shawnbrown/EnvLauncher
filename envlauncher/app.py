@@ -579,8 +579,8 @@ class EnvLauncherApp(object):
             raise
 
 
-def edit_settings(paths, reset_all=False):
-    """Edit settings."""
+def configure_envlauncher(paths, reset_all=False):
+    """Configure EnvLauncher settings."""
     # Temporarily use shutil.copy() to prevent users from directly
     # opening a file they don't have write permissions for (e.g.
     # a file in "/usr/local/share/applications/...").

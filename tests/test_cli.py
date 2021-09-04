@@ -32,21 +32,21 @@ class TestParseArgs(unittest.TestCase):
         args = parse_args([])
         self.assertEqual(args.activate, None)
         self.assertEqual(args.directory, None)
-        self.assertEqual(args.settings, False)
+        self.assertEqual(args.configure, False)
         self.assertEqual(args.reset_all, False)
 
     def test_activate(self):
         args = parse_args(['--activate', 'myscript'])
         self.assertEqual(args.activate, 'myscript')
         self.assertEqual(args.directory, None)
-        self.assertEqual(args.settings, False)
+        self.assertEqual(args.configure, False)
         self.assertEqual(args.reset_all, False)
 
     def test_activate_directory(self):
         args = parse_args(['--activate', 'myscript', '--directory', 'mydir'])
         self.assertEqual(args.activate, 'myscript')
         self.assertEqual(args.directory, 'mydir')
-        self.assertEqual(args.settings, False)
+        self.assertEqual(args.configure, False)
         self.assertEqual(args.reset_all, False)
 
     def test_directory(self):
@@ -58,18 +58,18 @@ class TestParseArgs(unittest.TestCase):
             self.exit_message.getvalue(),
         )
 
-    def test_settings(self):
-        args = parse_args(['--settings'])
+    def test_configure(self):
+        args = parse_args(['--configure'])
         self.assertEqual(args.activate, None)
         self.assertEqual(args.directory, None)
-        self.assertEqual(args.settings, True)
+        self.assertEqual(args.configure, True)
         self.assertEqual(args.reset_all, False)
 
-    def test_settings_reset_all(self):
-        args = parse_args(['--settings', '--reset-all'])
+    def test_configure_reset_all(self):
+        args = parse_args(['--configure', '--reset-all'])
         self.assertEqual(args.activate, None)
         self.assertEqual(args.directory, None)
-        self.assertEqual(args.settings, True)
+        self.assertEqual(args.configure, True)
         self.assertEqual(args.reset_all, True)
 
     def test_reset_all(self):
@@ -77,15 +77,15 @@ class TestParseArgs(unittest.TestCase):
             args = parse_args(['--reset-all'])
 
         self.assertIn(
-            'argument --settings is required when using --reset-all',
+            'argument --configure is required when using --reset-all',
             self.exit_message.getvalue(),
         )
 
     def test_mutually_exclusive_groups(self):
         with self.assertRaises(SystemExit):
-            args = parse_args(['--activate', 'myscript', '--settings'])
+            args = parse_args(['--activate', 'myscript', '--configure'])
 
         self.assertIn(
-            'argument --activate cannot be used with --settings',
+            'argument --activate cannot be used with --configure',
             self.exit_message.getvalue(),
         )

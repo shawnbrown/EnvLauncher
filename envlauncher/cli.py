@@ -21,7 +21,7 @@ import argparse
 from .app import __version__
 from .app import DataPaths
 from .app import EnvLauncherApp
-from .app import edit_settings
+from .app import configure_envlauncher
 
 
 def parse_args(args=None):
@@ -30,7 +30,7 @@ def parse_args(args=None):
         '\n'
         '  %(prog)s [-h]\n'
         '  %(prog)s --activate SCRIPT [--directory PATH]\n'
-        '  %(prog)s --settings [--reset-all]\n'
+        '  %(prog)s --configure [--reset-all]\n'
         '  %(prog)s --version'
     )
     parser = argparse.ArgumentParser(usage=usage)
@@ -45,9 +45,9 @@ def parse_args(args=None):
         metavar='PATH',
     )
     parser.add_argument(
-        '--settings',
+        '--configure',
         action='store_true',
-        help='open settings manager',
+        help='configure EnvLauncher settings',
     )
     parser.add_argument(
         '--reset-all',
@@ -62,13 +62,13 @@ def parse_args(args=None):
     args = parser.parse_args(args=args)
 
     # Check that arguments conform to `usage` examples.
-    if args.activate and args.settings:
-        parser.error('argument --activate cannot be used with --settings')
+    if args.activate and args.configure:
+        parser.error('argument --activate cannot be used with --configure')
     if args.directory and not args.activate:
         parser.error('argument --activate is required when using --directory')
-    if args.reset_all and not args.settings:
-        parser.error('argument --settings is required when using --reset-all')
-    if args.version and (args.activate or args.settings):
+    if args.reset_all and not args.configure:
+        parser.error('argument --configure is required when using --reset-all')
+    if args.version and (args.activate or args.configure):
         parser.error('argument --version cannot be used with other arguments')
 
     return args
@@ -79,8 +79,8 @@ def main():
     if args.activate:
         launcher = EnvLauncherApp()
         launcher(args.activate, args.directory)
-    elif args.settings:
+    elif args.configure:
         paths = DataPaths()
-        edit_settings(paths, args.reset_all)
+        configure_envlauncher(paths, args.reset_all)
     elif args.version:
         print(__version__)

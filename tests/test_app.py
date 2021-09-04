@@ -244,7 +244,7 @@ class TestSettingsRcfile(unittest.TestCase):
         desktop_entry = textwrap.dedent("""
             [Desktop Entry]
             Name=EnvLauncher
-            Exec=envlauncher --settings
+            Exec=envlauncher --configure
             Type=Application
 
             [X-EnvLauncher Options]
@@ -269,7 +269,7 @@ class TestSettingsTerminalEmulator(unittest.TestCase):
         desktop_entry = textwrap.dedent("""
             [Desktop Entry]
             Name=EnvLauncher
-            Exec=envlauncher --settings
+            Exec=envlauncher --configure
             Type=Application
 
             [X-EnvLauncher Options]
@@ -298,7 +298,7 @@ class TestSettingsBanner(unittest.TestCase):
         desktop_entry = textwrap.dedent("""
             [Desktop Entry]
             Name=EnvLauncher
-            Exec=envlauncher --settings
+            Exec=envlauncher --configure
             Type=Application
 
             [X-EnvLauncher Options]
@@ -338,9 +338,9 @@ class TestSettingsMakeIdentifier(unittest.TestCase):
         desktop_entry = textwrap.dedent(f"""
             [Desktop Entry]
             Name=EnvLauncher
-            Exec=envlauncher --settings
+            Exec=envlauncher --configure
             Type=Application
-            Actions=settings;
+            Actions=configure;
         """)
         settings = envlauncher.Settings.from_string(desktop_entry)
         self.assertEqual(settings.make_identifier(), f'{prefix}1')
@@ -352,9 +352,9 @@ class TestSettingsMakeIdentifier(unittest.TestCase):
         desktop_entry = textwrap.dedent(f"""
             [Desktop Entry]
             Name=EnvLauncher
-            Exec=envlauncher --settings
+            Exec=envlauncher --configure
             Type=Application
-            Actions={prefix}2;settings;
+            Actions={prefix}2;configure;
         """)
         settings = envlauncher.Settings.from_string(desktop_entry)
         self.assertEqual(settings.make_identifier(), f'{prefix}1')
@@ -369,9 +369,9 @@ class TestSettingsGetActions(unittest.TestCase):
         desktop_entry = textwrap.dedent(f"""
             [Desktop Entry]
             Name=EnvLauncher
-            Exec=envlauncher --settings
+            Exec=envlauncher --configure
             Type=Application
-            Actions={self.prefix}1;{self.prefix}2;settings;
+            Actions={self.prefix}1;{self.prefix}2;configure;
 
             [Desktop Action {self.prefix}1]
             Name=Python 3.9
@@ -381,9 +381,9 @@ class TestSettingsGetActions(unittest.TestCase):
             Name=Python 2.7
             Exec=envlauncher --activate "~/.venv27/bin/activate" --directory "~/Projects/legacy/"
 
-            [Desktop Action settings]
-            Name=EnvLauncher Settings
-            Exec=envlauncher --settings
+            [Desktop Action configure]
+            Name=Configure EnvLauncher
+            Exec=envlauncher --configure
         """).lstrip()
         self.settings = envlauncher.Settings.from_string(desktop_entry)
 
@@ -401,7 +401,7 @@ class TestSettingsGetActions(unittest.TestCase):
         """
         prefix = self.prefix
 
-        self.settings._parser['Desktop Entry']['Actions'] = f'{prefix}1;{prefix}2;{prefix}3;settings;'
+        self.settings._parser['Desktop Entry']['Actions'] = f'{prefix}1;{prefix}2;{prefix}3;configure;'
         actual = self.settings.get_actions()
         expected = [
             (f'{prefix}1', 'Python 3.9', '~/.venv39/bin/activate', '~/Projects/'),
@@ -416,7 +416,7 @@ class TestSettingsGetActions(unittest.TestCase):
         prefix = self.prefix
 
         # Action identifiers are in a different order ("venv2" before "venv1").
-        self.settings._parser['Desktop Entry']['Actions'] = f'{prefix}2;{prefix}1;settings;'
+        self.settings._parser['Desktop Entry']['Actions'] = f'{prefix}2;{prefix}1;configure;'
         actual = self.settings.get_actions()
         expected = [
             (f'{prefix}2', 'Python 2.7', '~/.venv27/bin/activate', '~/Projects/legacy/'),
@@ -429,7 +429,7 @@ class TestSettingsGetActions(unittest.TestCase):
         desktop_entry = textwrap.dedent(f"""
             [Desktop Entry]
             Name=EnvLauncher
-            Exec=envlauncher --settings
+            Exec=envlauncher --configure
             Type=Application
         """).lstrip()
         settings = envlauncher.Settings.from_string(desktop_entry)
@@ -441,13 +441,13 @@ class TestSettingsSetActions(unittest.TestCase):
         desktop_entry = textwrap.dedent(f"""
             [Desktop Entry]
             Name=EnvLauncher
-            Exec=envlauncher --settings
+            Exec=envlauncher --configure
             Type=Application
-            Actions=settings;
+            Actions=configure;
 
-            [Desktop Action settings]
-            Name=EnvLauncher Settings
-            Exec=envlauncher --settings
+            [Desktop Action configure]
+            Name=Configure EnvLauncher
+            Exec=envlauncher --configure
         """).lstrip()
         self.settings = envlauncher.Settings.from_string(desktop_entry)
         self.prefix = envlauncher.Settings._venv_prefix
@@ -461,7 +461,7 @@ class TestSettingsSetActions(unittest.TestCase):
         self.settings.set_actions(actions)
 
         action_values = self.settings._parser['Desktop Entry']['Actions']
-        self.assertEqual(action_values, f'{prefix}1;{prefix}2;settings;')
+        self.assertEqual(action_values, f'{prefix}1;{prefix}2;configure;')
 
         actual_venv_groups = [
             self.settings._parser[f'Desktop Action {prefix}1'],
@@ -481,21 +481,21 @@ class TestSettingsSetActions(unittest.TestCase):
         desktop_entry = textwrap.dedent(f"""
             [Desktop Entry]
             Name=EnvLauncher
-            Exec=envlauncher --settings
+            Exec=envlauncher --configure
             Type=Application
-            Actions=other;{prefix}3;settings;
+            Actions=other;{prefix}3;configure;
 
             [Desktop Action other]
             Name=Other Action
-            Exec=envlauncher --settings
+            Exec=envlauncher --configure
 
             [Desktop Action {self.prefix}3]
             Name=Python 3.10
             Exec=envlauncher --activate "~/.venv310/bin/activate" --directory "~/Projects/"
 
-            [Desktop Action settings]
-            Name=EnvLauncher Settings
-            Exec=envlauncher --settings
+            [Desktop Action configure]
+            Name=Configure EnvLauncher
+            Exec=envlauncher --configure
         """).lstrip()
         settings = envlauncher.Settings.from_string(desktop_entry)
         settings.set_actions([
@@ -505,8 +505,8 @@ class TestSettingsSetActions(unittest.TestCase):
 
         self.assertEqual(
             settings._parser['Desktop Entry']['Actions'],
-            f'{prefix}1;{prefix}2;other;settings;',
-            msg='should preserve "other" and "settings" identifiers',
+            f'{prefix}1;{prefix}2;other;configure;',
+            msg='should preserve "other" and "configure" identifiers',
         )
 
         self.assertEqual(
@@ -514,11 +514,11 @@ class TestSettingsSetActions(unittest.TestCase):
             [
                 'Desktop Entry',
                 'Desktop Action other',
-                'Desktop Action settings',
+                'Desktop Action configure',
                 f'Desktop Action {prefix}1',
                 f'Desktop Action {prefix}2',
             ],
-            msg='should preserve "other" and "settings" groups',
+            msg='should preserve "other" and "configure" groups',
         )
 
     def test_missing_actions_section(self):
@@ -527,7 +527,7 @@ class TestSettingsSetActions(unittest.TestCase):
         desktop_entry = textwrap.dedent(f"""
             [Desktop Entry]
             Name=EnvLauncher
-            Exec=envlauncher --settings
+            Exec=envlauncher --configure
             Type=Application
         """).lstrip()
         settings = envlauncher.Settings.from_string(desktop_entry)
@@ -540,7 +540,7 @@ class TestSettingsSetActions(unittest.TestCase):
         expected = textwrap.dedent(f"""
             [Desktop Entry]
             Name=EnvLauncher
-            Exec=envlauncher --settings
+            Exec=envlauncher --configure
             Type=Application
             Actions={prefix}1;{prefix}2;
 

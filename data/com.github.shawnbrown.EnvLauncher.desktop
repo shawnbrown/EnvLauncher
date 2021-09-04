@@ -7,25 +7,25 @@ Keywords=venv;virtual;virtualenv;conda;environment;launcher;python;
 Keywords[ja]=venv;virtual;virtualenv;conda;environment;launcher;python;ランチャー;仮想環境;
 TryExec=envlauncher
 #Exec=envlauncher --activate "~/Projects/.venv39/bin/activate" --directory "~/Projects/"
-Exec=envlauncher --settings
+Exec=envlauncher --configure
 Icon=com.github.shawnbrown.EnvLauncher
 Type=Application
 MimeType=
 Categories=Development;
 StartupNotify=false
 StartupWMClass=com.github.shawnbrown.EnvLauncher
-#Actions=actn1;settings;
-Actions=settings;
+#Actions=actn1;configure;
+Actions=configure;
 
 #[Desktop Action actn1]
 #Name=Python 3.9
 #Exec=envlauncher --activate "~/Projects/.venv39/bin/activate" --directory "~/Projects/"
 #Icon=window-new
 
-[Desktop Action settings]
+[Desktop Action configure]
 Name=Configure EnvLauncher
 Name[ja]=Envランチャーを構成します
-Exec=envlauncher --settings
+Exec=envlauncher --configure
 Icon=preferences-other
 
 [X-EnvLauncher Options]
