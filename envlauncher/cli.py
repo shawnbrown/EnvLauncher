@@ -18,6 +18,7 @@
 """Command-line interface for EnvLauncher."""
 
 import argparse
+from .app import __version__
 from .app import DataPaths
 from .app import EnvLauncherApp
 from .app import edit_settings

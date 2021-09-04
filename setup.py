@@ -54,7 +54,7 @@ if __name__ == '__main__':
     setup(
         # Required fields:
         name='EnvLauncher',
-        version=get_version('envlauncher/__init__.py'),
+        version=get_version('envlauncher/app.py'),
         description=('A GNOME desktop launcher to activate Python '
                      'development environments.'),
         packages=['envlauncher'],

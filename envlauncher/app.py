@@ -33,6 +33,7 @@ from typing import List, Tuple, Optional
 
 
 APP_NAME = 'com.github.shawnbrown.EnvLauncher'
+__version__ = '0.1a1.dev1'
 
 
 class DataPaths(object):
