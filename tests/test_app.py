@@ -553,28 +553,3 @@ class TestSettingsSetActions(unittest.TestCase):
             Exec=envlauncher --activate "~/.venv27/bin/activate" --directory "~/Projects/legacy/"
         """).lstrip()
         self.assertEqual(export, expected)
-
-
-class TestDBusInteraction(unittest.TestCase):
-    def test_false(self):
-        result = envlauncher.name_has_owner('unknown.name.with.no.owner')
-        self.assertFalse(result)
-
-    def test_true(self):
-        if os.environ.get('DESKTOP_SESSION', '').lower() != 'gnome':
-            return
-
-        result = envlauncher.name_has_owner('org.gnome.Shell')
-        self.assertTrue(result)
-
-
-@unittest.skipUnless(shutil.which('gnome-terminal'), 'requires gnome-terminal')
-class TestGnomeTerminalSupport(unittest.TestCase):
-    def test_get_terminal_emulators(self):
-        result = envlauncher.get_terminal_emulators()
-        self.assertIn('gnome-terminal', result)
-
-    def test_find_gnome_terminal_server(self):
-        result = envlauncher.EnvLauncherApp._find_gnome_terminal_server()
-        self.assertIsNotNone(result)
-        self.assertRegex(result, 'gnome-terminal-server$')

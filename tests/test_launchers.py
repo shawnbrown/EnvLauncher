@@ -21,6 +21,7 @@ import subprocess
 import tempfile
 import unittest
 from envlauncher.launchers import BaseLauncher
+from envlauncher.launchers import GnomeTerminalLauncher
 from envlauncher.launchers import XTermLauncher
 
 
@@ -61,6 +62,27 @@ class TestLauncherBase(unittest.TestCase):
             f.write('exit\n')  # Dummy script, simply exits.
         self.script_path = f.name
         self.addCleanup(lambda: os.remove(self.script_path))
+
+
+@unittest.skipUnless(shutil.which('gnome-terminal'), 'requires gnome-terminal')
+class TestGnomeTerminalLauncher(TestLauncherBase):
+    def test_find_gnome_terminal_server(self):
+        result = GnomeTerminalLauncher._find_gnome_terminal_server()
+        self.assertIsNotNone(result)
+        self.assertRegex(result, 'gnome-terminal-server$')
+
+    def test_name_has_owner(self):
+        result = GnomeTerminalLauncher.name_has_owner('unknown.name.with.no.owner')
+        self.assertFalse(result)
+
+        result = GnomeTerminalLauncher.name_has_owner('org.gnome.Shell')
+        self.assertTrue(result)
+
+    def test_call_launcher(self):
+        launcher = GnomeTerminalLauncher(self.script_path)
+        process = launcher()
+        process.wait(timeout=5)
+        self.assertEqual(process.returncode, 0)
 
 
 class TestSimpleLaunchers(TestLauncherBase):

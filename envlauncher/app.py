@@ -328,21 +328,6 @@ class Settings(object):
         self._parser['Desktop Entry']['Actions'] = f'{actions_value};'
 
 
-def name_has_owner(name) -> bool:
-    """Check if the name exists on the session bus (has an owner)."""
-    reply = subprocess.check_output([
-        'dbus-send',
-        '--session',                          # <- use session message bus
-        '--dest=org.freedesktop.DBus',        # <- message destination
-        '--print-reply=literal',              # <- set reply format
-        '--type=method_call',                 # <- message type
-        '/',                                  # <- OBJECT_PATH
-        'org.freedesktop.DBus.NameHasOwner',  # <- INTERFACE.MEMBER (method)
-        f'string:{name}',                     # <- message CONTENTS
-    ])
-    return b'true' in reply.lower()
-
-
 class EnvLauncherApp(object):
     """A class to prepare and launch virtual environment sessions."""
     def __init__(self):
@@ -380,61 +365,12 @@ class EnvLauncherApp(object):
 
         return '\n'.join(rcfile_lines)
 
-    @staticmethod
-    def _find_gnome_terminal_server() -> Optional[str]:
-        """Find and return the path to gnome-terminal-server."""
-        search_paths = [
-            '/usr/libexec/gnome-terminal-server',
-            '/usr/lib/gnome-terminal/gnome-terminal-server',
-            '/usr/lib/gnome-terminal-server',
-        ]
-        for path in search_paths:
-            if os.path.exists(path):
-                return path
-        return None
-
-    @classmethod
-    def _register_app_id(cls, app_id) -> None:
-        """Register *app_id* with gnome-terminal-server."""
-        if name_has_owner(app_id):
-            return  # <- EXIT! (already registered)
-
-        gnome_terminal_server = cls._find_gnome_terminal_server()
-        if gnome_terminal_server:
-            args = [gnome_terminal_server, '--app-id', app_id]
-            if os.environ.get('XDG_CURRENT_DESKTOP') == 'KDE':
-                # Class and name determine grouping and icon in KDE.
-                args.extend(['--class', app_id, '--name', app_id])
-            process = subprocess.Popen(args)
-
-            timeout = time() + 1
-            while True:
-                sleep(0.03125)  # 1/32nd of a second polling interval
-                if name_has_owner(app_id):
-                    return  # <- EXIT! (successfully registered)
-                if time() > timeout:    # Timeout check must not be used in
-                    raise TimeoutError  # the `while` condition--body of loop
-        raise OSError                   # MUST execute at least once.
-
     def get_launcher(self, terminal_emulator, rcfile_name):
         """Returns a function and arguments used to launch a terminal
         emulator and activate a virtual environment.
         """
-        # GNOME default terminal.
         if terminal_emulator == 'gnome-terminal':
-            def func(args):
-                # Register app-id or fallback to `--class` argument.
-                try:
-                    self._register_app_id(APP_NAME)
-                except (OSError, TimeoutError):
-                    args[args.index('--app-id')] = '--class'  # Replace argument.
-                return subprocess.Popen(args)
-
-            args = ['gnome-terminal',
-                    '--app-id', APP_NAME,
-                    '--', 'bash', '--rcfile', rcfile_name]
-
-            return lambda: func(args)
+            return launchers.GnomeTerminalLauncher(rcfile_name)
 
         if terminal_emulator == 'terminator':
             args = ['terminator',
