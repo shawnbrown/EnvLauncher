@@ -432,7 +432,7 @@ class EnvLauncherApp(object):
                     '--app-id', APP_NAME,
                     '--', 'bash', '--rcfile', rcfile_name]
 
-            return func, (args,)
+            return lambda: func(args)
 
         if terminal_emulator == 'terminator':
             args = ['terminator',
@@ -440,14 +440,14 @@ class EnvLauncherApp(object):
                     '--icon', APP_NAME,
                     '--no-dbus',  # <- For clean grouping in dash/taskbar.
                     '-x', 'bash', '--rcfile', rcfile_name]
-            return subprocess.Popen, (args,)
+            return lambda: subprocess.Popen(args)
 
         if terminal_emulator == 'xterm':
             args = ['xterm',
                     '-class', APP_NAME,
                     '-n', APP_NAME,  # <- Defines iconName resource.
                     '-e', 'bash', '--rcfile', rcfile_name]
-            return subprocess.Popen, (args,)
+            return lambda: subprocess.Popen(args)
 
         # KDE default terminal.
         if terminal_emulator == 'konsole':
@@ -457,20 +457,20 @@ class EnvLauncherApp(object):
             args.extend(['-p', f'Icon={APP_NAME}',
                          '-p', f'LocalTabTitleFormat=EnvLauncher : %D : %n',
                          '-e', 'bash', '--rcfile', rcfile_name])
-            return subprocess.Popen, (args,)
+            return lambda: subprocess.Popen(args)
 
         if terminal_emulator == 'alacritty':
             args = ['alacritty',
                     '--class', f'{APP_NAME},{APP_NAME}',
                     '--title', 'EnvLauncher',
                     '-e', 'bash', '--rcfile', rcfile_name]
-            return subprocess.Popen, (args,)
+            return lambda: subprocess.Popen(args)
 
         if terminal_emulator == 'kitty':
             args = ['kitty',
                     '--class', APP_NAME,
                     'bash', '--rcfile', rcfile_name]
-            return subprocess.Popen, (args,)
+            return lambda: subprocess.Popen(args)
 
         if terminal_emulator == 'guake':
             args = ['guake',
@@ -478,7 +478,7 @@ class EnvLauncherApp(object):
                     '--new-tab', '.',
                     '--show',
                     '-e', f'clear;source {shlex.quote(rcfile_name)}']
-            return subprocess.Popen, (args,)
+            return lambda: subprocess.Popen(args)
 
         if terminal_emulator == 'yakuake':
             def func(args):
@@ -524,8 +524,7 @@ class EnvLauncherApp(object):
                     '/yakuake/window',
                     'org.kde.yakuake.toggleWindowState',
                 ])
-            args = [None]
-            return func, args
+            return func
 
         # XFCE default terminal.
         if terminal_emulator == 'xfce4-terminal':
@@ -534,25 +533,25 @@ class EnvLauncherApp(object):
                     '--icon', APP_NAME,
                     '--initial-title', 'EnvLauncher',
                     '-x', 'bash', '--rcfile', rcfile_name]
-            return subprocess.Popen, (args,)
+            return lambda: subprocess.Popen(args)
 
         # LXQt default terminal.
         if terminal_emulator == 'qterminal':
             args = ['qterminal',
                     '--name', APP_NAME,
                     '-e', f'bash --rcfile {shlex.quote(rcfile_name)}']
-            return subprocess.Popen, (args,)
+            return lambda: subprocess.Popen(args)
 
         if terminal_emulator == 'sakura':
             args = ['sakura',
                     '--class', APP_NAME,
                     '--icon', APP_NAME,
                     '-e', 'bash', '--rcfile', rcfile_name]
-            return subprocess.Popen, (args,)
+            return lambda: subprocess.Popen(args)
 
         if terminal_emulator == 'cool-retro-term':
             args = ['cool-retro-term', '-e', 'bash', '--rcfile', rcfile_name]
-            return subprocess.Popen, (args,)
+            return lambda: subprocess.Popen(args)
 
         raise Exception(f'Unsupported terminal emulator {terminal_emulator!r}')
 
@@ -565,11 +564,11 @@ class EnvLauncherApp(object):
                                                  file_to_delete=rcfile.name)
                 rcfile.write(rcfile_text)
 
-            func, args = self.get_launcher(
+            func = self.get_launcher(
                 terminal_emulator=self.settings.terminal_emulator,
                 rcfile_name=rcfile.name,
             )
-            func(*args)
+            func()
 
         except Exception:
             try:
