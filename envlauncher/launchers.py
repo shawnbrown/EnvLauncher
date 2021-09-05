@@ -36,3 +36,17 @@ class BaseLauncher(abc.ABC):
     def __call__(self) -> Optional[subprocess.Popen]:
         """Start terminal emulator and run activation script."""
         raise NotImplementedError
+
+
+class XTermLauncher(BaseLauncher):
+    def __init__(self, script_path):
+        self.script_path = script_path
+        self.command = 'xterm'
+        self.args = [
+            '-class', self.app_id,
+            '-n', self.app_id,  # <- Defines iconName resource.
+            '-e', 'bash', '--rcfile', self.script_path,
+        ]
+
+    def __call__(self) -> subprocess.Popen:
+        return subprocess.Popen([self.command] + self.args)

@@ -31,6 +31,8 @@ import tempfile
 from time import sleep, time
 from typing import List, Tuple, Optional
 
+from . import launchers
+
 
 APP_NAME = 'com.github.shawnbrown.EnvLauncher'
 __version__ = '0.1a1.dev1'
@@ -443,11 +445,7 @@ class EnvLauncherApp(object):
             return lambda: subprocess.Popen(args)
 
         if terminal_emulator == 'xterm':
-            args = ['xterm',
-                    '-class', APP_NAME,
-                    '-n', APP_NAME,  # <- Defines iconName resource.
-                    '-e', 'bash', '--rcfile', rcfile_name]
-            return lambda: subprocess.Popen(args)
+            return launchers.XTermLauncher(rcfile_name)
 
         # KDE default terminal.
         if terminal_emulator == 'konsole':

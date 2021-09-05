@@ -15,9 +15,13 @@
 # You should have received a copy of the GNU General Public License
 # along with EnvLauncher.  If not, see <https://www.gnu.org/licenses/>.
 
+import os
+import shutil
 import subprocess
+import tempfile
 import unittest
 from envlauncher.launchers import BaseLauncher
+from envlauncher.launchers import XTermLauncher
 
 
 class TestAbstractBaseLauncher(unittest.TestCase):
@@ -49,3 +53,20 @@ class TestAbstractBaseLauncher(unittest.TestCase):
                 pass
 
         launcher = MinimalLauncher()
+
+
+class TestLauncherBase(unittest.TestCase):
+    def setUp(self):
+        with tempfile.NamedTemporaryFile(mode='w', delete=False) as f:
+            f.write('exit\n')  # Dummy script, simply exits.
+        self.script_path = f.name
+        self.addCleanup(lambda: os.remove(self.script_path))
+
+
+class TestSimpleLaunchers(TestLauncherBase):
+    @unittest.skipUnless(shutil.which('xterm'), 'requires xterm')
+    def test_xterm(self):
+        launcher = XTermLauncher(self.script_path)
+        process = launcher()
+        process.wait(timeout=5)
+        self.assertEqual(process.returncode, 0)
