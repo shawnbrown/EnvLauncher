@@ -20,19 +20,32 @@ import unittest
 from envlauncher.launchers import BaseLauncher
 
 
-class TestBaseLauncher(unittest.TestCase):
-    def test_minimal_launcher(self):
-        """Test abstract base class with dummy concrete class."""
+class TestAbstractBaseLauncher(unittest.TestCase):
+    def test_missing_init(self):
+        """Subclasses must define __init__()."""
+        class MissingInit(BaseLauncher):
+            def __call__(self):
+                pass
 
+        with self.assertRaises(TypeError):
+            launcher = MissingInit()
+
+    def test_missing_call(self):
+        """Subclasses must define __call__()."""
+        class MissingCall(BaseLauncher):
+            def __init__(self):
+                pass
+
+        with self.assertRaises(TypeError):
+            launcher = MissingCall()
+
+    def test_minimal_subclass(self):
+        """Minimal concrete class definition."""
         class MinimalLauncher(BaseLauncher):
             def __init__(self):
                 pass
 
             def __call__(self):
-                process = subprocess.Popen(['true', 'dummy', 'command'])
-                process.wait()  # Wait until subprocess completes.
-                return process
+                pass
 
         launcher = MinimalLauncher()
-        return_val = launcher()
-        self.assertIsInstance(return_val, subprocess.Popen)
