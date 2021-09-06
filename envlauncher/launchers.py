@@ -20,6 +20,7 @@
 import abc
 import os
 import subprocess
+import warnings
 from time import sleep, time
 from typing import Optional
 
@@ -93,6 +94,12 @@ class GnomeTerminalLauncher(BaseLauncher):
                 # Class and name determine grouping and icon in KDE.
                 args.extend(['--class', app_id, '--name', app_id])
             process = subprocess.Popen(args)
+            # Until we can sort-out how to best handle this process,
+            # we will filter the ResourceWarning for the specific PID.
+            warnings.filterwarnings(
+                'ignore',
+                message=f'subprocess {process.pid} is still running',
+            )
 
             timeout = time() + 1
             while True:
