@@ -30,6 +30,7 @@ from envlauncher.launchers import KittyLauncher
 from envlauncher.launchers import KonsoleLauncher
 from envlauncher.launchers import QTerminalLauncher
 from envlauncher.launchers import TerminatorLauncher
+from envlauncher.launchers import Xfce4Terminal
 from envlauncher.launchers import XTermLauncher
 from envlauncher.launchers import YakuakeLauncher
 
@@ -184,6 +185,13 @@ class TestSimpleLaunchers(TestLauncherBase):
     def test_terminator(self):
         launch = TerminatorLauncher(self.script_path)
         process = launch()
+        process.wait(timeout=5)
+        self.assertEqual(process.returncode, 0)
+
+    @unittest.skipUnless(shutil.which('xfce4-terminal'), 'requires xfce4-terminal')
+    def test_xfce4terminal(self):
+        launcher = Xfce4Terminal(self.script_path)
+        process = launcher()
         process.wait(timeout=5)
         self.assertEqual(process.returncode, 0)
 

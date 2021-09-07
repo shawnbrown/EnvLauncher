@@ -391,14 +391,8 @@ class EnvLauncherApp(object):
         if terminal_emulator == 'yakuake':
             return launchers.YakuakeLauncher(rcfile_name)
 
-        # XFCE default terminal.
         if terminal_emulator == 'xfce4-terminal':
-            args = ['xfce4-terminal',
-                    '--startup-id', APP_NAME,
-                    '--icon', APP_NAME,
-                    '--initial-title', 'EnvLauncher',
-                    '-x', 'bash', '--rcfile', rcfile_name]
-            return lambda: subprocess.Popen(args)
+            return launchers.Xfce4Terminal(rcfile_name)
 
         # LXQt default terminal.
         if terminal_emulator == 'qterminal':
