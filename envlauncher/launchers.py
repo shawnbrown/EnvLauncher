@@ -19,7 +19,9 @@
 
 import abc
 import os
+import re
 import subprocess
+import sys
 import warnings
 from time import sleep, time
 from typing import Optional
@@ -166,3 +168,57 @@ class KonsoleLauncher(BaseLauncher):
 
     def __call__(self) -> subprocess.Popen:
         return subprocess.Popen([self.command] + self.args)
+
+
+class YakuakeLauncher(BaseLauncher):
+    def __init__(self, script_path):
+        self.script_path = script_path
+
+    @property
+    def command(self) -> str:
+        return 'yakuake'
+
+    def __call__(self) -> None:
+        reply = subprocess.check_output([
+            'dbus-send',
+            '--session',
+            '--dest=org.kde.yakuake',
+            '--print-reply=literal',
+            '--type=method_call',
+            '/yakuake/sessions',
+            'org.kde.yakuake.addSession',
+        ])
+        reply = str(reply, encoding=sys.stdout.encoding)
+        matched = re.search(r'(?:int16|int32|int64)[ ](\d+)', reply)
+        if matched:
+            yakuake_session = matched.group(1)
+        else:
+            msg = f'Unable to get Yakuake tab session id: {reply!r}'
+            raise RuntimeError(msg)
+
+        subprocess.Popen([
+            'dbus-send',
+            '--type=method_call',
+            '--dest=org.kde.yakuake',
+            '/yakuake/sessions',
+            'org.kde.yakuake.runCommandInTerminal',
+            f'int32:{yakuake_session}',
+            f'string:clear;source {self.script_path}',
+        ])
+        subprocess.Popen([
+            'dbus-send',
+            '--type=method_call',
+            '--dest=org.kde.yakuake',
+            '/yakuake/tabs',
+            'org.kde.yakuake.setTabTitle',
+            f'int32:{yakuake_session}',
+            'string:EnvLauncher',
+        ])
+        subprocess.Popen([
+            'dbus-send',
+            '--type=method_call',
+            '--dest=org.kde.yakuake',
+            '/yakuake/window',
+            'org.kde.yakuake.toggleWindowState',
+        ])
+        return os.EX_OK

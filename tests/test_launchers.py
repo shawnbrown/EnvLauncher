@@ -19,11 +19,13 @@ import os
 import shutil
 import subprocess
 import tempfile
+import time
 import unittest
 from envlauncher.launchers import BaseLauncher
 from envlauncher.launchers import GnomeTerminalLauncher
 from envlauncher.launchers import KonsoleLauncher
 from envlauncher.launchers import XTermLauncher
+from envlauncher.launchers import YakuakeLauncher
 
 
 class TestAbstractBaseLauncher(unittest.TestCase):
@@ -103,6 +105,28 @@ class TestGnomeTerminalLauncher(TestLauncherBase):
         process = launcher()
         process.wait(timeout=5)
         self.assertEqual(process.returncode, 0)
+
+
+@unittest.skipUnless(shutil.which('yakuake'), 'requires yakuake')
+class TestYakuakeLauncher(TestLauncherBase):
+    @staticmethod
+    def _hide_yakuake_window():
+        """Make D-Bus call to hide Yakuake window."""
+        subprocess.run([
+            'dbus-send',
+            '--type=method_call',
+            '--dest=org.kde.yakuake',
+            '/yakuake/MainWindow_1',
+            'org.qtproject.Qt.QWidget.hide',
+        ])
+
+    def test_yakuake(self):
+        self.addCleanup(self._hide_yakuake_window)
+
+        launch = YakuakeLauncher(self.script_path)
+        returncode = launch()
+        time.sleep(0.1)  # <- TODO: Remove after fixing process handling.
+        self.assertEqual(returncode, 0)
 
 
 class TestSimpleLaunchers(TestLauncherBase):
