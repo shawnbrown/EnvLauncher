@@ -129,22 +129,6 @@ class GnomeTerminalLauncher(BaseLauncher):
         return subprocess.Popen([self.command] + args)
 
 
-class XTermLauncher(BaseLauncher):
-    def __init__(self, script_path):
-        self.args = [
-            '-class', self.app_id,
-            '-n', self.app_id,  # <- Defines iconName resource.
-            '-e', 'bash', '--rcfile', script_path,
-        ]
-
-    @property
-    def command(self) -> str:
-        return 'xterm'
-
-    def __call__(self) -> subprocess.Popen:
-        return subprocess.Popen([self.command] + self.args)
-
-
 class KonsoleLauncher(BaseLauncher):
     """Konsole is the default terminal emulator in the KDE
     desktop environment.
@@ -165,6 +149,22 @@ class KonsoleLauncher(BaseLauncher):
     @property
     def command(self) -> str:
         return 'konsole'
+
+    def __call__(self) -> subprocess.Popen:
+        return subprocess.Popen([self.command] + self.args)
+
+
+class XTermLauncher(BaseLauncher):
+    def __init__(self, script_path):
+        self.args = [
+            '-class', self.app_id,
+            '-n', self.app_id,  # <- Defines iconName resource.
+            '-e', 'bash', '--rcfile', script_path,
+        ]
+
+    @property
+    def command(self) -> str:
+        return 'xterm'
 
     def __call__(self) -> subprocess.Popen:
         return subprocess.Popen([self.command] + self.args)

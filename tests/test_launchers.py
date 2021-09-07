@@ -130,16 +130,16 @@ class TestYakuakeLauncher(TestLauncherBase):
 
 
 class TestSimpleLaunchers(TestLauncherBase):
-    @unittest.skipUnless(shutil.which('xterm'), 'requires xterm')
-    def test_xterm(self):
-        launcher = XTermLauncher(self.script_path)
-        process = launcher()
-        process.wait(timeout=5)
-        self.assertEqual(process.returncode, 0)
-
     @unittest.skipUnless(shutil.which('konsole'), 'requires konsole')
     def test_konsole(self):
         launch = KonsoleLauncher(self.script_path)
         process = launch()
+        process.wait(timeout=5)
+        self.assertEqual(process.returncode, 0)
+
+    @unittest.skipUnless(shutil.which('xterm'), 'requires xterm')
+    def test_xterm(self):
+        launcher = XTermLauncher(self.script_path)
+        process = launcher()
         process.wait(timeout=5)
         self.assertEqual(process.returncode, 0)
