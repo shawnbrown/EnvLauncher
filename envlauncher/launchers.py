@@ -47,6 +47,22 @@ class BaseLauncher(abc.ABC):
         raise NotImplementedError
 
 
+class AlacrittyLauncher(BaseLauncher):
+    def __init__(self, script_path):
+        self.args = [
+            '--class', f'{self.app_id},{self.app_id}',
+            '--title', 'EnvLauncher',
+            '-e', 'bash', '--rcfile', script_path
+        ]
+
+    @property
+    def command(self) -> str:
+        return 'alacritty'
+
+    def __call__(self) -> subprocess.Popen:
+        return subprocess.Popen([self.command] + self.args)
+
+
 class GnomeTerminalLauncher(BaseLauncher):
     """gnome-terminal is the default terminal emulator in the GNOME
     desktop environment.

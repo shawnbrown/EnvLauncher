@@ -22,6 +22,7 @@ import tempfile
 import time
 import unittest
 from envlauncher.launchers import BaseLauncher
+from envlauncher.launchers import AlacrittyLauncher
 from envlauncher.launchers import GnomeTerminalLauncher
 from envlauncher.launchers import KonsoleLauncher
 from envlauncher.launchers import TerminatorLauncher
@@ -131,6 +132,13 @@ class TestYakuakeLauncher(TestLauncherBase):
 
 
 class TestSimpleLaunchers(TestLauncherBase):
+    @unittest.skipUnless(shutil.which('alacritty'), 'requires alacritty')
+    def test_alacritty(self):
+        launch = AlacrittyLauncher(self.script_path)
+        process = launch()
+        process.wait(timeout=5)
+        self.assertEqual(process.returncode, 0)
+
     @unittest.skipUnless(shutil.which('konsole'), 'requires konsole')
     def test_konsole(self):
         launch = KonsoleLauncher(self.script_path)

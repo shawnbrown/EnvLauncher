@@ -382,11 +382,7 @@ class EnvLauncherApp(object):
             return launchers.KonsoleLauncher(rcfile_name)
 
         if terminal_emulator == 'alacritty':
-            args = ['alacritty',
-                    '--class', f'{APP_NAME},{APP_NAME}',
-                    '--title', 'EnvLauncher',
-                    '-e', 'bash', '--rcfile', rcfile_name]
-            return lambda: subprocess.Popen(args)
+            return launchers.AlacrittyLauncher(rcfile_name)
 
         if terminal_emulator == 'kitty':
             args = ['kitty',
