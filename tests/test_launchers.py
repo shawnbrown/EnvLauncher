@@ -24,6 +24,7 @@ import unittest
 from envlauncher.launchers import BaseLauncher
 from envlauncher.launchers import GnomeTerminalLauncher
 from envlauncher.launchers import KonsoleLauncher
+from envlauncher.launchers import TerminatorLauncher
 from envlauncher.launchers import XTermLauncher
 from envlauncher.launchers import YakuakeLauncher
 
@@ -133,6 +134,13 @@ class TestSimpleLaunchers(TestLauncherBase):
     @unittest.skipUnless(shutil.which('konsole'), 'requires konsole')
     def test_konsole(self):
         launch = KonsoleLauncher(self.script_path)
+        process = launch()
+        process.wait(timeout=5)
+        self.assertEqual(process.returncode, 0)
+
+    @unittest.skipUnless(shutil.which('terminator'), 'requires terminator')
+    def test_terminator(self):
+        launch = TerminatorLauncher(self.script_path)
         process = launch()
         process.wait(timeout=5)
         self.assertEqual(process.returncode, 0)

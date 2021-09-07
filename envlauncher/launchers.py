@@ -154,6 +154,23 @@ class KonsoleLauncher(BaseLauncher):
         return subprocess.Popen([self.command] + self.args)
 
 
+class TerminatorLauncher(BaseLauncher):
+    def __init__(self, script_path):
+        self.args = [
+            '--name', self.app_id,
+            '--icon', self.app_id,
+            '--no-dbus',  # <- For clean grouping in dash/taskbar.
+            '-x', 'bash', '--rcfile', script_path
+        ]
+
+    @property
+    def command(self) -> str:
+        return 'terminator'
+
+    def __call__(self) -> subprocess.Popen:
+        return subprocess.Popen([self.command] + self.args)
+
+
 class XTermLauncher(BaseLauncher):
     def __init__(self, script_path):
         self.args = [

@@ -373,12 +373,7 @@ class EnvLauncherApp(object):
             return launchers.GnomeTerminalLauncher(rcfile_name)
 
         if terminal_emulator == 'terminator':
-            args = ['terminator',
-                    '--name', APP_NAME,
-                    '--icon', APP_NAME,
-                    '--no-dbus',  # <- For clean grouping in dash/taskbar.
-                    '-x', 'bash', '--rcfile', rcfile_name]
-            return lambda: subprocess.Popen(args)
+            return launchers.TerminatorLauncher(rcfile_name)
 
         if terminal_emulator == 'xterm':
             return launchers.XTermLauncher(rcfile_name)
