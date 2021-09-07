@@ -31,9 +31,13 @@ class BaseLauncher(abc.ABC):
 
     @abc.abstractmethod
     def __init__(self, script_path):
-        """Initialize launcher class."""
-        self.script_path = script_path  #: File path of activation script.
-        self.command = NotImplemented  #: Name of terminal emulator command.
+        """Initialize launcher (prepare to execute *script_path*)."""
+
+    @property
+    @abc.abstractmethod
+    def command(self) -> str:
+        """Name of terminal emulator command."""
+        return '<unspecified>'
 
     @abc.abstractmethod
     def __call__(self) -> Optional[subprocess.Popen]:
@@ -46,12 +50,14 @@ class GnomeTerminalLauncher(BaseLauncher):
     desktop environment.
     """
     def __init__(self, script_path):
-        self.script_path = script_path
-        self.command = 'gnome-terminal'
         self.args = [
             '--app-id', self.app_id,
             '--', 'bash', '--rcfile', script_path,
         ]
+
+    @property
+    def command(self) -> str:
+        return 'gnome-terminal'
 
     @staticmethod
     def _find_gnome_terminal_server() -> Optional[str]:
@@ -123,13 +129,15 @@ class GnomeTerminalLauncher(BaseLauncher):
 
 class XTermLauncher(BaseLauncher):
     def __init__(self, script_path):
-        self.script_path = script_path
-        self.command = 'xterm'
         self.args = [
             '-class', self.app_id,
             '-n', self.app_id,  # <- Defines iconName resource.
-            '-e', 'bash', '--rcfile', self.script_path,
+            '-e', 'bash', '--rcfile', script_path,
         ]
+
+    @property
+    def command(self) -> str:
+        return 'xterm'
 
     def __call__(self) -> subprocess.Popen:
         return subprocess.Popen([self.command] + self.args)

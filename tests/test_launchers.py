@@ -44,6 +44,18 @@ class TestAbstractBaseLauncher(unittest.TestCase):
         with self.assertRaises(TypeError):
             launcher = MissingCall()
 
+    def test_missing_command(self):
+        """Subclasses must define `command` property."""
+        class MissingCommand(BaseLauncher):
+            def __init__(self):
+                pass
+
+            def __call__(self):
+                pass
+
+        with self.assertRaises(TypeError):
+            launcher = MissingCommand()
+
     def test_minimal_subclass(self):
         """Minimal concrete class definition."""
         class MinimalLauncher(BaseLauncher):
@@ -52,6 +64,9 @@ class TestAbstractBaseLauncher(unittest.TestCase):
 
             def __call__(self):
                 pass
+
+            def command(self):
+                return 'dummy-app'
 
         launcher = MinimalLauncher()
 
