@@ -141,3 +141,28 @@ class XTermLauncher(BaseLauncher):
 
     def __call__(self) -> subprocess.Popen:
         return subprocess.Popen([self.command] + self.args)
+
+
+class KonsoleLauncher(BaseLauncher):
+    """Konsole is the default terminal emulator in the KDE
+    desktop environment.
+    """
+    def __init__(self, script_path):
+        if os.environ.get('XDG_CURRENT_DESKTOP') == 'KDE':
+            args = ['--name', self.app_id]  # Set WM_CLASSNAME in KDE.
+        else:
+            args = []
+
+        args.extend([
+            '-p', f'Icon={self.app_id}',
+            '-p', f'LocalTabTitleFormat=EnvLauncher : %D : %n',
+            '-e', 'bash', '--rcfile', script_path,
+        ])
+        self.args = args
+
+    @property
+    def command(self) -> str:
+        return 'konsole'
+
+    def __call__(self) -> subprocess.Popen:
+        return subprocess.Popen([self.command] + self.args)

@@ -383,15 +383,8 @@ class EnvLauncherApp(object):
         if terminal_emulator == 'xterm':
             return launchers.XTermLauncher(rcfile_name)
 
-        # KDE default terminal.
         if terminal_emulator == 'konsole':
-            args = ['konsole']
-            if os.environ.get('XDG_CURRENT_DESKTOP') == 'KDE':
-                args.extend(['--name', APP_NAME])  # Set WM_CLASSNAME in KDE.
-            args.extend(['-p', f'Icon={APP_NAME}',
-                         '-p', f'LocalTabTitleFormat=EnvLauncher : %D : %n',
-                         '-e', 'bash', '--rcfile', rcfile_name])
-            return lambda: subprocess.Popen(args)
+            return launchers.KonsoleLauncher(rcfile_name)
 
         if terminal_emulator == 'alacritty':
             args = ['alacritty',
