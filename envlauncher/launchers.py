@@ -20,6 +20,7 @@
 import abc
 import os
 import re
+import shlex
 import subprocess
 import sys
 import warnings
@@ -145,6 +146,21 @@ class GnomeTerminalLauncher(BaseLauncher):
         return subprocess.Popen([self.command] + args)
 
 
+class KittyLauncher(BaseLauncher):
+    def __init__(self, script_path):
+        self.args = [
+            '--class', self.app_id,
+            'bash', '--rcfile', script_path
+        ]
+
+    @property
+    def command(self) -> str:
+        return 'kitty'
+
+    def __call__(self) -> subprocess.Popen:
+        return subprocess.Popen([self.command] + self.args)
+
+
 class KonsoleLauncher(BaseLauncher):
     """Konsole is the default terminal emulator in the KDE
     desktop environment.
@@ -165,6 +181,21 @@ class KonsoleLauncher(BaseLauncher):
     @property
     def command(self) -> str:
         return 'konsole'
+
+    def __call__(self) -> subprocess.Popen:
+        return subprocess.Popen([self.command] + self.args)
+
+
+class QTerminalLauncher(BaseLauncher):
+    def __init__(self, script_path):
+        self.args = [
+            '--name', self.app_id,
+            '-e', f'bash --rcfile {shlex.quote(script_path)}',
+        ]
+
+    @property
+    def command(self) -> str:
+        return 'qterminal'
 
     def __call__(self) -> subprocess.Popen:
         return subprocess.Popen([self.command] + self.args)

@@ -24,7 +24,9 @@ import unittest
 from envlauncher.launchers import BaseLauncher
 from envlauncher.launchers import AlacrittyLauncher
 from envlauncher.launchers import GnomeTerminalLauncher
+from envlauncher.launchers import KittyLauncher
 from envlauncher.launchers import KonsoleLauncher
+from envlauncher.launchers import QTerminalLauncher
 from envlauncher.launchers import TerminatorLauncher
 from envlauncher.launchers import XTermLauncher
 from envlauncher.launchers import YakuakeLauncher
@@ -139,9 +141,23 @@ class TestSimpleLaunchers(TestLauncherBase):
         process.wait(timeout=5)
         self.assertEqual(process.returncode, 0)
 
+    @unittest.skipUnless(shutil.which('kitty'), 'requires kitty')
+    def test_kitty(self):
+        launch = KittyLauncher(self.script_path)
+        process = launch()
+        process.wait(timeout=5)
+        self.assertEqual(process.returncode, 0)
+
     @unittest.skipUnless(shutil.which('konsole'), 'requires konsole')
     def test_konsole(self):
         launch = KonsoleLauncher(self.script_path)
+        process = launch()
+        process.wait(timeout=5)
+        self.assertEqual(process.returncode, 0)
+
+    @unittest.skipUnless(shutil.which('qterminal'), 'requires qterminal')
+    def test_qterminal(self):
+        launch = QTerminalLauncher(self.script_path)
         process = launch()
         process.wait(timeout=5)
         self.assertEqual(process.returncode, 0)

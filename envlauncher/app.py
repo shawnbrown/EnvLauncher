@@ -26,9 +26,7 @@ import re
 import shlex
 import shutil
 import subprocess
-import sys
 import tempfile
-from time import sleep, time
 from typing import List, Tuple, Optional
 
 from . import launchers
@@ -385,10 +383,7 @@ class EnvLauncherApp(object):
             return launchers.AlacrittyLauncher(rcfile_name)
 
         if terminal_emulator == 'kitty':
-            args = ['kitty',
-                    '--class', APP_NAME,
-                    'bash', '--rcfile', rcfile_name]
-            return lambda: subprocess.Popen(args)
+            return launchers.KittyLauncher(rcfile_name)
 
         if terminal_emulator == 'guake':
             args = ['guake',
@@ -412,10 +407,7 @@ class EnvLauncherApp(object):
 
         # LXQt default terminal.
         if terminal_emulator == 'qterminal':
-            args = ['qterminal',
-                    '--name', APP_NAME,
-                    '-e', f'bash --rcfile {shlex.quote(rcfile_name)}']
-            return lambda: subprocess.Popen(args)
+            return launchers.QTerminalLauncher(rcfile_name)
 
         if terminal_emulator == 'sakura':
             args = ['sakura',
