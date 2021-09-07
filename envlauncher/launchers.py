@@ -196,7 +196,7 @@ class YakuakeLauncher(BaseLauncher):
             msg = f'Unable to get Yakuake tab session id: {reply!r}'
             raise RuntimeError(msg)
 
-        subprocess.Popen([
+        subprocess.run([
             'dbus-send',
             '--type=method_call',
             '--dest=org.kde.yakuake',
@@ -204,8 +204,8 @@ class YakuakeLauncher(BaseLauncher):
             'org.kde.yakuake.runCommandInTerminal',
             f'int32:{yakuake_session}',
             f'string:clear;source {self.script_path}',
-        ])
-        subprocess.Popen([
+        ], timeout=5, check=True)
+        subprocess.run([
             'dbus-send',
             '--type=method_call',
             '--dest=org.kde.yakuake',
@@ -213,12 +213,12 @@ class YakuakeLauncher(BaseLauncher):
             'org.kde.yakuake.setTabTitle',
             f'int32:{yakuake_session}',
             'string:EnvLauncher',
-        ])
-        subprocess.Popen([
+        ], timeout=5, check=True)
+        subprocess.run([
             'dbus-send',
             '--type=method_call',
             '--dest=org.kde.yakuake',
             '/yakuake/window',
             'org.kde.yakuake.toggleWindowState',
-        ])
+        ], timeout=5, check=True)
         return os.EX_OK
