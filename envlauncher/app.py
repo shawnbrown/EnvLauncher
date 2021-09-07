@@ -386,12 +386,7 @@ class EnvLauncherApp(object):
             return launchers.KittyLauncher(rcfile_name)
 
         if terminal_emulator == 'guake':
-            args = ['guake',
-                    '--no-startup-script',
-                    '--new-tab', '.',
-                    '--show',
-                    '-e', f'clear;source {shlex.quote(rcfile_name)}']
-            return lambda: subprocess.Popen(args)
+            return launchers.GuakeLauncher(rcfile_name)
 
         if terminal_emulator == 'yakuake':
             return launchers.YakuakeLauncher(rcfile_name)

@@ -146,6 +146,23 @@ class GnomeTerminalLauncher(BaseLauncher):
         return subprocess.Popen([self.command] + args)
 
 
+class GuakeLauncher(BaseLauncher):
+    def __init__(self, script_path):
+        self.args = [
+            '--no-startup-script',
+            '--new-tab', '.',
+            '--show',
+            '-e', f'clear;source {shlex.quote(script_path)}',
+        ]
+
+    @property
+    def command(self) -> str:
+        return 'guake'
+
+    def __call__(self) -> subprocess.Popen:
+        return subprocess.Popen([self.command] + self.args)
+
+
 class KittyLauncher(BaseLauncher):
     def __init__(self, script_path):
         self.args = [

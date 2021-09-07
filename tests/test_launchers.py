@@ -24,6 +24,7 @@ import unittest
 from envlauncher.launchers import BaseLauncher
 from envlauncher.launchers import AlacrittyLauncher
 from envlauncher.launchers import GnomeTerminalLauncher
+from envlauncher.launchers import GuakeLauncher
 from envlauncher.launchers import KittyLauncher
 from envlauncher.launchers import KonsoleLauncher
 from envlauncher.launchers import QTerminalLauncher
@@ -140,6 +141,15 @@ class TestSimpleLaunchers(TestLauncherBase):
         process = launch()
         process.wait(timeout=5)
         self.assertEqual(process.returncode, 0)
+
+    @unittest.skipUnless(shutil.which('guake'), 'requires guake')
+    def test_guake(self):
+        launch = GuakeLauncher(self.script_path)
+        process = launch()
+        process.wait(timeout=5)
+        self.assertEqual(process.returncode, 0)
+        time.sleep(0.1)
+        subprocess.run(['guake', '--hide'])
 
     @unittest.skipUnless(shutil.which('kitty'), 'requires kitty')
     def test_kitty(self):
