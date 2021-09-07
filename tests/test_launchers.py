@@ -90,7 +90,11 @@ class TestGnomeTerminalLauncher(TestLauncherBase):
         result = GnomeTerminalLauncher.name_has_owner('unknown.name.with.no.owner')
         self.assertFalse(result)
 
-        result = GnomeTerminalLauncher.name_has_owner('org.gnome.Shell')
+        current_desktop = os.environ.get('XDG_CURRENT_DESKTOP')
+        if current_desktop == 'GNOME':
+            result = GnomeTerminalLauncher.name_has_owner('org.gnome.Shell')
+        elif current_desktop == 'KDE':
+            result = GnomeTerminalLauncher.name_has_owner('org.kde.KWin')
         self.assertTrue(result)
 
     def test_call_launcher(self):
