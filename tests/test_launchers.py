@@ -23,6 +23,7 @@ import time
 import unittest
 from envlauncher.launchers import BaseLauncher
 from envlauncher.launchers import AlacrittyLauncher
+from envlauncher.launchers import CoolRetroTermLauncher
 from envlauncher.launchers import GnomeTerminalLauncher
 from envlauncher.launchers import GuakeLauncher
 from envlauncher.launchers import KittyLauncher
@@ -138,6 +139,13 @@ class TestSimpleLaunchers(TestLauncherBase):
     @unittest.skipUnless(shutil.which('alacritty'), 'requires alacritty')
     def test_alacritty(self):
         launch = AlacrittyLauncher(self.script_path)
+        process = launch()
+        process.wait(timeout=5)
+        self.assertEqual(process.returncode, 0)
+
+    @unittest.skipUnless(shutil.which('cool-retro-term'), 'requires cool-retro-term')
+    def test_cool_retro_term(self):
+        launch = CoolRetroTermLauncher(self.script_path)
         process = launch()
         process.wait(timeout=5)
         self.assertEqual(process.returncode, 0)

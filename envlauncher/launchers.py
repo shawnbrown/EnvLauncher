@@ -64,6 +64,18 @@ class AlacrittyLauncher(BaseLauncher):
         return subprocess.Popen([self.command] + self.args)
 
 
+class CoolRetroTermLauncher(BaseLauncher):
+    def __init__(self, script_path):
+        self.args = ['-e', 'bash', '--rcfile', script_path]
+
+    @property
+    def command(self) -> str:
+        return 'cool-retro-term'
+
+    def __call__(self) -> subprocess.Popen:
+        return subprocess.Popen([self.command] + self.args)
+
+
 class GnomeTerminalLauncher(BaseLauncher):
     """gnome-terminal is the default terminal emulator in the GNOME
     desktop environment.

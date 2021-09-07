@@ -412,8 +412,7 @@ class EnvLauncherApp(object):
             return lambda: subprocess.Popen(args)
 
         if terminal_emulator == 'cool-retro-term':
-            args = ['cool-retro-term', '-e', 'bash', '--rcfile', rcfile_name]
-            return lambda: subprocess.Popen(args)
+            return launchers.CoolRetroTermLauncher(rcfile_name)
 
         raise Exception(f'Unsupported terminal emulator {terminal_emulator!r}')
 
