@@ -21,29 +21,17 @@ import subprocess
 import tempfile
 import time
 import unittest
-from envlauncher.launchers import BaseLauncher
-from envlauncher.launchers import AlacrittyLauncher
-from envlauncher.launchers import CoolRetroTermLauncher
-from envlauncher.launchers import GnomeTerminalLauncher
-from envlauncher.launchers import GuakeLauncher
-from envlauncher.launchers import KittyLauncher
-from envlauncher.launchers import KonsoleLauncher
-from envlauncher.launchers import QTerminalLauncher
-from envlauncher.launchers import SakuraLauncher
-from envlauncher.launchers import TerminatorLauncher
-from envlauncher.launchers import Xfce4Terminal
-from envlauncher.launchers import XTermLauncher
-from envlauncher.launchers import YakuakeLauncher
+from envlauncher import launchers
 
 
 class TestAbstractBaseLauncher(unittest.TestCase):
     def test_required_methods(self):
-        methods = BaseLauncher.__abstractmethods__
+        methods = launchers.BaseLauncher.__abstractmethods__
         self.assertEqual(methods, {'__init__', '__call__', 'command'})
 
     def test_minimal_subclass(self):
         """Minimal concrete class definition."""
-        class MinimalLauncher(BaseLauncher):
+        class MinimalLauncher(launchers.BaseLauncher):
             def __init__(self):
                 pass
 
@@ -64,25 +52,27 @@ def requires_command(command):
 @requires_command('gnome-terminal')
 class TestGnomeTerminalHelperMethods(unittest.TestCase):
     def test_find_gnome_terminal_server(self):
-        result = GnomeTerminalLauncher._find_gnome_terminal_server()
+        result = launchers.GnomeTerminalLauncher._find_gnome_terminal_server()
         self.assertIsNotNone(result)
         self.assertRegex(result, 'gnome-terminal-server$')
 
     def test_name_has_owner(self):
-        result = GnomeTerminalLauncher.name_has_owner('unknown.name.with.no.owner')
+        name_has_owner = launchers.GnomeTerminalLauncher.name_has_owner
+
+        result = name_has_owner('unknown.name.with.no.owner')
         self.assertFalse(result)
 
         current_desktop = os.environ.get('XDG_CURRENT_DESKTOP')
         if current_desktop == 'GNOME':
-            result = GnomeTerminalLauncher.name_has_owner('org.gnome.Shell')
+            result = name_has_owner('org.gnome.Shell')
         elif current_desktop == 'KDE':
-            result = GnomeTerminalLauncher.name_has_owner('org.kde.KWin')
+            result = name_has_owner('org.kde.KWin')
         self.assertTrue(result)
 
 
 class TestYakuakeHelperMethods(unittest.TestCase):
     def test_build_args(self):
-        args = YakuakeLauncher.build_args(
+        args = launchers.YakuakeLauncher.build_args(
             '/yakuake/tabs',
             'setTabTitle',
             f'int32:7',
@@ -102,7 +92,7 @@ class TestYakuakeHelperMethods(unittest.TestCase):
         self.assertEqual(args, expected)
 
     def test_parse_session_id(self):
-        session_id = YakuakeLauncher.parse_session_id(b'   int32 7')
+        session_id = launchers.YakuakeLauncher.parse_session_id(b'   int32 7')
         self.assertEqual(session_id, 7)
 
 
@@ -128,19 +118,19 @@ class TestTerminalEmulators(unittest.TestCase):
 
     @requires_command('alacritty')
     def test_alacritty(self):
-        launch = AlacrittyLauncher(self.script_path)
+        launch = launchers.AlacrittyLauncher(self.script_path)
         process = launch()
         self.assertReturnCode(process, os.EX_OK)
 
     @requires_command('cool-retro-term')
     def test_cool_retro_term(self):
-        launch = CoolRetroTermLauncher(self.script_path)
+        launch = launchers.CoolRetroTermLauncher(self.script_path)
         process = launch()
         self.assertReturnCode(process, os.EX_OK)
 
     @requires_command('gnome-terminal')
     def test_gnome_terminal(self):
-        launcher = GnomeTerminalLauncher(self.script_path)
+        launcher = launchers.GnomeTerminalLauncher(self.script_path)
         process = launcher()
         self.assertReturnCode(process, os.EX_OK)
 
@@ -152,49 +142,49 @@ class TestTerminalEmulators(unittest.TestCase):
 
         self.addCleanup(hide_window)
 
-        launch = GuakeLauncher(self.script_path)
+        launch = launchers.GuakeLauncher(self.script_path)
         process = launch()
         self.assertReturnCode(process, os.EX_OK)
 
     @requires_command('kitty')
     def test_kitty(self):
-        launch = KittyLauncher(self.script_path)
+        launch = launchers.KittyLauncher(self.script_path)
         process = launch()
         self.assertReturnCode(process, os.EX_OK)
 
     @requires_command('konsole')
     def test_konsole(self):
-        launch = KonsoleLauncher(self.script_path)
+        launch = launchers.KonsoleLauncher(self.script_path)
         process = launch()
         self.assertReturnCode(process, os.EX_OK)
 
     @requires_command('qterminal')
     def test_qterminal(self):
-        launch = QTerminalLauncher(self.script_path)
+        launch = launchers.QTerminalLauncher(self.script_path)
         process = launch()
         self.assertReturnCode(process, os.EX_OK)
 
     @requires_command('sakura')
     def test_sakura(self):
-        launch = SakuraLauncher(self.script_path)
+        launch = launchers.SakuraLauncher(self.script_path)
         process = launch()
         self.assertReturnCode(process, os.EX_OK)
 
     @requires_command('terminator')
     def test_terminator(self):
-        launch = TerminatorLauncher(self.script_path)
+        launch = launchers.TerminatorLauncher(self.script_path)
         process = launch()
         self.assertReturnCode(process, os.EX_OK)
 
     @requires_command('xfce4-terminal')
     def test_xfce4terminal(self):
-        launcher = Xfce4Terminal(self.script_path)
+        launcher = launchers.Xfce4Terminal(self.script_path)
         process = launcher()
         self.assertReturnCode(process, os.EX_OK)
 
     @requires_command('xterm')
     def test_xterm(self):
-        launcher = XTermLauncher(self.script_path)
+        launcher = launchers.XTermLauncher(self.script_path)
         process = launcher()
         self.assertReturnCode(process, os.EX_OK)
 
@@ -212,6 +202,6 @@ class TestTerminalEmulators(unittest.TestCase):
 
         self.addCleanup(hide_window)
 
-        launch = YakuakeLauncher(self.script_path)
+        launch = launchers.YakuakeLauncher(self.script_path)
         result = launch()
         self.assertReturnCode(result, os.EX_OK)
