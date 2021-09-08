@@ -25,7 +25,7 @@ import subprocess
 import sys
 import warnings
 from time import sleep, time
-from typing import Optional
+from typing import List, Optional
 
 
 class BaseLauncher(abc.ABC):
@@ -305,47 +305,57 @@ class YakuakeLauncher(BaseLauncher):
     def command(self) -> str:
         return 'yakuake'
 
-    def __call__(self) -> None:
-        reply = subprocess.check_output([
+    @staticmethod
+    def build_args(object_path, method, *contents) -> List[str]:
+        """Return a list of `dbus-send` arguments to call methods of
+        the Yakuake D-Bus connection (org.kde.yakuake).
+        """
+        args = [
             'dbus-send',
             '--session',
             '--dest=org.kde.yakuake',
             '--print-reply=literal',
             '--type=method_call',
-            '/yakuake/sessions',
-            'org.kde.yakuake.addSession',
-        ])
+            object_path,
+            f'org.kde.yakuake.{method}',
+        ] + list(contents)
+        return args
+
+    @staticmethod
+    def parse_session_id(reply: bytes) -> int:
+        """Takes an `addSession` reply and returns the id as an int."""
         reply = str(reply, encoding=sys.stdout.encoding)
         matched = re.search(r'(?:int16|int32|int64)[ ](\d+)', reply)
-        if matched:
-            yakuake_session = matched.group(1)
-        else:
-            msg = f'Unable to get Yakuake tab session id: {reply!r}'
+        if not matched:
+            msg = f'Unable to get Yakuake tab session-id: {reply!r}'
             raise RuntimeError(msg)
+        return int(matched.group(1))
 
-        subprocess.run([
-            'dbus-send',
-            '--type=method_call',
-            '--dest=org.kde.yakuake',
+    def __call__(self):
+        # Create a new tab and get its session-id.
+        args = self.build_args('/yakuake/sessions', 'addSession')
+        reply = subprocess.check_output(args, timeout=5)
+        yakuake_session = self.parse_session_id(reply)
+
+        # Start the virtual environment in the new tab.
+        args = self.build_args(
             '/yakuake/sessions',
-            'org.kde.yakuake.runCommandInTerminal',
+            'runCommandInTerminal',
             f'int32:{yakuake_session}',
-            f'string:clear;source {self.script_path}',
-        ], timeout=5, check=True)
-        subprocess.run([
-            'dbus-send',
-            '--type=method_call',
-            '--dest=org.kde.yakuake',
+            f'string:clear;source {shlex.quote(self.script_path)}',
+        )
+        subprocess.run(args, timeout=5, check=True)
+
+        # Set the new tab's name.
+        args = self.build_args(
             '/yakuake/tabs',
-            'org.kde.yakuake.setTabTitle',
+            'setTabTitle',
             f'int32:{yakuake_session}',
             'string:EnvLauncher',
-        ], timeout=5, check=True)
-        subprocess.run([
-            'dbus-send',
-            '--type=method_call',
-            '--dest=org.kde.yakuake',
-            '/yakuake/window',
-            'org.kde.yakuake.toggleWindowState',
-        ], timeout=5, check=True)
+        )
+        subprocess.run(args, timeout=5, check=True)
+
+        # Open the Yakuake console.
+        args = self.build_args('/yakuake/window', 'toggleWindowState')
+        subprocess.run(args, timeout=5, check=True)
         return os.EX_OK

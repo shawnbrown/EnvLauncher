@@ -122,6 +122,29 @@ class TestGnomeTerminalLauncher(TestLauncherBase):
 
 @requires_command('yakuake')
 class TestYakuakeLauncher(TestLauncherBase):
+    def test_build_args(self):
+        args = YakuakeLauncher.build_args(
+            '/yakuake/tabs',
+            'setTabTitle',
+            f'int32:7',
+            'string:EnvLauncher',
+        )
+        expected = [
+            'dbus-send',
+            '--session',
+            '--dest=org.kde.yakuake',
+            '--print-reply=literal',
+            '--type=method_call',
+            '/yakuake/tabs',
+            'org.kde.yakuake.setTabTitle',
+            'int32:7',
+            'string:EnvLauncher',
+        ]
+        self.assertEqual(args, expected)
+
+    def test_parse_session_id(self):
+        args = YakuakeLauncher.build_args(b'   int32 7', 7)
+
     @staticmethod
     def _hide_yakuake_window():
         """Make D-Bus call to hide Yakuake window."""
