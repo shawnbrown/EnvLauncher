@@ -37,35 +37,9 @@ from envlauncher.launchers import YakuakeLauncher
 
 
 class TestAbstractBaseLauncher(unittest.TestCase):
-    def test_missing_init(self):
-        """Subclasses must define __init__()."""
-        class MissingInit(BaseLauncher):
-            def __call__(self):
-                pass
-
-        with self.assertRaises(TypeError):
-            launcher = MissingInit()
-
-    def test_missing_call(self):
-        """Subclasses must define __call__()."""
-        class MissingCall(BaseLauncher):
-            def __init__(self):
-                pass
-
-        with self.assertRaises(TypeError):
-            launcher = MissingCall()
-
-    def test_missing_command(self):
-        """Subclasses must define `command` property."""
-        class MissingCommand(BaseLauncher):
-            def __init__(self):
-                pass
-
-            def __call__(self):
-                pass
-
-        with self.assertRaises(TypeError):
-            launcher = MissingCommand()
+    def test_required_methods(self):
+        methods = BaseLauncher.__abstractmethods__
+        self.assertEqual(methods, {'__init__', '__call__', 'command'})
 
     def test_minimal_subclass(self):
         """Minimal concrete class definition."""
