@@ -230,6 +230,22 @@ class QTerminalLauncher(BaseLauncher):
         return subprocess.Popen([self.command] + self.args)
 
 
+class SakuraLauncher(BaseLauncher):
+    def __init__(self, script_path):
+        self.args = [
+            '--class', self.app_id,
+            '--icon', self.app_id,
+            '-e', 'bash', '--rcfile', script_path,
+        ]
+
+    @property
+    def command(self) -> str:
+        return 'sakura'
+
+    def __call__(self) -> subprocess.Popen:
+        return subprocess.Popen([self.command] + self.args)
+
+
 class TerminatorLauncher(BaseLauncher):
     def __init__(self, script_path):
         self.args = [

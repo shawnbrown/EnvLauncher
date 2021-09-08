@@ -399,11 +399,7 @@ class EnvLauncherApp(object):
             return launchers.QTerminalLauncher(rcfile_name)
 
         if terminal_emulator == 'sakura':
-            args = ['sakura',
-                    '--class', APP_NAME,
-                    '--icon', APP_NAME,
-                    '-e', 'bash', '--rcfile', rcfile_name]
-            return lambda: subprocess.Popen(args)
+            return launchers.SakuraLauncher(rcfile_name)
 
         if terminal_emulator == 'cool-retro-term':
             return launchers.CoolRetroTermLauncher(rcfile_name)

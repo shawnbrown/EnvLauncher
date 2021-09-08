@@ -29,6 +29,7 @@ from envlauncher.launchers import GuakeLauncher
 from envlauncher.launchers import KittyLauncher
 from envlauncher.launchers import KonsoleLauncher
 from envlauncher.launchers import QTerminalLauncher
+from envlauncher.launchers import SakuraLauncher
 from envlauncher.launchers import TerminatorLauncher
 from envlauncher.launchers import Xfce4Terminal
 from envlauncher.launchers import XTermLauncher
@@ -177,6 +178,13 @@ class TestSimpleLaunchers(TestLauncherBase):
     @unittest.skipUnless(shutil.which('qterminal'), 'requires qterminal')
     def test_qterminal(self):
         launch = QTerminalLauncher(self.script_path)
+        process = launch()
+        process.wait(timeout=5)
+        self.assertEqual(process.returncode, 0)
+
+    @unittest.skipUnless(shutil.which('sakura'), 'requires sakura')
+    def test_sakura(self):
+        launch = SakuraLauncher(self.script_path)
         process = launch()
         process.wait(timeout=5)
         self.assertEqual(process.returncode, 0)
