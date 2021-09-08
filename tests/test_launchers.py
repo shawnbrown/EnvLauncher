@@ -82,6 +82,11 @@ class TestAbstractBaseLauncher(unittest.TestCase):
         launcher = MinimalLauncher()
 
 
+def requires_command(command):
+    """A decorator to skip a test if the executible command is not available."""
+    return unittest.skipUnless(shutil.which(command), f'requires {command}')
+
+
 class TestLauncherBase(unittest.TestCase):
     def setUp(self):
         with tempfile.NamedTemporaryFile(mode='w', delete=False) as f:
@@ -90,7 +95,7 @@ class TestLauncherBase(unittest.TestCase):
         self.addCleanup(lambda: os.remove(self.script_path))
 
 
-@unittest.skipUnless(shutil.which('gnome-terminal'), 'requires gnome-terminal')
+@requires_command('gnome-terminal')
 class TestGnomeTerminalLauncher(TestLauncherBase):
     def test_find_gnome_terminal_server(self):
         result = GnomeTerminalLauncher._find_gnome_terminal_server()
@@ -115,7 +120,7 @@ class TestGnomeTerminalLauncher(TestLauncherBase):
         self.assertEqual(process.returncode, 0)
 
 
-@unittest.skipUnless(shutil.which('yakuake'), 'requires yakuake')
+@requires_command('yakuake')
 class TestYakuakeLauncher(TestLauncherBase):
     @staticmethod
     def _hide_yakuake_window():
@@ -138,21 +143,21 @@ class TestYakuakeLauncher(TestLauncherBase):
 
 
 class TestSimpleLaunchers(TestLauncherBase):
-    @unittest.skipUnless(shutil.which('alacritty'), 'requires alacritty')
+    @requires_command('alacritty')
     def test_alacritty(self):
         launch = AlacrittyLauncher(self.script_path)
         process = launch()
         process.wait(timeout=5)
         self.assertEqual(process.returncode, 0)
 
-    @unittest.skipUnless(shutil.which('cool-retro-term'), 'requires cool-retro-term')
+    @requires_command('cool-retro-term')
     def test_cool_retro_term(self):
         launch = CoolRetroTermLauncher(self.script_path)
         process = launch()
         process.wait(timeout=5)
         self.assertEqual(process.returncode, 0)
 
-    @unittest.skipUnless(shutil.which('guake'), 'requires guake')
+    @requires_command('guake')
     def test_guake(self):
         launch = GuakeLauncher(self.script_path)
         process = launch()
@@ -161,49 +166,49 @@ class TestSimpleLaunchers(TestLauncherBase):
         time.sleep(0.1)
         subprocess.run(['guake', '--hide'])
 
-    @unittest.skipUnless(shutil.which('kitty'), 'requires kitty')
+    @requires_command('kitty')
     def test_kitty(self):
         launch = KittyLauncher(self.script_path)
         process = launch()
         process.wait(timeout=5)
         self.assertEqual(process.returncode, 0)
 
-    @unittest.skipUnless(shutil.which('konsole'), 'requires konsole')
+    @requires_command('konsole')
     def test_konsole(self):
         launch = KonsoleLauncher(self.script_path)
         process = launch()
         process.wait(timeout=5)
         self.assertEqual(process.returncode, 0)
 
-    @unittest.skipUnless(shutil.which('qterminal'), 'requires qterminal')
+    @requires_command('qterminal')
     def test_qterminal(self):
         launch = QTerminalLauncher(self.script_path)
         process = launch()
         process.wait(timeout=5)
         self.assertEqual(process.returncode, 0)
 
-    @unittest.skipUnless(shutil.which('sakura'), 'requires sakura')
+    @requires_command('sakura')
     def test_sakura(self):
         launch = SakuraLauncher(self.script_path)
         process = launch()
         process.wait(timeout=5)
         self.assertEqual(process.returncode, 0)
 
-    @unittest.skipUnless(shutil.which('terminator'), 'requires terminator')
+    @requires_command('terminator')
     def test_terminator(self):
         launch = TerminatorLauncher(self.script_path)
         process = launch()
         process.wait(timeout=5)
         self.assertEqual(process.returncode, 0)
 
-    @unittest.skipUnless(shutil.which('xfce4-terminal'), 'requires xfce4-terminal')
+    @requires_command('xfce4-terminal')
     def test_xfce4terminal(self):
         launcher = Xfce4Terminal(self.script_path)
         process = launcher()
         process.wait(timeout=5)
         self.assertEqual(process.returncode, 0)
 
-    @unittest.skipUnless(shutil.which('xterm'), 'requires xterm')
+    @requires_command('xterm')
     def test_xterm(self):
         launcher = XTermLauncher(self.script_path)
         process = launcher()
