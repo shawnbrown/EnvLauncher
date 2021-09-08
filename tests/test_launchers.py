@@ -87,16 +87,8 @@ def requires_command(command):
     return unittest.skipUnless(shutil.which(command), f'requires {command}')
 
 
-class TestLauncherBase(unittest.TestCase):
-    def setUp(self):
-        with tempfile.NamedTemporaryFile(mode='w', delete=False) as f:
-            f.write('exit\n')  # Dummy script, simply exits.
-        self.script_path = f.name
-        self.addCleanup(lambda: os.remove(self.script_path))
-
-
 @requires_command('gnome-terminal')
-class TestGnomeTerminalLauncher(TestLauncherBase):
+class TestGnomeTerminalHelperMethods(unittest.TestCase):
     def test_find_gnome_terminal_server(self):
         result = GnomeTerminalLauncher._find_gnome_terminal_server()
         self.assertIsNotNone(result)
@@ -113,15 +105,8 @@ class TestGnomeTerminalLauncher(TestLauncherBase):
             result = GnomeTerminalLauncher.name_has_owner('org.kde.KWin')
         self.assertTrue(result)
 
-    def test_call_launcher(self):
-        launcher = GnomeTerminalLauncher(self.script_path)
-        process = launcher()
-        process.wait(timeout=5)
-        self.assertEqual(process.returncode, 0)
 
-
-@requires_command('yakuake')
-class TestYakuakeLauncher(TestLauncherBase):
+class TestYakuakeHelperMethods(unittest.TestCase):
     def test_build_args(self):
         args = YakuakeLauncher.build_args(
             '/yakuake/tabs',
@@ -143,29 +128,17 @@ class TestYakuakeLauncher(TestLauncherBase):
         self.assertEqual(args, expected)
 
     def test_parse_session_id(self):
-        args = YakuakeLauncher.build_args(b'   int32 7', 7)
-
-    @staticmethod
-    def _hide_yakuake_window():
-        """Make D-Bus call to hide Yakuake window."""
-        subprocess.run([
-            'dbus-send',
-            '--type=method_call',
-            '--dest=org.kde.yakuake',
-            '/yakuake/MainWindow_1',
-            'org.qtproject.Qt.QWidget.hide',
-        ])
-
-    def test_yakuake(self):
-        self.addCleanup(self._hide_yakuake_window)
-
-        launch = YakuakeLauncher(self.script_path)
-        returncode = launch()
-        time.sleep(0.1)  # <- TODO: Remove after fixing process handling.
-        self.assertEqual(returncode, 0)
+        session_id = YakuakeLauncher.parse_session_id(b'   int32 7')
+        self.assertEqual(session_id, 7)
 
 
-class TestSimpleLaunchers(TestLauncherBase):
+class TestSimpleLaunchers(unittest.TestCase):
+    def setUp(self):
+        with tempfile.NamedTemporaryFile(mode='w', delete=False) as f:
+            f.write('exit\n')  # Dummy script, simply exits.
+        self.script_path = f.name
+        self.addCleanup(lambda: os.remove(self.script_path))
+
     @requires_command('alacritty')
     def test_alacritty(self):
         launch = AlacrittyLauncher(self.script_path)
@@ -180,14 +153,25 @@ class TestSimpleLaunchers(TestLauncherBase):
         process.wait(timeout=5)
         self.assertEqual(process.returncode, 0)
 
+    @requires_command('gnome-terminal')
+    def test_gnome_terminal(self):
+        launcher = GnomeTerminalLauncher(self.script_path)
+        process = launcher()
+        process.wait(timeout=5)
+        self.assertEqual(process.returncode, 0)
+
     @requires_command('guake')
     def test_guake(self):
+        def hide_window():  # <- Helper function to close Guake window.
+            time.sleep(0.1)
+            subprocess.run(['guake', '--hide'])
+
+        self.addCleanup(hide_window)
+
         launch = GuakeLauncher(self.script_path)
         process = launch()
         process.wait(timeout=5)
         self.assertEqual(process.returncode, 0)
-        time.sleep(0.1)
-        subprocess.run(['guake', '--hide'])
 
     @requires_command('kitty')
     def test_kitty(self):
@@ -237,3 +221,21 @@ class TestSimpleLaunchers(TestLauncherBase):
         process = launcher()
         process.wait(timeout=5)
         self.assertEqual(process.returncode, 0)
+
+    @requires_command('yakuake')
+    def test_yakuake(self):
+        def hide_window():  # <- Helper function to close Yakuake window.
+            time.sleep(0.1)
+            subprocess.run([
+                'dbus-send',
+                '--type=method_call',
+                '--dest=org.kde.yakuake',
+                '/yakuake/MainWindow_1',
+                'org.qtproject.Qt.QWidget.hide',
+            ])
+
+        self.addCleanup(hide_window)
+
+        launch = YakuakeLauncher(self.script_path)
+        returncode = launch()
+        self.assertEqual(returncode, 0)
