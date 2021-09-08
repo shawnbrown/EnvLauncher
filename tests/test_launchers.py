@@ -106,33 +106,43 @@ class TestYakuakeHelperMethods(unittest.TestCase):
         self.assertEqual(session_id, 7)
 
 
-class TestSimpleLaunchers(unittest.TestCase):
+class TestTerminalEmulators(unittest.TestCase):
     def setUp(self):
         with tempfile.NamedTemporaryFile(mode='w', delete=False) as f:
             f.write('exit\n')  # Dummy script, simply exits.
         self.script_path = f.name
         self.addCleanup(lambda: os.remove(self.script_path))
 
+    def assertReturnCode(self, obj, expected):
+        """Check that the return code from *obj* matches the *expected*
+        value.
+
+        Args:
+            obj (Popen | int): A process object or return code to check.
+            expected (int): The expected integer return code.
+        """
+        if hasattr(obj, 'wait'):
+            obj.wait(timeout=5)
+            obj = obj.returncode
+        self.assertEqual(obj, expected)
+
     @requires_command('alacritty')
     def test_alacritty(self):
         launch = AlacrittyLauncher(self.script_path)
         process = launch()
-        process.wait(timeout=5)
-        self.assertEqual(process.returncode, 0)
+        self.assertReturnCode(process, os.EX_OK)
 
     @requires_command('cool-retro-term')
     def test_cool_retro_term(self):
         launch = CoolRetroTermLauncher(self.script_path)
         process = launch()
-        process.wait(timeout=5)
-        self.assertEqual(process.returncode, 0)
+        self.assertReturnCode(process, os.EX_OK)
 
     @requires_command('gnome-terminal')
     def test_gnome_terminal(self):
         launcher = GnomeTerminalLauncher(self.script_path)
         process = launcher()
-        process.wait(timeout=5)
-        self.assertEqual(process.returncode, 0)
+        self.assertReturnCode(process, os.EX_OK)
 
     @requires_command('guake')
     def test_guake(self):
@@ -144,57 +154,49 @@ class TestSimpleLaunchers(unittest.TestCase):
 
         launch = GuakeLauncher(self.script_path)
         process = launch()
-        process.wait(timeout=5)
-        self.assertEqual(process.returncode, 0)
+        self.assertReturnCode(process, os.EX_OK)
 
     @requires_command('kitty')
     def test_kitty(self):
         launch = KittyLauncher(self.script_path)
         process = launch()
-        process.wait(timeout=5)
-        self.assertEqual(process.returncode, 0)
+        self.assertReturnCode(process, os.EX_OK)
 
     @requires_command('konsole')
     def test_konsole(self):
         launch = KonsoleLauncher(self.script_path)
         process = launch()
-        process.wait(timeout=5)
-        self.assertEqual(process.returncode, 0)
+        self.assertReturnCode(process, os.EX_OK)
 
     @requires_command('qterminal')
     def test_qterminal(self):
         launch = QTerminalLauncher(self.script_path)
         process = launch()
-        process.wait(timeout=5)
-        self.assertEqual(process.returncode, 0)
+        self.assertReturnCode(process, os.EX_OK)
 
     @requires_command('sakura')
     def test_sakura(self):
         launch = SakuraLauncher(self.script_path)
         process = launch()
-        process.wait(timeout=5)
-        self.assertEqual(process.returncode, 0)
+        self.assertReturnCode(process, os.EX_OK)
 
     @requires_command('terminator')
     def test_terminator(self):
         launch = TerminatorLauncher(self.script_path)
         process = launch()
-        process.wait(timeout=5)
-        self.assertEqual(process.returncode, 0)
+        self.assertReturnCode(process, os.EX_OK)
 
     @requires_command('xfce4-terminal')
     def test_xfce4terminal(self):
         launcher = Xfce4Terminal(self.script_path)
         process = launcher()
-        process.wait(timeout=5)
-        self.assertEqual(process.returncode, 0)
+        self.assertReturnCode(process, os.EX_OK)
 
     @requires_command('xterm')
     def test_xterm(self):
         launcher = XTermLauncher(self.script_path)
         process = launcher()
-        process.wait(timeout=5)
-        self.assertEqual(process.returncode, 0)
+        self.assertReturnCode(process, os.EX_OK)
 
     @requires_command('yakuake')
     def test_yakuake(self):
@@ -211,5 +213,5 @@ class TestSimpleLaunchers(unittest.TestCase):
         self.addCleanup(hide_window)
 
         launch = YakuakeLauncher(self.script_path)
-        returncode = launch()
-        self.assertEqual(returncode, 0)
+        result = launch()
+        self.assertReturnCode(result, os.EX_OK)
