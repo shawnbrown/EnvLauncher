@@ -71,10 +71,10 @@ class TestGnomeTerminalHelperMethods(unittest.TestCase):
 
 
 class TestYakuakeHelperMethods(unittest.TestCase):
-    def test_build_args(self):
+    def test_build_args_unqualified(self):
         args = launchers.YakuakeLauncher.build_args(
             '/yakuake/tabs',
-            'setTabTitle',
+            'setTabTitle',  # <- Unqualified method name.
             f'int32:7',
             'string:EnvLauncher',
         )
@@ -85,9 +85,29 @@ class TestYakuakeHelperMethods(unittest.TestCase):
             '--print-reply=literal',
             '--type=method_call',
             '/yakuake/tabs',
-            'org.kde.yakuake.setTabTitle',
+            'org.kde.yakuake.setTabTitle',  # <- Gets 'org.kde.yakuake' interface.
             'int32:7',
             'string:EnvLauncher',
+        ]
+        self.assertEqual(args, expected)
+
+    def test_build_args_qualified(self):
+        args = launchers.YakuakeLauncher.build_args(
+            '/yakuake/MainWindow_1',
+            'org.freedesktop.DBus.Properties.Get',  # <- Fully qualified name.
+            'string:org.qtproject.Qt.QWidget',
+            'string:visible',
+        )
+        expected = [
+            'dbus-send',
+            '--session',
+            '--dest=org.kde.yakuake',
+            '--print-reply=literal',
+            '--type=method_call',
+            '/yakuake/MainWindow_1',
+            'org.freedesktop.DBus.Properties.Get',  # <- Returned unchanged.
+            'string:org.qtproject.Qt.QWidget',
+            'string:visible'
         ]
         self.assertEqual(args, expected)
 

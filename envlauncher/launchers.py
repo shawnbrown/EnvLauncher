@@ -307,8 +307,14 @@ class YakuakeLauncher(BaseLauncher):
 
     @staticmethod
     def build_args(object_path, method, *contents) -> List[str]:
-        """Return a list of `dbus-send` arguments to call methods of
-        the Yakuake D-Bus connection (org.kde.yakuake).
+        """Return a list of arguments for using the `dbus-send`
+        command to call methods of the Yakuake D-Bus connection
+        (org.kde.yakuake).
+
+        If *method* is a fully qualified name ("interface.member"),
+        it will be used as-is. But if it's unqualified, then
+        "org.kde.yakuake" will be used as the member's default
+        interface.
         """
         args = [
             'dbus-send',
@@ -317,9 +323,9 @@ class YakuakeLauncher(BaseLauncher):
             '--print-reply=literal',
             '--type=method_call',
             object_path,
-            f'org.kde.yakuake.{method}',
-        ] + list(contents)
-        return args
+            method if ('.' in method) else f'org.kde.yakuake.{method}',
+        ]
+        return args + list(contents)
 
     @staticmethod
     def parse_session_id(reply: bytes) -> int:
