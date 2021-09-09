@@ -356,6 +356,12 @@ class YakuakeLauncher(BaseLauncher):
             raise
         return b'boolean true' in reply
 
+    @classmethod
+    def toggle_window(cls):
+        """Toggle console from open-to-closed or closed-to-open."""
+        args = cls.build_args('/yakuake/window', 'toggleWindowState')
+        subprocess.run(args, timeout=5, check=True)
+
     def __call__(self):
         # Create a new tab and get its session-id.
         args = self.build_args('/yakuake/sessions', 'addSession')
@@ -380,7 +386,7 @@ class YakuakeLauncher(BaseLauncher):
         )
         subprocess.run(args, timeout=5, check=True)
 
-        # Open the Yakuake console.
-        args = self.build_args('/yakuake/window', 'toggleWindowState')
-        subprocess.run(args, timeout=5, check=True)
+        # Open the console.
+        if not self.is_visible():
+            self.toggle_window()
         return os.EX_OK
