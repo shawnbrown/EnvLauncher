@@ -362,6 +362,42 @@ class YakuakeLauncher(BaseLauncher):
         args = cls.build_args('/yakuake/window', 'toggleWindowState')
         subprocess.run(args, timeout=5, check=True)
 
+    @classmethod
+    def set_focus(cls):
+        """Set the GUI focus on the already-visible Yakuake console.
+
+        Note: Currently, Yakuake does not have a straight-forward
+        way to set the GUI focus on an already-visibile window. The
+        relevant methods (org.qtproject.Qt.QWidget.setFocus and
+        org.kde.yakuake.raiseSession) do not work in practice. Because
+        of this, focus is set by first hiding and then toggling-open
+        the window. This works because toggleWindowState() sets the
+        focus when it completes. This implementation should change if
+        a workable method is added to the Yakuake D-Bus interface in
+        the future.
+        """
+        try:
+            # Hide the already-visible console.
+            args = cls.build_args(
+                '/yakuake/MainWindow_1',
+                'org.qtproject.Qt.QWidget.hide',
+            )
+            subprocess.run(args, stderr=subprocess.PIPE, timeout=5, check=True)
+        except subprocess.CalledProcessError as e:
+            if e.stderr:
+                print(e.stderr, file=sys.stderr)
+                if b"No such object path '/yakuake/MainWindow_1'" in e.stderr:
+                    return  # <- EXIT! If MainWindow_1 path not available.
+            raise
+
+        timeout = time() + 1
+        while cls.is_visible():  # Wait until the console closes (using
+            sleep(0.03125)       # 1/32nd of a second polling interval).
+            if time() > timeout:
+                raise TimeoutError
+
+        cls.toggle_window()  # Toggle-open the console to set its focus.
+
     def __call__(self):
         # Create a new tab and get its session-id.
         args = self.build_args('/yakuake/sessions', 'addSession')
@@ -386,7 +422,9 @@ class YakuakeLauncher(BaseLauncher):
         )
         subprocess.run(args, timeout=5, check=True)
 
-        # Open the console.
-        if not self.is_visible():
+        # Open the console or set focus if it's already visible.
+        if self.is_visible():
+            self.set_focus()
+        else:
             self.toggle_window()
         return os.EX_OK
