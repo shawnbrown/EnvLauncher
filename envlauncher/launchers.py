@@ -337,6 +337,25 @@ class YakuakeLauncher(BaseLauncher):
             raise RuntimeError(msg)
         return int(matched.group(1))
 
+    @classmethod
+    def is_visible(cls):
+        """Check if the Yakuake console is currently visible."""
+        args = cls.build_args(
+            '/yakuake/MainWindow_1',
+            'org.freedesktop.DBus.Properties.Get',
+            'string:org.qtproject.Qt.QWidget',
+            'string:visible',
+        )
+        try:
+            reply = subprocess.check_output(args, stderr=subprocess.PIPE, timeout=5)
+        except subprocess.CalledProcessError as e:
+            if e.stderr:
+                print(e.stderr, file=sys.stderr)
+                if b"No such object path '/yakuake/MainWindow_1'" in e.stderr:
+                    return False  # If MainWindow_1 path not available, assume false.
+            raise
+        return b'boolean true' in reply
+
     def __call__(self):
         # Create a new tab and get its session-id.
         args = self.build_args('/yakuake/sessions', 'addSession')

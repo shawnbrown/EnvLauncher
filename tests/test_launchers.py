@@ -70,6 +70,7 @@ class TestGnomeTerminalHelperMethods(unittest.TestCase):
         self.assertTrue(result)
 
 
+@requires_command('yakuake')
 class TestYakuakeHelperMethods(unittest.TestCase):
     def test_build_args_unqualified(self):
         args = launchers.YakuakeLauncher.build_args(
@@ -114,6 +115,10 @@ class TestYakuakeHelperMethods(unittest.TestCase):
     def test_parse_session_id(self):
         session_id = launchers.YakuakeLauncher.parse_session_id(b'   int32 7')
         self.assertEqual(session_id, 7)
+
+    def test_is_visible(self):
+        result = launchers.YakuakeLauncher.is_visible()
+        self.assertIsInstance(result, bool)
 
 
 class TestTerminalEmulators(unittest.TestCase):
