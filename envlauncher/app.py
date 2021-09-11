@@ -155,8 +155,6 @@ class Settings(object):
         self._parser.read_string(string)
 
         self._terminal_emulator_choices = get_terminal_emulators()
-        self._rcfile = self._parser.get('X-EnvLauncher Options', 'Rcfile', fallback='')
-        self._banner = self._parser.get('X-EnvLauncher Options', 'Banner', fallback='color')
         self._venv_number = itertools.count(1)
         self._app_data_subdir = 'envlauncher'
 
@@ -209,13 +207,11 @@ class Settings(object):
         """An "rc" file to execute after activating the environment
         (e.g., ~/.bashrc).
         """
-        return self._rcfile
+        return self._parser.get('X-EnvLauncher Options', 'Rcfile', fallback='')
 
     @rcfile.setter
-    def rcfile(self, value):
-        if not isinstance(value, str):
-            value = ''
-        self._rcfile = value
+    def rcfile(self, value: str):
+        self._parser['X-EnvLauncher Options']['Rcfile'] = value
 
     @property
     def terminal_emulator_choices(self) -> List[str]:
@@ -239,13 +235,14 @@ class Settings(object):
     @property
     def banner(self) -> str:
         """Python logo banner option."""
-        return self._banner
+        value = self._parser.get('X-EnvLauncher Options', 'Banner', fallback='')
+        if value not in {'color', 'plain', 'none'}:
+            return 'color'
+        return value
 
     @banner.setter
-    def banner(self, value):
-        if value not in {'color', 'plain', 'none'}:
-            value = 'color'
-        self._banner = value
+    def banner(self, value: str):
+        self._parser['X-EnvLauncher Options']['Banner'] = value
 
     @property
     def banner_resource(self) -> Optional[Tuple[str, str]]:

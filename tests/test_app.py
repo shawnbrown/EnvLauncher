@@ -259,10 +259,6 @@ class TestSettingsRcfile(unittest.TestCase):
         self.settings.rcfile = '.venvrc'
         self.assertEqual(self.settings.rcfile, '.venvrc')
 
-    def test_invalid_value(self):
-        self.settings.rcfile = 1234  # <- Bogus value.
-        self.assertEqual(self.settings.rcfile, '')  # <- Empty string.
-
 
 class TestSettingsTerminalEmulator(unittest.TestCase):
     def setUp(self):
@@ -309,16 +305,16 @@ class TestSettingsBanner(unittest.TestCase):
     def test_read(self):
         self.assertEqual(self.settings.banner, 'color')
 
+    def test_read_bad_value(self):
+        self.settings.banner = 'some bad value'
+        self.assertEqual(self.settings.banner, 'color')
+
     def test_set_value(self):
         self.settings.banner = 'plain'
         self.assertEqual(self.settings.banner, 'plain')
 
         self.settings.banner = 'none'
         self.assertEqual(self.settings.banner, 'none')
-
-    def test_invalid_value(self):
-        self.settings.banner = 1234  # <- Bogus value.
-        self.assertEqual(self.settings.banner, 'color')  # <- Defaults to color.
 
     def test_banner_resource(self):
         self.assertEqual(self.settings.banner_resource,
