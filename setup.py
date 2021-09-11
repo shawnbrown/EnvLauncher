@@ -22,11 +22,21 @@ except (ModuleNotFoundError, ImportError) as error:
     error.msg = """{0}
 
     Your system does not appear to have the full `distutils` package.
-    Distutils is part of the Python Standard Library but some Linux
-    distributions are shipped with a minimal install of Python. You
-    may have to install `distutils` using your system's package manager.
+    In Python versions 3.11 and earlier, `distutils` is part of the
+    Standard Library (see PEP 632) but certain Linux distributions are
+    shipped with a minimal install of Python that omits some standard
+    packages.
 
-    For Debian or Debian-based distributions (like Ubuntu, Mint, etc.):
+    The use of `setuptools` is recommended over `distustils` but
+    either one is sufficient. You should be able to install one of
+    these packages using your system's package manager.
+
+    For Debian or Debian-based distributions (like Ubuntu, Mint,
+    Pop!_OS, etc.), you can use one of the following commands:
+
+        sudo apt install python3-setuptools
+
+        or
 
         sudo apt install python3-distutils
     """.format(error.msg)
