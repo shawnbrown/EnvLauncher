@@ -330,10 +330,10 @@ class YakuakeLauncher(BaseLauncher):
     @staticmethod
     def parse_session_id(reply: bytes) -> int:
         """Takes an `addSession` reply and returns the id as an int."""
-        reply = str(reply, encoding=sys.stdout.encoding)
-        matched = re.search(r'(?:int16|int32|int64)[ ](\d+)', reply)
+        reply_str = str(reply, encoding=sys.stdout.encoding)
+        matched = re.search(r'(?:int16|int32|int64)[ ](\d+)', reply_str)
         if not matched:
-            msg = f'Unable to get Yakuake tab session-id: {reply!r}'
+            msg = f'Unable to get Yakuake tab session-id: {reply_str!r}'
             raise RuntimeError(msg)
         return int(matched.group(1))
 
