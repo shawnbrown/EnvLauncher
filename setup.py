@@ -16,6 +16,21 @@
 # along with EnvLauncher.  If not, see <https://www.gnu.org/licenses/>.
 
 """EnvLauncher: Launch Python development environments."""
+
+import sys
+if sys.version_info < (3, 6):
+    # A few older Linux distributions that are still supported (but
+    # nearing end-of-life) still ship with versions of Python whose
+    # installation tools do not enforce the `python_requires` argument.
+    error_message = (
+        "ERROR:\n"
+        "  Package 'envlauncher' requires Python 3.6 or newer\n"
+        "  but installation was attempted using Python {0}.{1}.\n"
+    ).format(*sys.version_info[:2])
+    sys.stderr.write(error_message)
+    sys.exit(1)
+
+
 try:
     from distutils.core import setup
 except (ModuleNotFoundError, ImportError) as error:
