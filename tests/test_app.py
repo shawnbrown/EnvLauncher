@@ -451,7 +451,7 @@ class TestSettingsSetActions(unittest.TestCase):
     def test_set_actions(self):
         prefix = self.prefix
         actions = [
-            (f'{prefix}1', 'Python 3.9', '~/.venv39/bin/activate', '~/Projects/'),
+            (f'{prefix}1', 'Python 3.9', '/opt/.venv39/bin/activate', '/opt/Projects/'),
             (f'{prefix}2', 'Python 2.7', '~/.venv27/bin/activate', '~/Projects/legacy/'),
         ]
         self.settings.set_actions(actions)
@@ -465,9 +465,9 @@ class TestSettingsSetActions(unittest.TestCase):
         ]
         expected_venv_groups = [
             {'Name': 'Python 3.9',
-             'Exec': 'envlauncher --activate "~/.venv39/bin/activate" --directory "~/Projects/"'},
+             'Exec': "envlauncher --activate /opt/.venv39/bin/activate --directory /opt/Projects/"},
             {'Name': 'Python 2.7',
-             'Exec': 'envlauncher --activate "~/.venv27/bin/activate" --directory "~/Projects/legacy/"'},
+             'Exec': "envlauncher --activate '~/.venv27/bin/activate' --directory '~/Projects/legacy/'"},
         ]
         self.assertEqual(actual_venv_groups, expected_venv_groups)
 
@@ -487,7 +487,7 @@ class TestSettingsSetActions(unittest.TestCase):
 
             [Desktop Action {self.prefix}3]
             Name=Python 3.10
-            Exec=envlauncher --activate "~/.venv310/bin/activate" --directory "~/Projects/"
+            Exec=envlauncher --activate ~/.venv310/bin/activate --directory ~/Projects/
 
             [Desktop Action configure]
             Name=Configure EnvLauncher
@@ -542,10 +542,10 @@ class TestSettingsSetActions(unittest.TestCase):
 
             [Desktop Action {prefix}1]
             Name=Python 3.9
-            Exec=envlauncher --activate "~/.venv39/bin/activate" --directory "~/Projects/"
+            Exec=envlauncher --activate '~/.venv39/bin/activate' --directory '~/Projects/'
 
             [Desktop Action {prefix}2]
             Name=Python 2.7
-            Exec=envlauncher --activate "~/.venv27/bin/activate" --directory "~/Projects/legacy/"
+            Exec=envlauncher --activate '~/.venv27/bin/activate' --directory '~/Projects/legacy/'
         """).lstrip()
         self.assertEqual(export, expected)

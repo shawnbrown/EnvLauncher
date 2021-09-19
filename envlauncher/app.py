@@ -312,9 +312,11 @@ class Settings(object):
         # Add venv action groups and collect identifiers.
         venv_identifiers = []
         for identifier, name, activate, directory in actions:
+            activate = shlex.quote(activate)
+            directory = shlex.quote(directory)
             self._parser[f'Desktop Action {identifier}'] = {
                 'Name': name.strip(),
-                'Exec': f'envlauncher --activate "{activate}" --directory "{directory}"',
+                'Exec': f'envlauncher --activate {activate} --directory {directory}',
             }
             venv_identifiers.append(identifier)
 
