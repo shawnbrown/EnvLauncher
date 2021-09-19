@@ -263,7 +263,7 @@ class TerminatorLauncher(BaseLauncher):
         return subprocess.Popen([self.command] + self.args)
 
 
-class Xfce4Terminal(BaseLauncher):
+class Xfce4TerminalLauncher(BaseLauncher):
     """The default terminal emulator for the Xfce Desktop."""
     def __init__(self, script_path):
         self.args = [

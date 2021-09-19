@@ -203,7 +203,7 @@ class TestTerminalEmulators(unittest.TestCase):
 
     @requires_command('xfce4-terminal')
     def test_xfce4terminal(self):
-        launcher = launchers.Xfce4Terminal(self.script_path)
+        launcher = launchers.Xfce4TerminalLauncher(self.script_path)
         process = launcher()
         self.assertReturnCode(process, os.EX_OK)
 

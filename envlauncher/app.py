@@ -397,7 +397,7 @@ class EnvLauncherApp(object):
             return launchers.YakuakeLauncher(rcfile_name)
 
         if terminal_emulator == 'xfce4-terminal':
-            return launchers.Xfce4Terminal(rcfile_name)
+            return launchers.Xfce4TerminalLauncher(rcfile_name)
 
         # LXQt default terminal.
         if terminal_emulator == 'qterminal':
