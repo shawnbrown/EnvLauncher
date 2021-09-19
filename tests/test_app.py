@@ -371,11 +371,11 @@ class TestSettingsGetActions(unittest.TestCase):
 
             [Desktop Action {self.prefix}1]
             Name=Python 3.9
-            Exec=envlauncher --activate "~/.venv39/bin/activate" --directory "~/Projects/"
+            Exec=envlauncher --activate ~/.venv39/bin/activate --directory ~/Projects/
 
             [Desktop Action {self.prefix}2]
             Name=Python 2.7
-            Exec=envlauncher --activate "~/.venv27/bin/activate" --directory "~/Projects/legacy/"
+            Exec=envlauncher --activate '~/Old Env/bin/activate' --directory ~/Projects/legacy/
 
             [Desktop Action configure]
             Name=Configure EnvLauncher
@@ -387,7 +387,7 @@ class TestSettingsGetActions(unittest.TestCase):
         actual = self.settings.get_actions()
         expected = [
             (f'{self.prefix}1', 'Python 3.9', '~/.venv39/bin/activate', '~/Projects/'),
-            (f'{self.prefix}2', 'Python 2.7', '~/.venv27/bin/activate', '~/Projects/legacy/'),
+            (f'{self.prefix}2', 'Python 2.7', '~/Old Env/bin/activate', '~/Projects/legacy/'),
         ]
         self.assertEqual(actual, expected)
 
@@ -401,7 +401,7 @@ class TestSettingsGetActions(unittest.TestCase):
         actual = self.settings.get_actions()
         expected = [
             (f'{prefix}1', 'Python 3.9', '~/.venv39/bin/activate', '~/Projects/'),
-            (f'{prefix}2', 'Python 2.7', '~/.venv27/bin/activate', '~/Projects/legacy/'),
+            (f'{prefix}2', 'Python 2.7', '~/Old Env/bin/activate', '~/Projects/legacy/'),
         ]
         self.assertEqual(actual, expected)
 
@@ -415,7 +415,7 @@ class TestSettingsGetActions(unittest.TestCase):
         self.settings._parser['Desktop Entry']['Actions'] = f'{prefix}2;{prefix}1;configure;'
         actual = self.settings.get_actions()
         expected = [
-            (f'{prefix}2', 'Python 2.7', '~/.venv27/bin/activate', '~/Projects/legacy/'),
+            (f'{prefix}2', 'Python 2.7', '~/Old Env/bin/activate', '~/Projects/legacy/'),
             (f'{prefix}1', 'Python 3.9', '~/.venv39/bin/activate', '~/Projects/'),
         ]
         self.assertEqual(actual, expected)

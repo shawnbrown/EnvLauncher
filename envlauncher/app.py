@@ -269,17 +269,23 @@ class Settings(object):
 
     def get_actions(self) -> List[Tuple[str, str, str, str]]:
         """Return sorted list of virtual environment launcher actions."""
-        regex = re.compile(r'^envlauncher --activate "(.+)" --directory "(.+)"$')
         action_data = {}
         for section in self._parser.sections():
             if not section.startswith(f'Desktop Action {self._venv_prefix}'):
                 continue
             _, _, identifier = section.partition('Desktop Action ')
             name = self._parser[section]['Name']
-            match = regex.match(self._parser[section]['Exec'])
-            if match:
-                activate, directory = match.group(1, 2)
-                action_data[identifier] = (identifier, name, activate, directory)
+            from . import cli
+            exec_value = self._parser[section]['Exec']
+            exec_args = shlex.split(exec_value)
+            exec_args = exec_args[1:]  # Slice-off 'envlauncher'
+            try:
+                parsed_args = cli.parse_args(exec_args)
+            except SystemExit:
+                continue
+            activate = parsed_args.activate
+            directory = parsed_args.directory
+            action_data[identifier] = (identifier, name, activate, directory)
 
         actions_value = self._parser.get('Desktop Entry', 'Actions', fallback='')
         identifiers = [x.strip() for x in actions_value.rstrip(';').split(';')]
