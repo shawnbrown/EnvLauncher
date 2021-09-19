@@ -29,7 +29,7 @@ def parse_args(args=None):
         '  %(prog)s --configure [--reset-all]\n'
         '  %(prog)s --version'
     )
-    parser = argparse.ArgumentParser(usage=usage)
+    parser = argparse.ArgumentParser(prog='envlauncher', usage=usage)
     parser.add_argument(
         '--activate',
         help='environment activation script',
