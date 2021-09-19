@@ -80,8 +80,10 @@ if __name__ == '__main__':
         # Required fields:
         name='EnvLauncher',
         version=get_version('envlauncher/app.py'),
-        description=('A GNOME desktop launcher to activate Python '
-                     'development environments.'),
+        description=(
+            'A Linux desktop launcher for Python virtual '
+            'environments (supports GNOME, KDE, and more).'
+        ),
         packages=['envlauncher'],
 
         # Recommended fields:
