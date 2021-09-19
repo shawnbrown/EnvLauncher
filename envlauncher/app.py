@@ -29,6 +29,7 @@ import subprocess
 import tempfile
 from typing import List, Tuple, Optional
 
+from . import cli
 from . import launchers
 
 
@@ -275,7 +276,6 @@ class Settings(object):
                 continue
             _, _, identifier = section.partition('Desktop Action ')
             name = self._parser[section]['Name']
-            from . import cli
             exec_value = self._parser[section]['Exec']
             exec_args = shlex.split(exec_value)
             exec_args = exec_args[1:]  # Slice-off 'envlauncher'

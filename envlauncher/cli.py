@@ -18,10 +18,6 @@
 """Command-line interface for EnvLauncher."""
 
 import argparse
-from .app import __version__
-from .app import DataPaths
-from .app import EnvLauncherApp
-from .app import configure_envlauncher
 
 
 def parse_args(args=None):
@@ -72,15 +68,3 @@ def parse_args(args=None):
         parser.error('argument --version cannot be used with other arguments')
 
     return args
-
-
-def main():
-    args = parse_args()
-    if args.activate:
-        launcher = EnvLauncherApp()
-        launcher(args.activate, args.directory)
-    elif args.configure:
-        paths = DataPaths()
-        configure_envlauncher(paths, args.reset_all)
-    elif args.version:
-        print(__version__)

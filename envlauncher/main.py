@@ -15,5 +15,22 @@
 # You should have received a copy of the GNU General Public License
 # along with EnvLauncher.  If not, see <https://www.gnu.org/licenses/>.
 
-from .app import *
-from .main import main
+"""Main function for EnvLauncher."""
+
+from .app import __version__
+from .app import DataPaths
+from .app import EnvLauncherApp
+from .app import configure_envlauncher
+from .cli import parse_args
+
+
+def main():
+    args = parse_args()
+    if args.activate:
+        launcher = EnvLauncherApp()
+        launcher(args.activate, args.directory)
+    elif args.configure:
+        paths = DataPaths()
+        configure_envlauncher(paths, args.reset_all)
+    elif args.version:
+        print(__version__)
