@@ -42,21 +42,31 @@ else:
 
 
 class TestAbstractBaseLauncher(unittest.TestCase):
-    def test_required_methods(self):
+    def test_required_methods_and_attributes(self):
         methods = launchers.BaseLauncher.__abstractmethods__
-        self.assertEqual(methods, {'__init__', '__call__', 'command'})
+        self.assertEqual(methods, {'__init__', '__call__'})
+
+    def test_missing_attribute(self):
+        """Since `command` is not defined, should raise error"""
+        with self.assertRaises(TypeError):
+            # Subclasses must also have "command" class attribute.
+            class IncompleteLauncher(launchers.BaseLauncher):
+                def __init__(self_):
+                    pass
+
+                def __call__(self_):
+                    pass
 
     def test_minimal_subclass(self):
         """Minimal concrete class definition."""
         class MinimalLauncher(launchers.BaseLauncher):
-            def __init__(self):
+            command = 'dummy-app'
+
+            def __init__(self_):
                 pass
 
-            def __call__(self):
+            def __call__(self_):
                 pass
-
-            def command(self):
-                return 'dummy-app'
 
         launcher = MinimalLauncher()
 

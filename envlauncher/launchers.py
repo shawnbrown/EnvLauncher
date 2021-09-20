@@ -45,15 +45,18 @@ class BaseLauncher(abc.ABC):
     """Base class for terminal emulator launchers."""
     app_id = 'com.github.shawnbrown.EnvLauncher'
 
+    command: str  #: Name of terminal emulator command.
+
+    @classmethod
+    def __init_subclass__(cls):
+        if not hasattr(cls, 'command'):
+            cls_name = cls.__name__
+            msg = f"Can't define class {cls_name} with without class attribute `command`"
+            raise TypeError(msg)
+
     @abc.abstractmethod
     def __init__(self, script_path):
         """Initialize launcher (prepare to execute *script_path*)."""
-
-    @property
-    @abc.abstractmethod
-    def command(self) -> str:
-        """Name of terminal emulator command."""
-        return '<unspecified>'
 
     @abc.abstractmethod
     def __call__(self) -> Optional[subprocess.Popen]:
@@ -62,6 +65,8 @@ class BaseLauncher(abc.ABC):
 
 
 class AlacrittyLauncher(BaseLauncher):
+    command = 'alacritty'
+
     def __init__(self, script_path):
         self.args = [
             '--class', f'{self.app_id},{self.app_id}',
@@ -69,21 +74,15 @@ class AlacrittyLauncher(BaseLauncher):
             '-e', 'bash', '--rcfile', script_path
         ]
 
-    @property
-    def command(self) -> str:
-        return 'alacritty'
-
     def __call__(self) -> subprocess.Popen:
         return subprocess.Popen([self.command] + self.args)
 
 
 class CoolRetroTermLauncher(BaseLauncher):
+    command = 'cool-retro-term'
+
     def __init__(self, script_path):
         self.args = ['-e', 'bash', '--rcfile', script_path]
-
-    @property
-    def command(self) -> str:
-        return 'cool-retro-term'
 
     def __call__(self) -> subprocess.Popen:
         return subprocess.Popen([self.command] + self.args)
@@ -93,15 +92,13 @@ class GnomeTerminalLauncher(BaseLauncher):
     """gnome-terminal is the default terminal emulator in the GNOME
     desktop environment.
     """
+    command = 'gnome-terminal'
+
     def __init__(self, script_path):
         self.args = [
             '--app-id', self.app_id,
             '--', 'bash', '--rcfile', script_path,
         ]
-
-    @property
-    def command(self) -> str:
-        return 'gnome-terminal'
 
     @staticmethod
     def _find_gnome_terminal_server() -> Optional[str]:
@@ -172,6 +169,8 @@ class GnomeTerminalLauncher(BaseLauncher):
 
 
 class GuakeLauncher(BaseLauncher):
+    command = 'guake'
+
     def __init__(self, script_path):
         self.args = [
             '--no-startup-script',
@@ -180,24 +179,18 @@ class GuakeLauncher(BaseLauncher):
             '-e', f'clear;source {shlex.quote(script_path)}',
         ]
 
-    @property
-    def command(self) -> str:
-        return 'guake'
-
     def __call__(self) -> subprocess.Popen:
         return subprocess.Popen([self.command] + self.args)
 
 
 class KittyLauncher(BaseLauncher):
+    command = 'kitty'
+
     def __init__(self, script_path):
         self.args = [
             '--class', self.app_id,
             'bash', '--rcfile', script_path
         ]
-
-    @property
-    def command(self) -> str:
-        return 'kitty'
 
     def __call__(self) -> subprocess.Popen:
         return subprocess.Popen([self.command] + self.args)
@@ -207,6 +200,8 @@ class KonsoleLauncher(BaseLauncher):
     """Konsole is the default terminal emulator in the KDE
     desktop environment.
     """
+    command = 'konsole'
+
     def __init__(self, script_path):
         if os.environ.get('XDG_CURRENT_DESKTOP') == 'KDE':
             args = ['--name', self.app_id]  # Set WM_CLASSNAME in KDE.
@@ -220,10 +215,6 @@ class KonsoleLauncher(BaseLauncher):
         ])
         self.args = args
 
-    @property
-    def command(self) -> str:
-        return 'konsole'
-
     def __call__(self) -> subprocess.Popen:
         return subprocess.Popen([self.command] + self.args)
 
@@ -232,21 +223,21 @@ class QterminalLauncher(BaseLauncher):
     """QTerminal is the default terminal emulator in the LXQt
     desktop environment.
     """
+    command = 'qterminal'
+
     def __init__(self, script_path):
         self.args = [
             '--name', self.app_id,
             '-e', f'bash --rcfile {shlex.quote(script_path)}',
         ]
 
-    @property
-    def command(self) -> str:
-        return 'qterminal'
-
     def __call__(self) -> subprocess.Popen:
         return subprocess.Popen([self.command] + self.args)
 
 
 class SakuraLauncher(BaseLauncher):
+    command = 'sakura'
+
     def __init__(self, script_path):
         self.args = [
             '--class', self.app_id,
@@ -254,15 +245,13 @@ class SakuraLauncher(BaseLauncher):
             '-e', 'bash', '--rcfile', script_path,
         ]
 
-    @property
-    def command(self) -> str:
-        return 'sakura'
-
     def __call__(self) -> subprocess.Popen:
         return subprocess.Popen([self.command] + self.args)
 
 
 class TerminatorLauncher(BaseLauncher):
+    command = 'terminator'
+
     def __init__(self, script_path):
         self.args = [
             '--name', self.app_id,
@@ -271,16 +260,14 @@ class TerminatorLauncher(BaseLauncher):
             '-x', 'bash', '--rcfile', script_path
         ]
 
-    @property
-    def command(self) -> str:
-        return 'terminator'
-
     def __call__(self) -> subprocess.Popen:
         return subprocess.Popen([self.command] + self.args)
 
 
 class Xfce4TerminalLauncher(BaseLauncher):
     """The default terminal emulator for the Xfce Desktop."""
+    command = 'xfce4-terminal'
+
     def __init__(self, script_path):
         self.args = [
             '--startup-id', self.app_id,
@@ -289,15 +276,13 @@ class Xfce4TerminalLauncher(BaseLauncher):
             '-x', 'bash', '--rcfile', script_path,
         ]
 
-    @property
-    def command(self) -> str:
-        return 'xfce4-terminal'
-
     def __call__(self) -> subprocess.Popen:
         return subprocess.Popen([self.command] + self.args)
 
 
 class XtermLauncher(BaseLauncher):
+    command = 'xterm'
+
     def __init__(self, script_path):
         self.args = [
             '-class', self.app_id,
@@ -305,21 +290,15 @@ class XtermLauncher(BaseLauncher):
             '-e', 'bash', '--rcfile', script_path,
         ]
 
-    @property
-    def command(self) -> str:
-        return 'xterm'
-
     def __call__(self) -> subprocess.Popen:
         return subprocess.Popen([self.command] + self.args)
 
 
 class YakuakeLauncher(BaseLauncher):
+    command = 'yakuake'
+
     def __init__(self, script_path):
         self.script_path = script_path
-
-    @property
-    def command(self) -> str:
-        return 'yakuake'
 
     @staticmethod
     def build_args(object_path, method, *contents) -> List[str]:
