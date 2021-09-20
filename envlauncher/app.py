@@ -372,44 +372,12 @@ class EnvLauncherApp(object):
         """Returns a function and arguments used to launch a terminal
         emulator and activate a virtual environment.
         """
-        if terminal_emulator == 'gnome-terminal':
-            return launchers.GnomeTerminalLauncher(rcfile_name)
-
-        if terminal_emulator == 'terminator':
-            return launchers.TerminatorLauncher(rcfile_name)
-
-        if terminal_emulator == 'xterm':
-            return launchers.XTermLauncher(rcfile_name)
-
-        if terminal_emulator == 'konsole':
-            return launchers.KonsoleLauncher(rcfile_name)
-
-        if terminal_emulator == 'alacritty':
-            return launchers.AlacrittyLauncher(rcfile_name)
-
-        if terminal_emulator == 'kitty':
-            return launchers.KittyLauncher(rcfile_name)
-
-        if terminal_emulator == 'guake':
-            return launchers.GuakeLauncher(rcfile_name)
-
-        if terminal_emulator == 'yakuake':
-            return launchers.YakuakeLauncher(rcfile_name)
-
-        if terminal_emulator == 'xfce4-terminal':
-            return launchers.Xfce4TerminalLauncher(rcfile_name)
-
-        # LXQt default terminal.
-        if terminal_emulator == 'qterminal':
-            return launchers.QTerminalLauncher(rcfile_name)
-
-        if terminal_emulator == 'sakura':
-            return launchers.SakuraLauncher(rcfile_name)
-
-        if terminal_emulator == 'cool-retro-term':
-            return launchers.CoolRetroTermLauncher(rcfile_name)
-
-        raise Exception(f'Unsupported terminal emulator {terminal_emulator!r}')
+        class_name = launchers.get_class_name(terminal_emulator)
+        try:
+            launcher_class = getattr(launchers, class_name)
+        except AttributeError:
+            raise Exception(f'Unsupported terminal emulator {terminal_emulator!r}')
+        return launcher_class(rcfile_name)
 
     def __call__(self, environment, working_dir=None):
         """Launch a terminal emulator and activate a dev environment."""
