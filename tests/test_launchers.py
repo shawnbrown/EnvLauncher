@@ -82,13 +82,17 @@ class TestLauncherClassNames(unittest.TestCase):
         self.assertEqual(launchers.get_class_name('foo-bar'), 'FooBarLauncher')
 
     def test_class_name_command_agreement(self):
-        """Class name should match `get_class_name(command)`."""
+        """Launcher class names should be derived from command strings.
+        For example, "gnome-terminal" needs to be "GnomeTerminalLauncher".
+        This test checks that all concrete launcher names correspond to
+        their command string values.
+        """
         for launcher_cls in self.launcher_classes:
             launcher = launcher_cls('config.sh')
-
+            required_name = launchers.get_class_name(launcher.command)
             with self.subTest(command=launcher.command):
-                expected = launchers.get_class_name(launcher.command)
-                self.assertEqual(launcher.__class__.__name__, expected)
+                msg = f'Class name needs to be {required_name}.'
+                self.assertEqual(launcher.__class__.__name__, required_name, msg=msg)
 
 
 @requires_command('gnome-terminal')
