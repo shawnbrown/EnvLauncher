@@ -228,7 +228,10 @@ class KonsoleLauncher(BaseLauncher):
         return subprocess.Popen([self.command] + self.args)
 
 
-class QTerminalLauncher(BaseLauncher):
+class QterminalLauncher(BaseLauncher):
+    """QTerminal is the default terminal emulator in the LXQt
+    desktop environment.
+    """
     def __init__(self, script_path):
         self.args = [
             '--name', self.app_id,
@@ -294,7 +297,7 @@ class Xfce4TerminalLauncher(BaseLauncher):
         return subprocess.Popen([self.command] + self.args)
 
 
-class XTermLauncher(BaseLauncher):
+class XtermLauncher(BaseLauncher):
     def __init__(self, script_path):
         self.args = [
             '-class', self.app_id,

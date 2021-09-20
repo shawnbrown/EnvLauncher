@@ -231,7 +231,7 @@ class TestTerminalEmulators(unittest.TestCase):
 
     @requires_command('qterminal')
     def test_qterminal(self):
-        launch = launchers.QTerminalLauncher(self.script_path)
+        launch = launchers.QterminalLauncher(self.script_path)
         process = launch()
         self.assertReturnCode(process, os.EX_OK)
 
@@ -255,7 +255,7 @@ class TestTerminalEmulators(unittest.TestCase):
 
     @requires_command('xterm')
     def test_xterm(self):
-        launcher = launchers.XTermLauncher(self.script_path)
+        launcher = launchers.XtermLauncher(self.script_path)
         process = launcher()
         self.assertReturnCode(process, os.EX_OK)
 
