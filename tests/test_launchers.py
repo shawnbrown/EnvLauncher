@@ -44,9 +44,14 @@ class TestAbstractBaseLauncher(unittest.TestCase):
         launcher = MinimalLauncher()
 
 
+def is_available(command):
+    """Return True if *command* is available."""
+    return shutil.which(command) is not None
+
+
 def requires_command(command):
     """A decorator to skip a test if the executible command is not available."""
-    return unittest.skipUnless(shutil.which(command), f'requires {command}')
+    return unittest.skipUnless(is_available(command), f'requires {command}')
 
 
 @requires_command('gnome-terminal')
