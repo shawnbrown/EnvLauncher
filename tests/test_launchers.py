@@ -54,6 +54,13 @@ def requires_command(command):
     return unittest.skipUnless(is_available(command), f'requires {command}')
 
 
+# Determine visibility of the Yakuake console before testing begins.
+if is_available('yakuake'):
+    YAKUAKE_NOT_VISIBLE = not launchers.YakuakeLauncher.is_visible()
+else:
+    YAKUAKE_NOT_VISIBLE = True
+
+
 @requires_command('gnome-terminal')
 class TestGnomeTerminalHelperMethods(unittest.TestCase):
     def test_find_gnome_terminal_server(self):
@@ -220,17 +227,24 @@ class TestTerminalEmulators(unittest.TestCase):
 
     @requires_command('yakuake')
     def test_yakuake(self):
-        def hide_window():  # <- Helper function to close Yakuake window.
-            time.sleep(0.1)
-            subprocess.run([
-                'dbus-send',
-                '--type=method_call',
-                '--dest=org.kde.yakuake',
-                '/yakuake/MainWindow_1',
-                'org.qtproject.Qt.QWidget.hide',
-            ])
+        if YAKUAKE_NOT_VISIBLE:
+            # If the Yakuake console is not visible when testing begins,
+            # then make sure to hide it when testing finishes.
+            def hide_window():
+                time.sleep(0.1)
+                subprocess.run([
+                    'dbus-send',
+                    '--type=method_call',
+                    '--dest=org.kde.yakuake',
+                    '/yakuake/MainWindow_1',
+                    'org.qtproject.Qt.QWidget.hide',
+                ])
 
-        self.addCleanup(hide_window)
+            self.addCleanup(hide_window)
+        else:
+            # If Yakuake is already visible before testing begins, then
+            # don't hide it when testing finishes.
+            pass
 
         launch = launchers.YakuakeLauncher(self.script_path)
         result = launch()
