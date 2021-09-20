@@ -133,6 +133,13 @@ class TestYakuakeHelperMethods(unittest.TestCase):
         self.assertIsInstance(result, bool)
 
 
+class TestLauncherClassNames(unittest.TestCase):
+    def test_get_class_name(self):
+        self.assertEqual(launchers.get_class_name('foo'), 'FooLauncher')
+        self.assertEqual(launchers.get_class_name('BAR'), 'BarLauncher')
+        self.assertEqual(launchers.get_class_name('foo-bar'), 'FooBarLauncher')
+
+
 class TestTerminalEmulators(unittest.TestCase):
     def setUp(self):
         with tempfile.NamedTemporaryFile(mode='w', delete=False) as f:

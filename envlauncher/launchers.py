@@ -28,6 +28,19 @@ from time import sleep, time
 from typing import List, Optional
 
 
+def get_class_name(command) -> str:
+    """Takes a terminal emulator command and returns the name of
+    its launcher class as a string.
+
+    For example::
+
+        >>> get_class_name('gnome-terminal')
+        GnomeTerminalLauncher
+    """
+    camel_case = ''.join(x.capitalize() for x in command.split('-'))
+    return f'{camel_case}Launcher'
+
+
 class BaseLauncher(abc.ABC):
     """Base class for terminal emulator launchers."""
     app_id = 'com.github.shawnbrown.EnvLauncher'
