@@ -134,10 +134,33 @@ class TestYakuakeHelperMethods(unittest.TestCase):
 
 
 class TestLauncherClassNames(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        launcher_classes = []
+        for obj in launchers.__dict__.values():
+            if not isinstance(obj, type):
+                continue
+            if not issubclass(obj, launchers.BaseLauncher):
+                continue
+            if obj is launchers.BaseLauncher:
+                continue
+            launcher_classes.append(obj)
+
+        cls.launcher_classes = launcher_classes
+
     def test_get_class_name(self):
         self.assertEqual(launchers.get_class_name('foo'), 'FooLauncher')
         self.assertEqual(launchers.get_class_name('BAR'), 'BarLauncher')
         self.assertEqual(launchers.get_class_name('foo-bar'), 'FooBarLauncher')
+
+    def test_class_name_command_agreement(self):
+        """Class name should match `get_class_name(command)`."""
+        for launcher_cls in self.launcher_classes:
+            launcher = launcher_cls('config.sh')
+
+            with self.subTest(command=launcher.command):
+                expected = launchers.get_class_name(launcher.command)
+                self.assertEqual(launcher.__class__.__name__, expected)
 
 
 class TestTerminalEmulators(unittest.TestCase):
