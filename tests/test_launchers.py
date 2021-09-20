@@ -24,6 +24,23 @@ import unittest
 from envlauncher import launchers
 
 
+def is_available(command):
+    """Return True if *command* is available."""
+    return shutil.which(command) is not None
+
+
+def requires_command(command):
+    """A decorator to skip a test if the executible command is not available."""
+    return unittest.skipUnless(is_available(command), f'requires {command}')
+
+
+# Determine visibility of the Yakuake console before testing begins.
+if is_available('yakuake'):
+    YAKUAKE_NOT_VISIBLE = not launchers.YakuakeLauncher.is_visible()
+else:
+    YAKUAKE_NOT_VISIBLE = True
+
+
 class TestAbstractBaseLauncher(unittest.TestCase):
     def test_required_methods(self):
         methods = launchers.BaseLauncher.__abstractmethods__
@@ -42,23 +59,6 @@ class TestAbstractBaseLauncher(unittest.TestCase):
                 return 'dummy-app'
 
         launcher = MinimalLauncher()
-
-
-def is_available(command):
-    """Return True if *command* is available."""
-    return shutil.which(command) is not None
-
-
-def requires_command(command):
-    """A decorator to skip a test if the executible command is not available."""
-    return unittest.skipUnless(is_available(command), f'requires {command}')
-
-
-# Determine visibility of the Yakuake console before testing begins.
-if is_available('yakuake'):
-    YAKUAKE_NOT_VISIBLE = not launchers.YakuakeLauncher.is_visible()
-else:
-    YAKUAKE_NOT_VISIBLE = True
 
 
 @requires_command('gnome-terminal')
