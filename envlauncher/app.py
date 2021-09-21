@@ -98,25 +98,12 @@ def get_terminal_emulators() -> List[str]:
     """Return a list of supported terminal emulators available
     on the system.
     """
-    supported = [
-        'gnome-terminal',  # GNOME default
-        'terminator',
-        'konsole',  # KDE default
-        'guake',
-        'yakuake',
-        'alacritty',
-        'kitty',
-        'xfce4-terminal',  # XFCE default
-        'qterminal',  # LXQt default
-        'xterm',
-        'sakura',
-        'cool-retro-term',
-    ]
-
     available = []
-    for terminal_emulator in supported:
-        if shutil.which(terminal_emulator):
-            available.append(terminal_emulator)
+    for obj in launchers.__dict__.values():
+        if is_launcher_class(obj):
+            terminal_emulator = obj.command
+            if is_available(terminal_emulator):
+                available.append(terminal_emulator)
 
     if not available:
         import warnings
