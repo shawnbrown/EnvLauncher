@@ -82,6 +82,18 @@ class DataPaths(object):
         return os.path.realpath(path)
 
 
+def is_available(command) -> bool:
+    """Return True if *command* is available."""
+    return shutil.which(command) is not None
+
+
+def is_launcher_class(obj) -> bool:
+    """Return True if *obj* is a concrete launcher class."""
+    return (isinstance(obj, type)
+            and issubclass(obj, launchers.BaseLauncher)
+            and (obj is not launchers.BaseLauncher))
+
+
 def get_terminal_emulators() -> List[str]:
     """Return a list of supported terminal emulators available
     on the system.
