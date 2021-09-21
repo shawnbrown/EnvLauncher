@@ -28,7 +28,7 @@ from time import sleep, time
 from typing import List, Optional
 
 
-def get_class_name(command) -> str:
+def get_class_name(command: str) -> str:
     """Takes a terminal emulator command and returns the name of
     its launcher class as a string.
 

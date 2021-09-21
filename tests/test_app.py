@@ -285,8 +285,14 @@ class TestSettingsTerminalEmulator(unittest.TestCase):
         `terminal_emulator` property should return the first available
         item from `terminal_emulator_choices`.
         """
-        self.settings._terminal_emulator_choices = ['konsole', 'yakuake']
-        self.assertEqual(self.settings.terminal_emulator, 'konsole')
+        bad_value = 'bogus-terminal-emulator-command'
+        self.settings._parser['X-EnvLauncher Options']['TerminalEmulator'] = bad_value
+
+        value_from_getter = self.settings.terminal_emulator
+
+        all_available_emulators = envlauncher.app.get_terminal_emulator_choices()
+        self.assertIn(value_from_getter, all_available_emulators,
+                      msg='should default to an available terminal emulator')
 
 
 class TestSettingsBanner(unittest.TestCase):

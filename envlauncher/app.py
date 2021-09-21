@@ -94,7 +94,7 @@ def is_launcher_class(obj) -> bool:
             and (obj is not launchers.BaseLauncher))
 
 
-def get_terminal_emulators() -> List[str]:
+def get_terminal_emulator_choices() -> List[str]:
     """Return a list of supported terminal emulators available
     on the system.
     """
@@ -153,8 +153,6 @@ class Settings(object):
         self._parser.optionxform = str  # Use option names as-is (no case-folding).
         string = self._escape_comments(string)
         self._parser.read_string(string)
-
-        self._terminal_emulator_choices = get_terminal_emulators()
         self._venv_number = itertools.count(1)
         self._app_data_subdir = 'envlauncher'
 
@@ -214,18 +212,21 @@ class Settings(object):
         self._parser['X-EnvLauncher Options']['Rcfile'] = value
 
     @property
-    def terminal_emulator_choices(self) -> List[str]:
-        return self._terminal_emulator_choices
-
-    @property
     def terminal_emulator(self) -> Optional[str]:
         """Terminal emulator to use when activating environment."""
         value = self._parser.get(section='X-EnvLauncher Options',
-                                 option='TerminalEmulator', fallback=None)
-        if value in self.terminal_emulator_choices:
-            return value
-        if self.terminal_emulator_choices:
-            return self.terminal_emulator_choices[0]
+                                 option='TerminalEmulator', fallback='')
+        class_name = launchers.get_class_name(value)
+        launcher_class = getattr(launchers, class_name, None)
+        if is_launcher_class(launcher_class) and is_available(value):
+            return value  # <- EXIT!
+
+        # If the designated terminal emulator is not available, use
+        # a different one.
+        available_choices = get_terminal_emulator_choices()
+        if available_choices:
+            fallback = available_choices[0]
+            return fallback
         return None
 
     @terminal_emulator.setter
