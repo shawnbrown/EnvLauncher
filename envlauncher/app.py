@@ -94,16 +94,12 @@ def is_launcher_class(obj) -> bool:
             and (obj is not launchers.BaseLauncher))
 
 
-def get_terminal_emulator_choices() -> List[str]:
-    """Return a list of supported terminal emulators available
-    on the system.
-    """
+def get_available_launchers() -> List[launchers.BaseLauncher]:
+    """Return a list of available launcher classes."""
     available = []
     for obj in launchers.__dict__.values():
-        if is_launcher_class(obj):
-            terminal_emulator = obj.command
-            if is_available(terminal_emulator):
-                available.append(terminal_emulator)
+        if is_launcher_class(obj) and is_available(obj.command):
+            available.append(obj)
 
     if not available:
         import warnings
@@ -212,22 +208,29 @@ class Settings(object):
         self._parser['X-EnvLauncher Options']['Rcfile'] = value
 
     @property
-    def terminal_emulator(self) -> Optional[str]:
-        """Terminal emulator to use when activating environment."""
+    def launcher_class(self):
+        """Launcher class to use when activating the environment."""
         value = self._parser.get(section='X-EnvLauncher Options',
                                  option='TerminalEmulator', fallback='')
         class_name = launchers.get_class_name(value)
         launcher_class = getattr(launchers, class_name, None)
         if is_launcher_class(launcher_class) and is_available(value):
-            return value  # <- EXIT!
+            return launcher_class  # <- EXIT!
 
         # If the designated terminal emulator is not available, use
         # a different one.
-        available_choices = get_terminal_emulator_choices()
-        if available_choices:
-            fallback = available_choices[0]
+        launcher_classes = get_available_launchers()
+        if launcher_classes:
+            fallback = launcher_classes[0]
             return fallback
         return None
+
+    @property
+    def terminal_emulator(self) -> Optional[str]:
+        """Terminal emulator that is used when activating the
+        environment.
+        """
+        return getattr(self.launcher_class, 'command', None)
 
     @terminal_emulator.setter
     def terminal_emulator(self, value):
@@ -368,17 +371,6 @@ class EnvLauncherApp(object):
 
         return '\n'.join(rcfile_lines)
 
-    def get_launcher(self, terminal_emulator, rcfile_name):
-        """Returns a function and arguments used to launch a terminal
-        emulator and activate a virtual environment.
-        """
-        class_name = launchers.get_class_name(terminal_emulator)
-        try:
-            launcher_class = getattr(launchers, class_name)
-        except AttributeError:
-            raise Exception(f'Unsupported terminal emulator {terminal_emulator!r}')
-        return launcher_class(rcfile_name)
-
     def __call__(self, environment, working_dir=None):
         """Launch a terminal emulator and activate a dev environment."""
         try:
@@ -388,11 +380,10 @@ class EnvLauncherApp(object):
                                                  file_to_delete=rcfile.name)
                 rcfile.write(rcfile_text)
 
-            func = self.get_launcher(
-                terminal_emulator=self.settings.terminal_emulator,
-                rcfile_name=rcfile.name,
-            )
-            func()
+            launcher = self.settings.launcher_class
+            if launcher:
+                launch = launcher(rcfile.name)
+                launch()
 
         except Exception:
             try:
