@@ -290,8 +290,10 @@ class TestSettingsTerminalEmulator(unittest.TestCase):
 
         value_from_getter = self.settings.terminal_emulator
 
-        all_available_emulators = envlauncher.app.get_terminal_emulator_choices()
-        self.assertIn(value_from_getter, all_available_emulators,
+        available_launchers = envlauncher.app.get_available_launchers()
+        available_commands = [x.command for x in available_launchers]
+
+        self.assertIn(value_from_getter, available_commands,
                       msg='should default to an available terminal emulator')
 
 
