@@ -272,7 +272,8 @@ class Settings(object):
         return candidate
 
     def get_actions(self) -> List[Tuple[str, str, str, str]]:
-        """Return sorted list of virtual environment launcher actions."""
+        """Return ordered list of virtual environment launcher actions."""
+        # Build a dictionary of records from Desktop Action sections.
         action_data = {}
         for section in self._parser.sections():
             if not section.startswith(f'Desktop Action {self._venv_prefix}'):
@@ -290,10 +291,11 @@ class Settings(object):
             directory = parsed_args.directory
             action_data[identifier] = (identifier, name, activate, directory)
 
+        # Get the ordered list of identifiers from the Actions key.
         actions_value = self._parser.get('Desktop Entry', 'Actions', fallback='')
         identifiers = [x.strip() for x in actions_value.rstrip(';').split(';')]
 
-        # Get action data in identifier order.
+        # Build a list of Desktop Action records in identifier-order.
         actions = []
         for ident in identifiers:
             action = action_data.pop(ident, None)
