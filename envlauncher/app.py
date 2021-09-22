@@ -405,10 +405,10 @@ def configure_envlauncher(paths, reset_all=False):
         shutil.copy(src=desktop_path, dst=desktop_home)
 
     # Open file in text editor (will be replaced with GUI).
-    if shutil.which('gedit'):
+    if is_available('gedit'):
         args = ['gedit', '--standalone', '--class', APP_NAME, desktop_home]
-    elif shutil.which('kate'):
+    elif is_available('kate'):
         args = ['kate', '--new', '--desktopfile', APP_NAME, desktop_home]
-    elif shutil.which('featherpad'):
+    elif is_available('featherpad'):
         args = ['featherpad', '--standalone', desktop_home]
     process = subprocess.Popen(args)
