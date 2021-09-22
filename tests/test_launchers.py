@@ -99,10 +99,15 @@ class TestLauncherClassNames(unittest.TestCase):
         values.
         """
         for launcher_cls in self.launcher_classes:
+            # Name of this launcher class.
+            cls_name = launcher_cls.__name__
+
+            # Generated name (based on `launcher_cls.command` value).
             required_name = launchers.get_class_name(launcher_cls.command)
+
             with self.subTest(command=launcher_cls.command):
                 msg = f'Class name needs to be {required_name}.'
-                self.assertEqual(launcher_cls.__name__, required_name, msg=msg)
+                self.assertEqual(cls_name, required_name, msg=msg)
 
 
 @requires_command('gnome-terminal')
