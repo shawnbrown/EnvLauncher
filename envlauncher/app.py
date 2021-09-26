@@ -376,18 +376,24 @@ class EnvLauncherApp(object):
     def __call__(self, environment, working_dir=None):
         """Launch a terminal emulator and activate a dev environment."""
         try:
+            # Build the launcher script and write it to a tempfile. The last
+            # line of the launcher script will remove the *file_to_delete*
+            # which should be the name of the script itself.
             with tempfile.NamedTemporaryFile(mode='w', delete=False) as rcfile:
                 rcfile_text = self._build_rcfile(environment,
                                                  working_dir,
                                                  file_to_delete=rcfile.name)
                 rcfile.write(rcfile_text)
 
+            # Instantiate the launcher, passing it the tempfile name.
             launcher = self.settings.launcher_class
             if launcher:
                 launch = launcher(rcfile.name)
                 launch()
 
         except Exception:
+            # If there's an error, the tempfile script may not have deleted
+            # itself. Make sure it is removed and reraise the error.
             try:
                 os.remove(rcfile.name)
             except FileNotFoundError:
