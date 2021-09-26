@@ -249,6 +249,21 @@ class SakuraLauncher(BaseLauncher):
         return subprocess.Popen([self.command] + self.args)
 
 
+class StLauncher(BaseLauncher):
+    """A simple terminal implementation for X (by suckless)."""
+    command = 'st'
+
+    def __init__(self, script_path):
+        self.args = [
+            '-c', self.app_id,
+            '-t', 'EnvLauncher',
+            '-e', 'bash', '--rcfile', script_path,
+        ]
+
+    def __call__(self) -> subprocess.Popen:
+        return subprocess.Popen([self.command] + self.args)
+
+
 class TerminatorLauncher(BaseLauncher):
     command = 'terminator'
 
@@ -258,6 +273,20 @@ class TerminatorLauncher(BaseLauncher):
             '--icon', self.app_id,
             '--no-dbus',  # <- For clean grouping in dash/taskbar.
             '-x', 'bash', '--rcfile', script_path
+        ]
+
+    def __call__(self) -> subprocess.Popen:
+        return subprocess.Popen([self.command] + self.args)
+
+
+class UrxvtLauncher(BaseLauncher):
+    """rxvt-unicode: a VT102 emulator for the X window system."""
+    command = 'urxvt'
+
+    def __init__(self, script_path):
+        self.args = [
+            '-name', self.app_id,
+            '-e', 'bash', '--rcfile', script_path,
         ]
 
     def __call__(self) -> subprocess.Popen:

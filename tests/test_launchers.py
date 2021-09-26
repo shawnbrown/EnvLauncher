@@ -256,9 +256,21 @@ class TestTerminalEmulators(unittest.TestCase):
         process = launch()
         self.assertReturnCode(process, os.EX_OK)
 
+    @requires_command('st')
+    def test_st(self):
+        launch = launchers.StLauncher(self.script_path)
+        process = launch()
+        self.assertReturnCode(process, os.EX_OK)
+
     @requires_command('terminator')
     def test_terminator(self):
         launch = launchers.TerminatorLauncher(self.script_path)
+        process = launch()
+        self.assertReturnCode(process, os.EX_OK)
+
+    @requires_command('urxvt')
+    def test_urxvt(self):
+        launch = launchers.UrxvtLauncher(self.script_path)
         process = launch()
         self.assertReturnCode(process, os.EX_OK)
 
