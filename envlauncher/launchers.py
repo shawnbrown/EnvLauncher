@@ -292,6 +292,19 @@ class TerminatorLauncher(BaseLauncher):
         return subprocess.Popen([self.command] + self.args)
 
 
+class TilixLauncher(BaseLauncher):
+    command = 'tilix'
+
+    def __init__(self, script_path):
+        self.args = [
+            '--name', self.app_id,
+            '-e', 'bash', '--rcfile', script_path
+        ]
+
+    def __call__(self) -> subprocess.Popen:
+        return subprocess.Popen([self.command] + self.args)
+
+
 class UrxvtLauncher(BaseLauncher):
     """rxvt-unicode: a VT102 emulator for the X window system."""
     command = 'urxvt'

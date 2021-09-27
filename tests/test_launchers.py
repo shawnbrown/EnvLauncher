@@ -274,6 +274,12 @@ class TestTerminalEmulators(unittest.TestCase):
         process = launch()
         self.assertReturnCode(process, os.EX_OK)
 
+    @requires_command('tilix')
+    def test_tilix(self):
+        launch = launchers.TilixLauncher(self.script_path)
+        process = launch()
+        self.assertReturnCode(process, os.EX_OK)
+
     @requires_command('urxvt')
     def test_urxvt(self):
         launch = launchers.UrxvtLauncher(self.script_path)
