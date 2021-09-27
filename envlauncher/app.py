@@ -419,4 +419,6 @@ def configure_envlauncher(paths, reset_all=False):
         args = ['kate', '--new', '--desktopfile', APP_NAME, desktop_home]
     elif is_available('featherpad'):
         args = ['featherpad', '--standalone', desktop_home]
+    elif is_available('xed'):
+        args = ['xed', '--standalone', '--class', APP_NAME, desktop_home]
     process = subprocess.Popen(args)
