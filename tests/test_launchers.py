@@ -244,6 +244,12 @@ class TestTerminalEmulators(unittest.TestCase):
         process = launch()
         self.assertReturnCode(process, os.EX_OK)
 
+    @requires_command('mate-terminal')
+    def test_mate_terminal(self):
+        launch = launchers.MateTerminalLauncher(self.script_path)
+        process = launch()
+        self.assertReturnCode(process, os.EX_OK)
+
     @requires_command('qterminal')
     def test_qterminal(self):
         launch = launchers.QterminalLauncher(self.script_path)

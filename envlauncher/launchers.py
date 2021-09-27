@@ -219,6 +219,19 @@ class KonsoleLauncher(BaseLauncher):
         return subprocess.Popen([self.command] + self.args)
 
 
+class MateTerminalLauncher(BaseLauncher):
+    command = 'mate-terminal'
+
+    def __init__(self, script_path):
+        self.args = [
+            '--class', self.app_id,
+            '-e', f'bash --rcfile {shlex.quote(script_path)}',
+        ]
+
+    def __call__(self) -> subprocess.Popen:
+        return subprocess.Popen([self.command] + self.args)
+
+
 class QterminalLauncher(BaseLauncher):
     """QTerminal is the default terminal emulator in the LXQt
     desktop environment.
