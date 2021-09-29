@@ -1,6 +1,7 @@
 # EnvLauncher
 
-A GNOME desktop launcher to activate Python development environments.
+Launch Python virtual environments from the Linux desktop (supports GNOME,
+KDE, and more).
 
 NOTE: This software is pre-alpha and it's not ready for general use.
 
