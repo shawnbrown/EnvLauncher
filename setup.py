@@ -97,13 +97,15 @@ if __name__ == '__main__':
         scripts=['bin/envlauncher'],
         data_files = [
             ('share/applications', ['data/com.github.shawnbrown.EnvLauncher.desktop']),
+            ('share/envlauncher', ['data/envlauncher/banner-color.ascii',
+                                   'data/envlauncher/banner-plain.ascii']),
+            # Fallback/default icons used by GNOME environment.
             ('share/icons/hicolor/scalable/apps', ['data/hicolor/com.github.shawnbrown.EnvLauncher.svg']),
             ('share/icons/hicolor/symbolic/apps', ['data/hicolor/com.github.shawnbrown.EnvLauncher-symbolic.svg']),
+            # Icons for default Ubuntu theme.
             ('share/icons/Yaru/48x48/apps', ['data/Yaru/48x48/com.github.shawnbrown.EnvLauncher.svg']),
             ('share/icons/Yaru/scalable/apps', ['data/Yaru/scalable/com.github.shawnbrown.EnvLauncher.svg',
                                                 'data/Yaru/scalable/com.github.shawnbrown.EnvLauncher-symbolic.svg']),
-            ('share/envlauncher', ['data/envlauncher/banner-color.ascii',
-                                   'data/envlauncher/banner-plain.ascii']),
         ],
         install_requires=[],  # <- No additional dependencies!
         python_requires='>=3.6',
